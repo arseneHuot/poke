@@ -197,8 +197,9 @@ const WorldData = {
         // Flowers
         this._fillRect(tiles, 14, 14, 3, 3, TILE.FLOWER);
 
-        // Sign
+        // Signs
         tiles[35][19] = TILE.SIGN;
+        tiles[10][19] = TILE.SIGN;
 
         // Border openings
         for (let x = 0; x < w; x++) {
@@ -218,7 +219,8 @@ const WorldData = {
                   dialogue: 'trainer_battle', team: [{ id: 10, level: 5 }], defeated: false, reward: 200 },
                 { id: 'trainer_r1_2', type: 'trainer', x: 28, y: 14, dir: DIR.LEFT, name: 'Fillette Marie',
                   dialogue: 'trainer_battle', team: [{ id: 12, level: 5 }], defeated: false, reward: 200 },
-                { id: 'sign_r1', type: 'sign', x: 19, y: 35, dialogue: 'sign_route1' }
+                { id: 'sign_r1_south', type: 'sign', x: 19, y: 35, dialogue: 'sign_route1' },
+                { id: 'sign_r1_north', type: 'sign', x: 19, y: 10, dialogue: 'sign_route1' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'borgo', targetX: 20, targetY: 1 },
@@ -285,6 +287,14 @@ const WorldData = {
                   ], defeated: false, reward: 1800, badge: 0, storyReq: 'has_starter' },
                 { id: 'villager_porto1', type: 'villager', x: 24, y: 20, dir: DIR.LEFT, name: 'Marin',
                   dialogue: 'porto_marin' },
+                { id: 'villager_porto2', type: 'villager', x: 15, y: 25, dir: DIR.DOWN, name: 'Pêcheur',
+                  dialogue: 'porto_pescatore' },
+                { id: 'villager_porto3', type: 'villager', x: 35, y: 27, dir: DIR.LEFT, name: 'Vieux marin',
+                  dialogue: 'porto_vieux_marin' },
+                { id: 'villager_porto4', type: 'villager', x: 8, y: 22, dir: DIR.RIGHT, name: 'Enfant',
+                  dialogue: 'porto_enfant' },
+                { id: 'villager_porto5', type: 'villager', x: 30, y: 15, dir: DIR.DOWN, name: 'Dame',
+                  dialogue: 'porto_dame' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route1', targetX: 20, targetY: 1 },
@@ -315,6 +325,10 @@ const WorldData = {
         // Cave entrance
         tiles[19][0] = TILE.DOOR;
 
+        // Signs
+        tiles[19][w-3] = TILE.SIGN;
+        tiles[19][3] = TILE.SIGN;
+
         this.maps['route2'] = {
             id: 'route2', name: 'Route 2', width: w, height: h, tiles,
             music: 'route',
@@ -330,6 +344,8 @@ const WorldData = {
                   dialogue: 'trainer_battle', team: [{ id: 24, level: 10 }, { id: 15, level: 10 }], defeated: false, reward: 400 },
                 { id: 'trainer_r2_2', type: 'trainer', x: 38, y: 12, dir: DIR.LEFT, name: 'Dresseuse Luna',
                   dialogue: 'trainer_battle', team: [{ id: 18, level: 11 }, { id: 22, level: 11 }], defeated: false, reward: 440 },
+                { id: 'sign_r2_east', type: 'sign', x: w-3, y: 19, dialogue: 'sign_route2' },
+                { id: 'sign_r2_west', type: 'sign', x: 3, y: 19, dialogue: 'sign_route2' },
             ],
             warps: [
                 { x: w-1, y: 19, targetMap: 'porto', targetX: 1, targetY: 19 },
@@ -394,11 +410,15 @@ const WorldData = {
         // Lots of flowers and trees
         this._fillRect(tiles, 24, 22, 8, 5, TILE.FLOWER);
         this._fillRect(tiles, 34, 10, 6, 6, TILE.FLOWER);
+        this._fillRect(tiles, 14, 28, 4, 3, TILE.FLOWER);
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.TREE; tiles[y][w-1] = TILE.TREE; }
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+
+        // Sign
+        tiles[16][22] = TILE.SIGN;
 
         this.maps['campoverde'] = {
             id: 'campoverde', name: 'Campoverde', width: w, height: h, tiles,
@@ -413,6 +433,15 @@ const WorldData = {
                   dialogue: 'gym2_dialogue', team: [
                     { id: 22, level: 18 }, { id: 63, level: 19 }, { id: 40, level: 21 }
                   ], defeated: false, reward: 2400, badge: 1, storyReq: 'badge_0' },
+                { id: 'villager_campo1', type: 'villager', x: 32, y: 24, dir: DIR.LEFT, name: 'Botaniste',
+                  dialogue: 'campo_botaniste' },
+                { id: 'villager_campo2', type: 'villager', x: 38, y: 14, dir: DIR.DOWN, name: 'Fillette',
+                  dialogue: 'campo_enfant' },
+                { id: 'villager_campo3', type: 'villager', x: 20, y: 26, dir: DIR.UP, name: 'Herboriste',
+                  dialogue: 'campo_herboriste' },
+                { id: 'villager_campo4', type: 'villager', x: 14, y: 20, dir: DIR.RIGHT, name: 'Ancien',
+                  dialogue: 'campo_vieux' },
+                { id: 'sign_campo', type: 'sign', x: 22, y: 16, dialogue: 'sign_campoverde' },
             ],
             warps: [
                 { x: w-1, y: 19, targetMap: 'grotte1', targetX: 5, targetY: 18 },
@@ -439,6 +468,10 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
 
+        // Signs
+        tiles[35][19] = TILE.SIGN;
+        tiles[5][19] = TILE.SIGN;
+
         this.maps['route3'] = {
             id: 'route3', name: 'Route 3', width: w, height: h, tiles,
             music: 'route',
@@ -463,6 +496,8 @@ const WorldData = {
                   dialogue: 'story_eclipse_encounter', team: [
                     { id: 45, level: 17 }, { id: 34, level: 18 }
                   ], defeated: false, reward: 720, storyReq: 'badge_1' },
+                { id: 'sign_r3_south', type: 'sign', x: 19, y: 35, dialogue: 'sign_route3' },
+                { id: 'sign_r3_north', type: 'sign', x: 19, y: 5, dialogue: 'sign_route3' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'porto', targetX: 20, targetY: 1 },
@@ -520,6 +555,15 @@ const WorldData = {
                   dialogue: 'gym4_dialogue', team: [
                     { id: 18, level: 27 }, { id: 49, level: 28 }, { id: 19, level: 30 }
                   ], defeated: false, reward: 3600, badge: 3, storyReq: 'badge_2' },
+                { id: 'villager_rivalta1', type: 'villager', x: 22, y: 22, dir: DIR.RIGHT, name: 'Chercheur',
+                  dialogue: 'rivalta_chercheur' },
+                { id: 'villager_rivalta2', type: 'villager', x: 22, y: 30, dir: DIR.UP, name: 'Nageur',
+                  dialogue: 'rivalta_nageur' },
+                { id: 'villager_rivalta3', type: 'villager', x: 14, y: 14, dir: DIR.DOWN, name: 'Ingénieur',
+                  dialogue: 'rivalta_ingenieur' },
+                { id: 'villager_rivalta4', type: 'villager', x: 38, y: 10, dir: DIR.LEFT, name: 'Vieille dame',
+                  dialogue: 'rivalta_ancienne' },
+                { id: 'sign_rivalta', type: 'sign', x: 22, y: 16, dialogue: 'sign_rivalta' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route3', targetX: 20, targetY: 1 },
@@ -547,6 +591,10 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.ROCK; tiles[h-1][x] = TILE.ROCK; }
         }
 
+        // Signs
+        tiles[35][19] = TILE.SIGN;
+        tiles[5][19] = TILE.SIGN;
+
         this.maps['route4'] = {
             id: 'route4', name: 'Route 4 - Chemin du Désert', width: w, height: h, tiles,
             music: 'route',
@@ -564,6 +612,8 @@ const WorldData = {
                   dialogue: 'trainer_battle', team: [
                     { id: 32, level: 25 }, { id: 82, level: 26 }
                   ], defeated: false, reward: 1040 },
+                { id: 'sign_r4_south', type: 'sign', x: 19, y: 35, dialogue: 'sign_route4' },
+                { id: 'sign_r4_north', type: 'sign', x: 19, y: 5, dialogue: 'sign_route4' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'rivalta', targetX: 20, targetY: 1 },

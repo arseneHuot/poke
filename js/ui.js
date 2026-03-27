@@ -235,8 +235,8 @@ const UI = {
 
             case 'trainer_battle':
                 this._endDialogue();
-                if (game && typeof game.startTrainerBattle === 'function') {
-                    game.startTrainerBattle();
+                if (game && this._currentNpc) {
+                    game.startBattle('trainer', { npc: this._currentNpc });
                 }
                 break;
 
@@ -585,12 +585,13 @@ const UI = {
         panel.appendChild(movesTitle);
 
         if (pokemon.moves) {
-            pokemon.moves.forEach(moveId => {
-                const move = MOVES_DB[moveId];
+            pokemon.moves.forEach(moveObj => {
+                const move = MOVES_DB[moveObj.id];
                 if (!move) return;
+                const ppLeft = (move.pp || 10) - (moveObj.ppUsed || 0);
                 const moveDiv = document.createElement('div');
                 moveDiv.style.cssText = 'font-size:12px;color:#ccc;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:4px;';
-                moveDiv.textContent = move.name + ' | ' + move.type.toUpperCase() + ' | Puiss. ' + (move.power || '-') + ' | Prec. ' + (move.accuracy || '-');
+                moveDiv.textContent = move.name + ' | ' + move.type.toUpperCase() + ' | Puiss. ' + (move.power || '-') + ' | PP ' + ppLeft + '/' + (move.pp || 10);
                 panel.appendChild(moveDiv);
             });
         }

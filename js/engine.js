@@ -400,6 +400,7 @@ const GameEngine = {
         // Show dialogue via UI system
         if (typeof UI !== 'undefined' && UI.showDialogue) {
             this.inputLocked = true;
+            UI._currentNpc = npc;
             UI.showDialogue(dialogue, () => {
                 this.inputLocked = false;
             });

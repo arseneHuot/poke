@@ -61,7 +61,7 @@ const DIALOGUES = {
     story_rival_route7: [
         { name: "Kaël", text: "Te voilà enfin ! J'ai bien progressé depuis notre dernière rencontre." },
         { name: "Kaël", text: "J'ai 7 badges maintenant. Et toi ? On fait un combat pour voir ?" },
-        { action: 'rival_battle_r7' }
+        { action: 'trainer_battle' }
     ],
 
     // === TEAM ECLIPSE ===
@@ -78,6 +78,71 @@ const DIALOGUES = {
         { name: "Admin Nox", text: "Nous réveillerons Solarkos et Lunarkos, et le monde sera plongé dans l'éclipse éternelle !" },
         { name: "Admin Nox", text: "Assez parlé. Voyons si tu peux me battre !" },
         { action: 'trainer_battle' }
+    ],
+
+    // === PORTO CITY VILLAGERS ===
+    porto_pescatore: [
+        { name: "Pêcheur", text: "Cette mer regorge de Pokémon aquatiques ! J'ai pêché un Pokémon rare l'autre jour." },
+        { name: "Pêcheur", text: "Conseil de pro : les Pokémon Eau sont vulnérables à l'Électrik et au Plante. N'oublie pas ça !" }
+    ],
+    porto_vieux_marin: [
+        { name: "Vieux marin", text: "Ça fait 40 ans que je navigue sur les mers de Novara. J'en ai vu des choses..." },
+        { name: "Vieux marin", text: "Par temps de tempête, des Pokémon légendaires remontent des profondeurs, dit-on." }
+    ],
+    porto_enfant: [
+        { name: "Enfant", text: "Tu as vu l'Arène ? Le Champion Marco est super fort ! Mais pas autant que moi dans 10 ans !" }
+    ],
+    porto_dame: [
+        { name: "Dame", text: "Porto City est fière de son port. Des marchands du monde entier viennent ici." },
+        { name: "Dame", text: "Si tu cherches des Pokémon rares, explore bien les herbes hautes des routes voisines !" }
+    ],
+
+    // === CAMPOVERDE VILLAGERS ===
+    campo_botaniste: [
+        { name: "Botaniste", text: "Campoverde est célèbre pour ses jardins. Chaque fleur ici attire des Pokémon Plante." },
+        { name: "Botaniste", text: "La Championne Flora a appris la botanique avant même le dressage. C'est une légende ici !" }
+    ],
+    campo_enfant: [
+        { name: "Fillette", text: "J'ai un ami Pokémon dans la forêt ! Un tout petit, avec des feuilles vertes sur la tête." }
+    ],
+    campo_herboriste: [
+        { name: "Herboriste", text: "Ces herbes sont utilisées pour soigner les Pokémon naturellement. La nature offre tout ce qu'il faut." }
+    ],
+    campo_vieux: [
+        { name: "Ancien", text: "Dans ma jeunesse, la forêt derrière Campoverde était encore plus dense. Des Pokémon mystérieux y vivaient." },
+        { name: "Ancien", text: "Si tu trouves un Pokémon de type Feu, méfie-toi de Flora. L'eau et la Plante ne font pas bon ménage avec le Feu !" }
+    ],
+
+    // === RIVALTA VILLAGERS ===
+    rivalta_chercheur: [
+        { name: "Chercheur", text: "J'étudie les propriétés électriques des Pokémon de type Électrik. Fascinant !" },
+        { name: "Chercheur", text: "Saviez-vous que les attaques Électrik ne touchent pas les Pokémon Sol ? C'est de la physique pure !" }
+    ],
+    rivalta_nageur: [
+        { name: "Nageur", text: "J'entraîne mes Pokémon Eau dans le lac de Rivalta chaque matin. L'eau froide les rend plus forts !" }
+    ],
+    rivalta_ingenieur: [
+        { name: "Ingénieur", text: "La centrale électrique au nord de Rivalta alimente toute la région. C'est les Pokémon Électrik qui la font tourner !" }
+    ],
+    rivalta_ancienne: [
+        { name: "Vieille dame", text: "Deux arènes dans une seule ville ! C'est unique dans toute Novara. Rivalta est vraiment spéciale." }
+    ],
+
+    // === ROUTE SIGNS ===
+    sign_route2: [
+        { text: "Route 2 - Vers Campoverde à l'ouest. Attention : grotte dangereuse !" }
+    ],
+    sign_route3: [
+        { text: "Route 3 - Chemin vers Rivalta. Des membres de la Team Éclipse ont été signalés dans la zone." }
+    ],
+    sign_route4: [
+        { text: "Route 4 - Désert aride. Emportez des Potions et des Répulsifs pour le voyage." }
+    ],
+    sign_campoverde: [
+        { text: "Campoverde - La Ville Fleurie de Novara. Population : 832 habitants." }
+    ],
+    sign_rivalta: [
+        { text: "Rivalta - Ville des Deux Arènes. Maîtrisez l'eau et l'électricité pour progresser !" }
     ],
 
     // === NURSE & MERCHANT ===

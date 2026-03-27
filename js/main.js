@@ -247,7 +247,7 @@ const game = {
         if (map) AudioSystem.playMusic(map.music || 'town');
 
         // Handle result
-        if (result === 'blackout') {
+        if (result === 'lose') {
             // Heal and return to start
             this.state.party.forEach(p => {
                 if (p) { p.currentHp = p.stats.hp; p.status = null; }

@@ -836,7 +836,7 @@ const BattleSystem = {
         } else {
             const playerSpd = this._getEffectiveStat(this.state.playerPokemon, 'spd', this.state.playerStatStages);
             const enemySpd = this._getEffectiveStat(this.state.enemyPokemon, 'spd', this.state.enemyStatStages);
-            playerFirst = playerSpd >= enemySpd ? true : (playerSpd === enemySpd ? Math.random() < 0.5 : false);
+            playerFirst = playerSpd > enemySpd ? true : (playerSpd === enemySpd ? Math.random() < 0.5 : false);
         }
 
         if (playerFirst) {
@@ -849,11 +849,12 @@ const BattleSystem = {
                 return;
             }
 
-            // Clear flinch from player's attack
+            // Save flinch state before clearing it
+            const enemyFlinched = this.state.enemyPokemon._flinched;
             this.state.enemyPokemon._flinched = false;
 
             // Enemy turn
-            if (this.state.enemyPokemon._flinched) {
+            if (enemyFlinched) {
                 this._queueMessage(`${this.state.enemyPokemon.nickname || this.state.enemyPokemon.name} a tressailli !`);
             } else {
                 this._doEnemyTurn(enemyMove.id);
@@ -1325,7 +1326,7 @@ const BattleSystem = {
         // Hide submenus
         const actions = document.getElementById('battle-actions');
         const moves = document.getElementById('battle-moves');
-        if (actions) actions.classList.remove('hidden');
+        if (actions) actions.classList.add('hidden');
         if (moves) moves.classList.add('hidden');
 
         // Mark trainer as defeated
