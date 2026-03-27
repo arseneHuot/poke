@@ -1,0 +1,1309 @@
+// ============================================================
+// POKEMON NOVARA - UI System
+// ============================================================
+
+const UI = {
+    // DOM references
+    elements: {},
+
+    // Dialogue state
+    dialogue: {
+        active: false,
+        lines: [],
+        currentIndex: 0,
+        typewriterTimer: null,
+        typewriterDone: false,
+        fullText: '',
+        displayedChars: 0,
+        charDelay: 30,
+        callback: null,
+    },
+
+    // Menu state
+    menu: {
+        open: false,
+        currentTab: 'party',
+    },
+
+    // Notification state
+    notification: {
+        timer: null,
+    },
+
+    // HUD state
+    hud: {
+        locationTimer: null,
+    },
+
+    // Shop state
+    shop: {
+        active: false,
+        mode: 'buy',
+        items: [],
+        selectedIndex: 0,
+    },
+
+    // Starter selection state
+    starterSelect: {
+        active: false,
+    },
+
+    // ----------------------------------------------------------------
+    // Initialization
+    // ----------------------------------------------------------------
+    init() {
+        this.elements = {
+            dialogueBox: document.getElementById('dialogue-box'),
+            dialogueName: document.getElementById('dialogue-name'),
+            dialogueText: document.getElementById('dialogue-text'),
+            dialogueIndicator: document.getElementById('dialogue-indicator'),
+            menuOverlay: document.getElementById('menu-overlay'),
+            menuPanel: document.getElementById('menu-panel'),
+            hud: document.getElementById('hud'),
+            locationName: document.getElementById('location-name'),
+            badgesDisplay: document.getElementById('badges-display'),
+        };
+
+        this._initBadgeSlots();
+        this._bindKeys();
+    },
+
+    _initBadgeSlots() {
+        const display = this.elements.badgesDisplay;
+        display.innerHTML = '';
+        for (let i = 0; i < 8; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'badge-slot';
+            slot.dataset.index = i;
+            display.appendChild(slot);
+        }
+    },
+
+    _bindKeys() {
+        document.addEventListener('keydown', (e) => {
+            if (this.starterSelect.active) return;
+
+            if (e.code === 'Space' || e.code === 'Enter') {
+                if (this.dialogue.active) {
+                    e.preventDefault();
+                    this.advanceDialogue();
+                }
+            }
+
+            if (e.code === 'Escape' || e.code === 'KeyX') {
+                if (this.shop.active) {
+                    e.preventDefault();
+                    this.closeShop();
+                } else if (this.menu.open) {
+                    e.preventDefault();
+                    this.closeMenu();
+                } else if (!this.dialogue.active && game && game.state && game.state.gameMode === 'overworld') {
+                    e.preventDefault();
+                    this.openMenu();
+                }
+            }
+        });
+    },
+
+    // ----------------------------------------------------------------
+    // Dialogue System
+    // ----------------------------------------------------------------
+    showDialogue(dialogueOrId, callback) {
+        const lines = Array.isArray(dialogueOrId) ? dialogueOrId : DIALOGUES[dialogueOrId];
+        if (!lines || lines.length === 0) return;
+
+        this.dialogue.active = true;
+        this.dialogue.lines = lines;
+        this.dialogue.currentIndex = 0;
+        this.dialogue.callback = callback || null;
+
+        if (game) game.state.gameMode = 'dialogue';
+
+        this._showCurrentLine();
+    },
+
+    _showCurrentLine() {
+        const line = this.dialogue.lines[this.dialogue.currentIndex];
+        if (!line) {
+            this._endDialogue();
+            return;
+        }
+
+        // Handle action lines
+        if (line.action) {
+            this._handleDialogueAction(line.action);
+            return;
+        }
+
+        // Show the dialogue box
+        this.elements.dialogueBox.classList.remove('hidden');
+
+        // Set speaker name
+        if (line.name) {
+            this.elements.dialogueName.textContent = line.name;
+            this.elements.dialogueName.style.display = 'block';
+        } else {
+            this.elements.dialogueName.style.display = 'none';
+        }
+
+        // Start typewriter effect
+        this.elements.dialogueText.textContent = '';
+        this.elements.dialogueIndicator.style.display = 'none';
+        this.dialogue.fullText = line.text || '';
+        this.dialogue.displayedChars = 0;
+        this.dialogue.typewriterDone = false;
+
+        this._clearTypewriter();
+        this.dialogue.typewriterTimer = setInterval(() => {
+            this._typewriterTick();
+        }, this.dialogue.charDelay);
+    },
+
+    _typewriterTick() {
+        if (this.dialogue.displayedChars < this.dialogue.fullText.length) {
+            this.dialogue.displayedChars++;
+            this.elements.dialogueText.textContent =
+                this.dialogue.fullText.substring(0, this.dialogue.displayedChars);
+        } else {
+            this._clearTypewriter();
+            this.dialogue.typewriterDone = true;
+            this.elements.dialogueIndicator.style.display = 'block';
+        }
+    },
+
+    _clearTypewriter() {
+        if (this.dialogue.typewriterTimer) {
+            clearInterval(this.dialogue.typewriterTimer);
+            this.dialogue.typewriterTimer = null;
+        }
+    },
+
+    advanceDialogue() {
+        if (!this.dialogue.active) return;
+
+        // If typewriter still going, finish it immediately
+        if (!this.dialogue.typewriterDone) {
+            this._clearTypewriter();
+            this.dialogue.displayedChars = this.dialogue.fullText.length;
+            this.elements.dialogueText.textContent = this.dialogue.fullText;
+            this.dialogue.typewriterDone = true;
+            this.elements.dialogueIndicator.style.display = 'block';
+            return;
+        }
+
+        // Move to the next line
+        this.dialogue.currentIndex++;
+        if (this.dialogue.currentIndex < this.dialogue.lines.length) {
+            this._showCurrentLine();
+        } else {
+            this._endDialogue();
+        }
+    },
+
+    _endDialogue() {
+        this._clearTypewriter();
+        this.elements.dialogueBox.classList.add('hidden');
+        this.dialogue.active = false;
+
+        if (game) game.state.gameMode = 'overworld';
+
+        if (this.dialogue.callback) {
+            const cb = this.dialogue.callback;
+            this.dialogue.callback = null;
+            cb();
+        }
+    },
+
+    _handleDialogueAction(action) {
+        switch (action) {
+            case 'choose_starter':
+                this.elements.dialogueBox.classList.add('hidden');
+                this._showStarterSelection();
+                break;
+
+            case 'heal_pokemon':
+                this._healAllPokemon();
+                // Continue to next line
+                this.dialogue.currentIndex++;
+                this._showCurrentLine();
+                break;
+
+            case 'open_shop':
+                this.elements.dialogueBox.classList.add('hidden');
+                this._openShopUI();
+                break;
+
+            case 'trainer_battle':
+                this._endDialogue();
+                if (game && typeof game.startTrainerBattle === 'function') {
+                    game.startTrainerBattle();
+                }
+                break;
+
+            default:
+                // Unknown action, skip to next line
+                this.dialogue.currentIndex++;
+                this._showCurrentLine();
+                break;
+        }
+    },
+
+    _healAllPokemon() {
+        if (!game || !game.state || !game.state.party) return;
+        game.state.party.forEach(pokemon => {
+            if (!pokemon) return;
+            recalcStats(pokemon);
+            pokemon.currentHp = pokemon.stats.hp;
+            pokemon.status = null;
+            // Restore all move PP
+            if (pokemon.moves) {
+                pokemon.moves.forEach(m => { m.ppUsed = 0; });
+            }
+        });
+        AudioSystem.playSfx('heal');
+        this.showNotification('Vos Pokemon sont en pleine forme !');
+    },
+
+    // ----------------------------------------------------------------
+    // Starter Selection
+    // ----------------------------------------------------------------
+    _showStarterSelection() {
+        this.starterSelect.active = true;
+        if (game) game.state.gameMode = 'dialogue';
+
+        const starters = [
+            { id: 1, name: 'Flamby', type: 'fire', typeName: 'Feu' },
+            { id: 4, name: 'Aquali', type: 'water', typeName: 'Eau' },
+            { id: 7, name: 'Verdant', type: 'grass', typeName: 'Plante' },
+        ];
+
+        const overlay = this.elements.menuOverlay;
+        const panel = this.elements.menuPanel;
+
+        panel.innerHTML = '';
+        const title = document.createElement('h2');
+        title.textContent = 'Choisissez votre Pokemon !';
+        panel.appendChild(title);
+
+        const choiceMenu = document.createElement('div');
+        choiceMenu.className = 'choice-menu';
+
+        starters.forEach(starter => {
+            const option = document.createElement('div');
+            option.className = 'choice-option';
+
+            // Sprite canvas
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 96;
+            spriteCanvas.height = 96;
+            const spriteCtx = spriteCanvas.getContext('2d');
+            SpriteRenderer.drawPokemon(spriteCtx, starter.id, 0, 0, 96, 'front', false);
+            option.appendChild(spriteCanvas);
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'choice-name';
+            nameDiv.textContent = starter.name;
+            option.appendChild(nameDiv);
+
+            const typeDiv = document.createElement('div');
+            typeDiv.className = 'choice-type';
+            typeDiv.textContent = starter.typeName;
+            typeDiv.style.color = TYPE_COLORS[starter.type] || '#aaa';
+            option.appendChild(typeDiv);
+
+            option.addEventListener('click', () => {
+                this._selectStarter(starter.id);
+            });
+
+            choiceMenu.appendChild(option);
+        });
+
+        panel.appendChild(choiceMenu);
+        overlay.classList.remove('hidden');
+    },
+
+    _selectStarter(pokemonId) {
+        if (!game || !game.state) return;
+
+        const pokemon = createPokemon(pokemonId, 5, false);
+        if (!pokemon) return;
+
+        pokemon.ot = game.state.playerName || 'Joueur';
+
+        game.state.party.push(pokemon);
+        game.state.storyFlags.has_starter = true;
+        game.state.storyFlags.choose_starter = true;
+        game.state.pokedexSeen.add(pokemonId);
+        game.state.pokedexCaught.add(pokemonId);
+
+        // Give starter Poke Balls
+        if (!game.state.bag.pokeball) game.state.bag.pokeball = 0;
+        game.state.bag.pokeball += 5;
+
+        const data = getPokemonById(pokemonId);
+        this.showNotification(data.name + ' a rejoint votre equipe !');
+
+        AudioSystem.playSfx('catch');
+
+        // Close starter selection
+        this.elements.menuOverlay.classList.add('hidden');
+        this.starterSelect.active = false;
+
+        // Continue dialogue (story_after_starter)
+        this.dialogue.currentIndex++;
+        if (this.dialogue.currentIndex < this.dialogue.lines.length) {
+            this._showCurrentLine();
+        } else {
+            this._endDialogue();
+            // Trigger the after-starter dialogue
+            if (DIALOGUES.story_after_starter) {
+                setTimeout(() => {
+                    this.showDialogue('story_after_starter');
+                }, 500);
+            }
+        }
+    },
+
+    // ----------------------------------------------------------------
+    // Menu System
+    // ----------------------------------------------------------------
+    openMenu() {
+        if (this.dialogue.active || this.shop.active || this.starterSelect.active) return;
+        if (game) game.state.gameMode = 'menu';
+
+        this.menu.open = true;
+        this.menu.currentTab = 'party';
+        this._renderMenu();
+        this.elements.menuOverlay.classList.remove('hidden');
+        AudioSystem.playSfx('select');
+    },
+
+    closeMenu() {
+        this.menu.open = false;
+        this.elements.menuOverlay.classList.add('hidden');
+        this.elements.menuPanel.innerHTML = '';
+        if (game) game.state.gameMode = 'overworld';
+        AudioSystem.playSfx('select');
+    },
+
+    _renderMenu() {
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        // Tabs
+        const tabs = [
+            { id: 'party', label: 'Equipe' },
+            { id: 'bag', label: 'Sac' },
+            { id: 'pokedex', label: 'Pokedex' },
+            { id: 'trainer', label: 'Dresseur' },
+            { id: 'save', label: 'Sauvegarder' },
+            { id: 'quit', label: 'Quitter' },
+        ];
+
+        const tabBar = document.createElement('div');
+        tabBar.className = 'menu-tabs';
+
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = 'menu-tab' + (this.menu.currentTab === tab.id ? ' active' : '');
+            btn.textContent = tab.label;
+            btn.addEventListener('click', () => {
+                this.menu.currentTab = tab.id;
+                this._renderMenu();
+                AudioSystem.playSfx('select');
+            });
+            tabBar.appendChild(btn);
+        });
+
+        panel.appendChild(tabBar);
+
+        // Content
+        const content = document.createElement('div');
+        content.className = 'menu-content';
+
+        switch (this.menu.currentTab) {
+            case 'party':
+                this._renderPartyTab(content);
+                break;
+            case 'bag':
+                this._renderBagTab(content);
+                break;
+            case 'pokedex':
+                this._renderPokedexTab(content);
+                break;
+            case 'trainer':
+                this._renderTrainerTab(content);
+                break;
+            case 'save':
+                this._renderSaveTab(content);
+                break;
+            case 'quit':
+                this._renderQuitTab(content);
+                break;
+        }
+
+        panel.appendChild(content);
+    },
+
+    // -- Party Tab --
+    _renderPartyTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Equipe';
+        container.appendChild(title);
+
+        if (!game || !game.state || !game.state.party || game.state.party.length === 0) {
+            const empty = document.createElement('p');
+            empty.textContent = 'Aucun Pokemon dans l\'equipe.';
+            empty.style.color = '#888';
+            empty.style.textAlign = 'center';
+            container.appendChild(empty);
+            return;
+        }
+
+        const list = document.createElement('div');
+        list.className = 'pokemon-party-list';
+
+        game.state.party.forEach((pokemon, index) => {
+            if (!pokemon) return;
+            const data = getPokemonById(pokemon.id);
+            if (!data) return;
+
+            const row = document.createElement('div');
+            row.className = 'party-pokemon';
+
+            // Sprite
+            const spriteContainer = document.createElement('div');
+            spriteContainer.className = 'sprite-container';
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 48;
+            spriteCanvas.height = 48;
+            const spriteCtx = spriteCanvas.getContext('2d');
+            SpriteRenderer.drawPokemon(spriteCtx, pokemon.id, 0, 0, 48, 'front', pokemon.isShiny);
+            spriteContainer.appendChild(spriteCanvas);
+            row.appendChild(spriteContainer);
+
+            // Info
+            const info = document.createElement('div');
+            info.className = 'info';
+
+            const nameSpan = document.createElement('div');
+            nameSpan.className = 'name';
+            nameSpan.textContent = (pokemon.nickname || data.name);
+            if (pokemon.status) {
+                const statusBadge = document.createElement('span');
+                statusBadge.textContent = ' [' + pokemon.status.toUpperCase() + ']';
+                statusBadge.style.color = '#f44336';
+                statusBadge.style.fontSize = '11px';
+                nameSpan.appendChild(statusBadge);
+            }
+            info.appendChild(nameSpan);
+
+            const details = document.createElement('div');
+            details.className = 'details';
+            const typeNames = data.types.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/');
+            details.textContent = 'Nv. ' + pokemon.level + ' | ' + typeNames;
+            info.appendChild(details);
+
+            row.appendChild(info);
+
+            // HP bar
+            const hpSection = document.createElement('div');
+            hpSection.style.minWidth = '140px';
+
+            const hpBar = document.createElement('div');
+            hpBar.className = 'hp-bar';
+            const hpFill = document.createElement('div');
+            hpFill.className = 'hp-fill';
+            const hpPercent = pokemon.stats ? (pokemon.currentHp / pokemon.stats.hp) * 100 : 100;
+            hpFill.style.width = hpPercent + '%';
+            if (hpPercent <= 20) {
+                hpFill.classList.add('low');
+            } else if (hpPercent <= 50) {
+                hpFill.classList.add('medium');
+            }
+            hpBar.appendChild(hpFill);
+            hpSection.appendChild(hpBar);
+
+            const hpText = document.createElement('div');
+            hpText.className = 'hp-text';
+            hpText.textContent = pokemon.currentHp + ' / ' + (pokemon.stats ? pokemon.stats.hp : '?');
+            hpSection.appendChild(hpText);
+
+            row.appendChild(hpSection);
+
+            // Click to show details / use item
+            row.addEventListener('click', () => {
+                this._showPokemonDetail(pokemon, index);
+            });
+
+            list.appendChild(row);
+        });
+
+        container.appendChild(list);
+    },
+
+    _showPokemonDetail(pokemon, index) {
+        const data = getPokemonById(pokemon.id);
+        if (!data) return;
+
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        const title = document.createElement('h2');
+        title.textContent = pokemon.nickname || data.name;
+        panel.appendChild(title);
+
+        // Sprite
+        const spriteCanvas = document.createElement('canvas');
+        spriteCanvas.width = 96;
+        spriteCanvas.height = 96;
+        spriteCanvas.style.display = 'block';
+        spriteCanvas.style.margin = '0 auto 15px';
+        const spriteCtx = spriteCanvas.getContext('2d');
+        SpriteRenderer.drawPokemon(spriteCtx, pokemon.id, 0, 0, 96, 'front', pokemon.isShiny);
+        panel.appendChild(spriteCanvas);
+
+        // Stats
+        const statsDiv = document.createElement('div');
+        statsDiv.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px;';
+
+        const statLabels = { hp: 'PV', atk: 'Attaque', def: 'Defense', spatk: 'Atq. Spe.', spdef: 'Def. Spe.', spd: 'Vitesse' };
+        if (pokemon.stats) {
+            Object.entries(statLabels).forEach(([key, label]) => {
+                const statRow = document.createElement('div');
+                statRow.style.cssText = 'font-size:12px;color:#ccc;';
+                statRow.textContent = label + ': ' + pokemon.stats[key];
+                statsDiv.appendChild(statRow);
+            });
+        }
+        panel.appendChild(statsDiv);
+
+        // Moves
+        const movesTitle = document.createElement('div');
+        movesTitle.style.cssText = 'font-weight:bold;margin-bottom:8px;color:#ffd700;';
+        movesTitle.textContent = 'Attaques';
+        panel.appendChild(movesTitle);
+
+        if (pokemon.moves) {
+            pokemon.moves.forEach(moveId => {
+                const move = MOVES_DB[moveId];
+                if (!move) return;
+                const moveDiv = document.createElement('div');
+                moveDiv.style.cssText = 'font-size:12px;color:#ccc;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:4px;';
+                moveDiv.textContent = move.name + ' | ' + move.type.toUpperCase() + ' | Puiss. ' + (move.power || '-') + ' | Prec. ' + (move.accuracy || '-');
+                panel.appendChild(moveDiv);
+            });
+        }
+
+        // Back button
+        const backBtn = document.createElement('button');
+        backBtn.className = 'menu-tab';
+        backBtn.style.marginTop = '15px';
+        backBtn.textContent = 'Retour';
+        backBtn.addEventListener('click', () => {
+            this._renderMenu();
+        });
+        panel.appendChild(backBtn);
+    },
+
+    // -- Bag Tab --
+    _renderBagTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Sac';
+        container.appendChild(title);
+
+        if (!game || !game.state || !game.state.bag) return;
+
+        const bag = game.state.bag;
+        const entries = Object.entries(bag).filter(([, qty]) => qty > 0);
+
+        if (entries.length === 0) {
+            const empty = document.createElement('p');
+            empty.textContent = 'Votre sac est vide.';
+            empty.style.color = '#888';
+            empty.style.textAlign = 'center';
+            container.appendChild(empty);
+            return;
+        }
+
+        entries.forEach(([itemId, quantity]) => {
+            const itemData = ITEMS[itemId];
+            if (!itemData) return;
+
+            const row = document.createElement('div');
+            row.className = 'bag-item';
+
+            const leftCol = document.createElement('div');
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-name';
+            nameDiv.textContent = itemData.name;
+            leftCol.appendChild(nameDiv);
+
+            const descDiv = document.createElement('div');
+            descDiv.className = 'item-desc';
+            descDiv.textContent = itemData.desc;
+            leftCol.appendChild(descDiv);
+
+            row.appendChild(leftCol);
+
+            const countDiv = document.createElement('div');
+            countDiv.className = 'item-count';
+            countDiv.textContent = 'x' + quantity;
+            row.appendChild(countDiv);
+
+            // Click to use item
+            if (itemData.type === 'heal' || itemData.type === 'revive' || itemData.type === 'status' || itemData.type === 'levelup') {
+                row.addEventListener('click', () => {
+                    this._showItemUseTarget(itemId);
+                });
+                row.style.cursor = 'pointer';
+            }
+
+            container.appendChild(row);
+        });
+    },
+
+    _showItemUseTarget(itemId) {
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        const itemData = ITEMS[itemId];
+        if (!itemData) return;
+
+        const title = document.createElement('h2');
+        title.textContent = 'Utiliser ' + itemData.name + ' sur...';
+        panel.appendChild(title);
+
+        if (!game || !game.state || !game.state.party) return;
+
+        const list = document.createElement('div');
+        list.className = 'pokemon-party-list';
+
+        game.state.party.forEach((pokemon, index) => {
+            if (!pokemon) return;
+            const data = getPokemonById(pokemon.id);
+            if (!data) return;
+
+            const row = document.createElement('div');
+            row.className = 'party-pokemon';
+
+            // Sprite
+            const spriteContainer = document.createElement('div');
+            spriteContainer.className = 'sprite-container';
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 48;
+            spriteCanvas.height = 48;
+            const spriteCtx = spriteCanvas.getContext('2d');
+            SpriteRenderer.drawPokemon(spriteCtx, pokemon.id, 0, 0, 48, 'front', pokemon.isShiny);
+            spriteContainer.appendChild(spriteCanvas);
+            row.appendChild(spriteContainer);
+
+            const info = document.createElement('div');
+            info.className = 'info';
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
+            nameDiv.textContent = (pokemon.nickname || data.name) + ' Nv.' + pokemon.level;
+            info.appendChild(nameDiv);
+
+            const hpInfo = document.createElement('div');
+            hpInfo.className = 'details';
+            hpInfo.textContent = 'PV: ' + pokemon.currentHp + '/' + (pokemon.stats ? pokemon.stats.hp : '?');
+            info.appendChild(hpInfo);
+
+            row.appendChild(info);
+
+            row.addEventListener('click', () => {
+                this._useItemOnPokemon(itemId, pokemon, index);
+            });
+
+            list.appendChild(row);
+        });
+
+        container.appendChild(list);
+
+        // Back button
+        const backBtn = document.createElement('button');
+        backBtn.className = 'menu-tab';
+        backBtn.style.marginTop = '15px';
+        backBtn.textContent = 'Retour';
+        backBtn.addEventListener('click', () => {
+            this._renderMenu();
+        });
+        panel.appendChild(backBtn);
+    },
+
+    _useItemOnPokemon(itemId, pokemon, index) {
+        const itemData = ITEMS[itemId];
+        if (!itemData || !game || !game.state) return;
+
+        let used = false;
+        const data = getPokemonById(pokemon.id);
+
+        switch (itemData.type) {
+            case 'heal':
+                if (pokemon.currentHp <= 0) {
+                    this.showNotification(data.name + ' est K.O. ! Utilisez un Rappel.');
+                    return;
+                }
+                if (pokemon.stats && pokemon.currentHp >= pokemon.stats.hp) {
+                    this.showNotification(data.name + ' a deja tous ses PV !');
+                    return;
+                }
+                const maxHp = pokemon.stats ? pokemon.stats.hp : 999;
+                pokemon.currentHp = Math.min(maxHp, pokemon.currentHp + itemData.healAmount);
+                used = true;
+                this.showNotification(data.name + ' recupere des PV !');
+                break;
+
+            case 'revive':
+                if (pokemon.currentHp > 0) {
+                    this.showNotification(data.name + ' n\'est pas K.O. !');
+                    return;
+                }
+                const reviveHp = Math.floor((pokemon.stats ? pokemon.stats.hp : 20) * itemData.healPercent);
+                pokemon.currentHp = reviveHp;
+                pokemon.status = null;
+                used = true;
+                this.showNotification(data.name + ' est ranime !');
+                break;
+
+            case 'status':
+                if (!pokemon.status || pokemon.status !== itemData.cures) {
+                    this.showNotification('Cela n\'aura aucun effet.');
+                    return;
+                }
+                pokemon.status = null;
+                used = true;
+                this.showNotification(data.name + ' est soigne !');
+                break;
+
+            case 'levelup':
+                if (pokemon.currentHp <= 0) {
+                    this.showNotification(data.name + ' est K.O. !');
+                    return;
+                }
+                pokemon.level = Math.min(100, pokemon.level + 1);
+                recalcStats(pokemon);
+                pokemon.currentHp = pokemon.stats.hp;
+                used = true;
+                this.showNotification(data.name + ' passe au Nv.' + pokemon.level + ' !');
+                break;
+        }
+
+        if (used) {
+            game.state.bag[itemId]--;
+            if (game.state.bag[itemId] <= 0) {
+                delete game.state.bag[itemId];
+            }
+            AudioSystem.playSfx('select');
+            // Re-render menu after short delay
+            setTimeout(() => {
+                this._renderMenu();
+            }, 300);
+        }
+    },
+
+    // -- Pokedex Tab --
+    _renderPokedexTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Pokedex';
+        container.appendChild(title);
+
+        if (!game || !game.state) return;
+
+        const infoBar = document.createElement('div');
+        infoBar.style.cssText = 'text-align:center;margin-bottom:15px;font-size:13px;color:#aaa;';
+        infoBar.textContent = 'Vus: ' + game.state.pokedexSeen.size + ' | Captures: ' + game.state.pokedexCaught.size + ' / 150';
+        container.appendChild(infoBar);
+
+        const grid = document.createElement('div');
+        grid.className = 'pokedex-grid';
+
+        for (let id = 1; id <= 150; id++) {
+            const entry = document.createElement('div');
+            entry.className = 'pokedex-entry';
+
+            const seen = game.state.pokedexSeen.has(id);
+            const caught = game.state.pokedexCaught.has(id);
+
+            if (caught) {
+                entry.classList.add('caught');
+            } else if (seen) {
+                entry.classList.add('seen');
+            }
+
+            const numDiv = document.createElement('div');
+            numDiv.className = 'dex-number';
+            numDiv.textContent = '#' + String(id).padStart(3, '0');
+            entry.appendChild(numDiv);
+
+            if (seen || caught) {
+                // Draw mini sprite
+                const spriteCanvas = document.createElement('canvas');
+                spriteCanvas.width = 32;
+                spriteCanvas.height = 32;
+                spriteCanvas.style.display = 'block';
+                spriteCanvas.style.margin = '2px auto';
+                const spriteCtx = spriteCanvas.getContext('2d');
+                SpriteRenderer.drawPokemon(spriteCtx, id, 0, 0, 32, 'front', false);
+                entry.appendChild(spriteCanvas);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'dex-name';
+                const pokemonData = getPokemonById(id);
+                nameDiv.textContent = pokemonData ? pokemonData.name : '???';
+                nameDiv.style.color = caught ? '#ffd700' : '#6666ff';
+                entry.appendChild(nameDiv);
+            } else {
+                const unknown = document.createElement('div');
+                unknown.style.cssText = 'font-size:20px;margin:6px 0;color:#333;';
+                unknown.textContent = '?';
+                entry.appendChild(unknown);
+
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'dex-name';
+                nameDiv.textContent = '---';
+                nameDiv.style.color = '#444';
+                entry.appendChild(nameDiv);
+            }
+
+            grid.appendChild(entry);
+        }
+
+        container.appendChild(grid);
+    },
+
+    // -- Trainer Card Tab --
+    _renderTrainerTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Carte Dresseur';
+        container.appendChild(title);
+
+        if (!game || !game.state) return;
+
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,0.05);border:2px solid rgba(255,215,0,0.3);border-radius:12px;padding:25px;max-width:400px;margin:0 auto;';
+
+        const playerName = document.createElement('div');
+        playerName.style.cssText = 'font-size:20px;font-weight:bold;color:#ffd700;margin-bottom:20px;text-align:center;';
+        playerName.textContent = game.state.playerName || 'Dresseur';
+        card.appendChild(playerName);
+
+        const stats = [
+            { label: 'Argent', value: game.state.money + ' $' },
+            { label: 'Pokedex (vus)', value: game.state.pokedexSeen.size + '' },
+            { label: 'Pokedex (captures)', value: game.state.pokedexCaught.size + '' },
+            { label: 'Badges', value: game.state.badges.length + ' / 8' },
+            { label: 'Temps de jeu', value: this._formatPlayTime(game.state.playTime || 0) },
+        ];
+
+        stats.forEach(stat => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px;';
+            const label = document.createElement('span');
+            label.style.color = '#aaa';
+            label.textContent = stat.label;
+            const val = document.createElement('span');
+            val.style.color = '#fff';
+            val.textContent = stat.value;
+            row.appendChild(label);
+            row.appendChild(val);
+            card.appendChild(row);
+        });
+
+        // Badges display
+        const badgesLabel = document.createElement('div');
+        badgesLabel.style.cssText = 'margin-top:20px;font-weight:bold;color:#ffd700;margin-bottom:10px;text-align:center;';
+        badgesLabel.textContent = 'Badges';
+        card.appendChild(badgesLabel);
+
+        const badgeNames = [
+            'Normal', 'Plante', 'Eau', 'Electrik',
+            'Feu', 'Sol', 'Glace', 'Dragon'
+        ];
+
+        const badgeRow = document.createElement('div');
+        badgeRow.style.cssText = 'display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
+
+        for (let i = 0; i < 8; i++) {
+            const badge = document.createElement('div');
+            const earned = game.state.badges.includes(i);
+            badge.style.cssText = 'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;text-align:center;' +
+                (earned
+                    ? 'background:linear-gradient(135deg,#ffd700,#ff8c00);border:2px solid #ffd700;color:#000;font-weight:bold;box-shadow:0 0 8px rgba(255,215,0,0.5);'
+                    : 'background:rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);color:#555;');
+            badge.textContent = earned ? (i + 1) : '?';
+            badge.title = badgeNames[i];
+            badgeRow.appendChild(badge);
+        }
+
+        card.appendChild(badgeRow);
+        container.appendChild(card);
+    },
+
+    _formatPlayTime(seconds) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    },
+
+    // -- Save Tab --
+    _renderSaveTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Sauvegarder';
+        container.appendChild(title);
+
+        const info = document.createElement('p');
+        info.style.cssText = 'text-align:center;color:#aaa;margin-bottom:20px;';
+        info.textContent = 'Votre partie est sauvegardee automatiquement. Vous pouvez aussi sauvegarder manuellement.';
+        container.appendChild(info);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'menu-tab active';
+        saveBtn.style.cssText = 'display:block;margin:0 auto;padding:12px 40px;font-size:16px;';
+        saveBtn.textContent = 'Sauvegarder maintenant';
+        saveBtn.addEventListener('click', () => {
+            SaveSystem.save();
+            AudioSystem.playSfx('select');
+            this.showNotification('Partie sauvegardee !');
+            saveBtn.textContent = 'Sauvegarde OK !';
+            setTimeout(() => {
+                saveBtn.textContent = 'Sauvegarder maintenant';
+            }, 2000);
+        });
+        container.appendChild(saveBtn);
+    },
+
+    // -- Quit Tab --
+    _renderQuitTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Quitter';
+        container.appendChild(title);
+
+        const warning = document.createElement('p');
+        warning.style.cssText = 'text-align:center;color:#f44336;margin-bottom:20px;';
+        warning.textContent = 'Voulez-vous retourner au menu principal ?';
+        container.appendChild(warning);
+
+        const info = document.createElement('p');
+        info.style.cssText = 'text-align:center;color:#888;margin-bottom:20px;font-size:12px;';
+        info.textContent = 'Votre partie sera sauvegardee automatiquement.';
+        container.appendChild(info);
+
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'display:flex;justify-content:center;gap:20px;';
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.className = 'menu-tab';
+        confirmBtn.style.cssText = 'padding:10px 30px;border-color:#f44336;color:#f44336;';
+        confirmBtn.textContent = 'Oui, quitter';
+        confirmBtn.addEventListener('click', () => {
+            SaveSystem.save();
+            this.closeMenu();
+            if (game && typeof game.returnToTitle === 'function') {
+                game.returnToTitle();
+            } else {
+                location.reload();
+            }
+        });
+        btnRow.appendChild(confirmBtn);
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'menu-tab';
+        cancelBtn.style.cssText = 'padding:10px 30px;';
+        cancelBtn.textContent = 'Non, rester';
+        cancelBtn.addEventListener('click', () => {
+            this.menu.currentTab = 'party';
+            this._renderMenu();
+        });
+        btnRow.appendChild(cancelBtn);
+
+        container.appendChild(btnRow);
+    },
+
+    // ----------------------------------------------------------------
+    // Notification System
+    // ----------------------------------------------------------------
+    showNotification(text) {
+        // Remove existing notification
+        const existing = document.querySelector('.notification');
+        if (existing) existing.remove();
+
+        if (this.notification.timer) {
+            clearTimeout(this.notification.timer);
+            this.notification.timer = null;
+        }
+
+        const notif = document.createElement('div');
+        notif.className = 'notification';
+        notif.textContent = text;
+
+        const uiLayer = document.getElementById('ui-layer');
+        uiLayer.appendChild(notif);
+
+        this.notification.timer = setTimeout(() => {
+            if (notif.parentNode) {
+                notif.remove();
+            }
+            this.notification.timer = null;
+        }, 2500);
+    },
+
+    // ----------------------------------------------------------------
+    // HUD
+    // ----------------------------------------------------------------
+    showLocationName(name) {
+        const el = this.elements.locationName;
+        if (!el) return;
+
+        el.textContent = name;
+        el.classList.add('visible');
+
+        if (this.hud.locationTimer) {
+            clearTimeout(this.hud.locationTimer);
+        }
+
+        this.hud.locationTimer = setTimeout(() => {
+            el.classList.remove('visible');
+            this.hud.locationTimer = null;
+        }, 3000);
+    },
+
+    updateBadges() {
+        if (!game || !game.state || !this.elements.badgesDisplay) return;
+
+        const slots = this.elements.badgesDisplay.querySelectorAll('.badge-slot');
+        slots.forEach((slot, i) => {
+            if (game.state.badges.includes(i)) {
+                slot.classList.add('earned');
+            } else {
+                slot.classList.remove('earned');
+            }
+        });
+    },
+
+    // ----------------------------------------------------------------
+    // Shop System
+    // ----------------------------------------------------------------
+    _openShopUI() {
+        this.shop.active = true;
+        this.shop.mode = 'buy';
+        this.shop.items = [
+            'pokeball', 'superball', 'hyperball',
+            'potion', 'superpotion', 'hyperpotion',
+            'antidote', 'revive', 'repel'
+        ];
+
+        if (game) game.state.gameMode = 'menu';
+        this._renderShop();
+        this.elements.menuOverlay.classList.remove('hidden');
+    },
+
+    closeShop() {
+        this.shop.active = false;
+        this.elements.menuOverlay.classList.add('hidden');
+        this.elements.menuPanel.innerHTML = '';
+
+        // Resume dialogue if there are more lines
+        if (this.dialogue.active) {
+            this.dialogue.currentIndex++;
+            if (this.dialogue.currentIndex < this.dialogue.lines.length) {
+                this._showCurrentLine();
+            } else {
+                this._endDialogue();
+            }
+        } else {
+            if (game) game.state.gameMode = 'overworld';
+        }
+    },
+
+    _renderShop() {
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        // Header
+        const title = document.createElement('h2');
+        title.textContent = 'Boutique';
+        panel.appendChild(title);
+
+        // Money display
+        const moneyDiv = document.createElement('div');
+        moneyDiv.style.cssText = 'text-align:right;color:#ffd700;font-size:16px;font-weight:bold;margin-bottom:15px;';
+        moneyDiv.textContent = 'Argent: ' + (game && game.state ? game.state.money : 0) + ' $';
+        panel.appendChild(moneyDiv);
+
+        // Mode tabs
+        const tabBar = document.createElement('div');
+        tabBar.className = 'menu-tabs';
+
+        const buyTab = document.createElement('button');
+        buyTab.className = 'menu-tab' + (this.shop.mode === 'buy' ? ' active' : '');
+        buyTab.textContent = 'Acheter';
+        buyTab.addEventListener('click', () => {
+            this.shop.mode = 'buy';
+            this._renderShop();
+        });
+        tabBar.appendChild(buyTab);
+
+        const sellTab = document.createElement('button');
+        sellTab.className = 'menu-tab' + (this.shop.mode === 'sell' ? ' active' : '');
+        sellTab.textContent = 'Vendre';
+        sellTab.addEventListener('click', () => {
+            this.shop.mode = 'sell';
+            this._renderShop();
+        });
+        tabBar.appendChild(sellTab);
+
+        const exitTab = document.createElement('button');
+        exitTab.className = 'menu-tab';
+        exitTab.textContent = 'Quitter';
+        exitTab.addEventListener('click', () => {
+            this.closeShop();
+        });
+        tabBar.appendChild(exitTab);
+
+        panel.appendChild(tabBar);
+
+        // Content
+        if (this.shop.mode === 'buy') {
+            this._renderShopBuy(panel);
+        } else {
+            this._renderShopSell(panel);
+        }
+    },
+
+    _renderShopBuy(panel) {
+        const list = document.createElement('div');
+
+        this.shop.items.forEach(itemId => {
+            const itemData = ITEMS[itemId];
+            if (!itemData || itemData.price <= 0) return;
+
+            const row = document.createElement('div');
+            row.className = 'bag-item';
+
+            const leftCol = document.createElement('div');
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-name';
+            nameDiv.textContent = itemData.name;
+            leftCol.appendChild(nameDiv);
+
+            const descDiv = document.createElement('div');
+            descDiv.className = 'item-desc';
+            descDiv.textContent = itemData.desc;
+            leftCol.appendChild(descDiv);
+
+            row.appendChild(leftCol);
+
+            const rightCol = document.createElement('div');
+            rightCol.style.cssText = 'display:flex;align-items:center;gap:10px;';
+
+            const priceSpan = document.createElement('span');
+            priceSpan.style.cssText = 'color:#ffd700;font-weight:bold;white-space:nowrap;';
+            priceSpan.textContent = itemData.price + ' $';
+            rightCol.appendChild(priceSpan);
+
+            const buyBtn = document.createElement('button');
+            buyBtn.className = 'menu-tab';
+            buyBtn.style.padding = '4px 12px';
+            buyBtn.textContent = 'Acheter';
+            const canAfford = game && game.state && game.state.money >= itemData.price;
+            if (!canAfford) {
+                buyBtn.style.opacity = '0.4';
+                buyBtn.style.cursor = 'default';
+            }
+            buyBtn.addEventListener('click', () => {
+                if (!game || !game.state) return;
+                if (game.state.money < itemData.price) {
+                    this.showNotification('Pas assez d\'argent !');
+                    return;
+                }
+                game.state.money -= itemData.price;
+                if (!game.state.bag[itemId]) game.state.bag[itemId] = 0;
+                game.state.bag[itemId]++;
+                AudioSystem.playSfx('select');
+                this.showNotification(itemData.name + ' achete !');
+                this._renderShop();
+            });
+            rightCol.appendChild(buyBtn);
+
+            row.appendChild(rightCol);
+            list.appendChild(row);
+        });
+
+        panel.appendChild(list);
+    },
+
+    _renderShopSell(panel) {
+        if (!game || !game.state || !game.state.bag) return;
+
+        const entries = Object.entries(game.state.bag).filter(([, qty]) => qty > 0);
+
+        if (entries.length === 0) {
+            const empty = document.createElement('p');
+            empty.style.cssText = 'text-align:center;color:#888;margin-top:20px;';
+            empty.textContent = 'Rien a vendre.';
+            panel.appendChild(empty);
+            return;
+        }
+
+        const list = document.createElement('div');
+
+        entries.forEach(([itemId, quantity]) => {
+            const itemData = ITEMS[itemId];
+            if (!itemData) return;
+
+            const sellPrice = Math.floor((itemData.price || 0) / 2);
+            if (sellPrice <= 0) return;
+
+            const row = document.createElement('div');
+            row.className = 'bag-item';
+
+            const leftCol = document.createElement('div');
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'item-name';
+            nameDiv.textContent = itemData.name + ' x' + quantity;
+            leftCol.appendChild(nameDiv);
+
+            row.appendChild(leftCol);
+
+            const rightCol = document.createElement('div');
+            rightCol.style.cssText = 'display:flex;align-items:center;gap:10px;';
+
+            const priceSpan = document.createElement('span');
+            priceSpan.style.cssText = 'color:#ffd700;white-space:nowrap;';
+            priceSpan.textContent = sellPrice + ' $';
+            rightCol.appendChild(priceSpan);
+
+            const sellBtn = document.createElement('button');
+            sellBtn.className = 'menu-tab';
+            sellBtn.style.padding = '4px 12px';
+            sellBtn.textContent = 'Vendre';
+            sellBtn.addEventListener('click', () => {
+                if (!game || !game.state) return;
+                game.state.money += sellPrice;
+                game.state.bag[itemId]--;
+                if (game.state.bag[itemId] <= 0) {
+                    delete game.state.bag[itemId];
+                }
+                AudioSystem.playSfx('select');
+                this.showNotification(itemData.name + ' vendu pour ' + sellPrice + ' $ !');
+                this._renderShop();
+            });
+            rightCol.appendChild(sellBtn);
+
+            row.appendChild(rightCol);
+            list.appendChild(row);
+        });
+
+        panel.appendChild(list);
+    },
+
+    // ----------------------------------------------------------------
+    // Utility
+    // ----------------------------------------------------------------
+    isBlocking() {
+        return this.dialogue.active || this.menu.open || this.shop.active || this.starterSelect.active;
+    },
+};

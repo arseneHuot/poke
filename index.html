@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Novara</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="ui-layer">
+            <div id="dialogue-box" class="hidden">
+                <div id="dialogue-name"></div>
+                <div id="dialogue-text"></div>
+                <div id="dialogue-indicator">▼</div>
+            </div>
+            <div id="battle-ui" class="hidden">
+                <div id="battle-enemy-info">
+                    <div class="pokemon-name" id="enemy-name"></div>
+                    <div class="pokemon-level" id="enemy-level"></div>
+                    <div class="hp-bar"><div class="hp-fill" id="enemy-hp"></div></div>
+                </div>
+                <div id="battle-player-info">
+                    <div class="pokemon-name" id="player-pokemon-name"></div>
+                    <div class="pokemon-level" id="player-pokemon-level"></div>
+                    <div class="hp-bar"><div class="hp-fill" id="player-hp"></div></div>
+                    <div class="hp-text" id="player-hp-text"></div>
+                    <div class="xp-bar"><div class="xp-fill" id="player-xp"></div></div>
+                </div>
+                <div id="battle-menu">
+                    <div id="battle-actions">
+                        <button class="battle-btn" data-action="fight">ATTAQUE</button>
+                        <button class="battle-btn" data-action="bag">SAC</button>
+                        <button class="battle-btn" data-action="pokemon">POKÉMON</button>
+                        <button class="battle-btn" data-action="run">FUITE</button>
+                    </div>
+                    <div id="battle-moves" class="hidden"></div>
+                    <div id="battle-message"></div>
+                </div>
+            </div>
+            <div id="menu-overlay" class="hidden">
+                <div id="menu-panel"></div>
+            </div>
+            <div id="hud">
+                <div id="location-name"></div>
+                <div id="badges-display"></div>
+            </div>
+            <div id="title-screen">
+                <div id="title-logo">
+                    <h1>POKÉMON</h1>
+                    <h2>NOVARA</h2>
+                </div>
+                <div id="title-menu">
+                    <button id="btn-new-game">Nouvelle Partie</button>
+                    <button id="btn-continue" class="hidden">Continuer</button>
+                </div>
+                <div id="title-version">v1.0 - Région de Novara</div>
+            </div>
+        </div>
+    </div>
+    <script src="js/constants.js"></script>
+    <script src="js/pokemon-data.js"></script>
+    <script src="js/world-data.js"></script>
+    <script src="js/story-data.js"></script>
+    <script src="js/sprite-renderer.js"></script>
+    <script src="js/save-system.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/battle.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
