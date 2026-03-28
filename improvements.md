@@ -95,7 +95,7 @@
 
 - ~~**Whiteout sequence**~~ **Done (2026-03-28)**: On loss, party is healed + PP restored, player warps to last heal location after 1.5s delay, loses half money. Notification "Vous avez perdu connaissance..." shown.
 
-- **Trainer battle intro differentiation**: Trainer battles currently look identical to wild battles. Consider adding a brief trainer intro sequence (e.g. trainer sprite sliding in, "Gamin Thomas veut se battre !" dialogue box) before the first Pokémon is sent out.
+- ~~**Trainer battle intro differentiation**~~ **Done (2026-03-28)**: Trainer battles now show intro messages ("X veut se battre !", "X envoie Y !") before revealing the enemy Pokémon. Enemy sprite starts hidden (alpha=0) and appears after the intro sequence. Wild battles also show their message before action buttons appear.
 
 - ~~**Potion unusable feedback**~~ **Done (2026-03-28)**: Already implemented — notification "a déjà tous ses PV !" shown for full HP, "est K.O. ! Utilisez un Rappel." for fainted. Verified in code.
 

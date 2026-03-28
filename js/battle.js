@@ -68,8 +68,6 @@ const BattleSystem = {
         AudioSystem.playMusic('battle');
 
         this._updateUI();
-        this._showActions();
-        this._queueMessage(`${enemyPokemon.name} sauvage apparaît !`);
     },
 
     startWildBattle(wildPokemon) {
@@ -79,6 +77,8 @@ const BattleSystem = {
         this.state.isTrainer = false;
         this.state.trainerNpc = null;
         this._initBattle(lead, wildPokemon);
+        this._queueMessage(`${wildPokemon.name} sauvage apparaît !`);
+        this._processMessageQueue(() => this._showActions());
     },
 
     startTrainerBattle(trainerNpc) {
@@ -96,9 +96,17 @@ const BattleSystem = {
         }
         const enemyPokemon = trainerNpc.party[0];
         if (!enemyPokemon) return;
+
+        // Hide enemy initially for intro sequence
         this._initBattle(lead, enemyPokemon);
+        this.state.enemyAnim.alpha = 0;
         this._queueMessage(`${trainerNpc.name} veut se battre !`);
         this._queueMessage(`${trainerNpc.name} envoie ${enemyPokemon.name} !`);
+        this._processMessageQueue(() => {
+            // Reveal enemy Pokémon with slide-in
+            this.state.enemyAnim.alpha = 1;
+            this._showActions();
+        });
     },
 
     // ----------------------------------------------------------
