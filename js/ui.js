@@ -330,6 +330,15 @@ const UI = {
             typeDiv.style.color = TYPE_COLORS[starter.type] || '#aaa';
             option.appendChild(typeDiv);
 
+            // Show base stats summary
+            const pdata = getPokemonById(starter.id);
+            if (pdata && pdata.baseStats) {
+                const statsDiv = document.createElement('div');
+                statsDiv.style.cssText = 'font-size:10px;color:#999;margin-top:6px;line-height:1.4;';
+                statsDiv.innerHTML = `PV:${pdata.baseStats.hp} Atq:${pdata.baseStats.atk} Déf:${pdata.baseStats.def}<br>Vit:${pdata.baseStats.spd}`;
+                option.appendChild(statsDiv);
+            }
+
             option.addEventListener('click', () => {
                 this._selectStarter(starter.id);
             });
@@ -909,6 +918,12 @@ const UI = {
                 nameDiv.textContent = pokemonData ? pokemonData.name : '???';
                 nameDiv.style.color = caught ? '#ffd700' : '#6666ff';
                 entry.appendChild(nameDiv);
+
+                // Click to show detail
+                entry.style.cursor = 'pointer';
+                entry.addEventListener('click', () => {
+                    this._showPokedexDetail(id, container);
+                });
             } else {
                 const unknown = document.createElement('div');
                 unknown.style.cssText = 'font-size:20px;margin:6px 0;color:#333;';
@@ -926,6 +941,84 @@ const UI = {
         }
 
         container.appendChild(grid);
+    },
+
+    _showPokedexDetail(id, container) {
+        const data = getPokemonById(id);
+        if (!data) return;
+
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        const title = document.createElement('h2');
+        title.textContent = 'Pokédex';
+        panel.appendChild(title);
+
+        const card = document.createElement('div');
+        card.style.cssText = 'background:rgba(255,255,255,0.05);border:2px solid rgba(255,215,0,0.3);border-radius:12px;padding:20px;max-width:420px;margin:0 auto;';
+
+        // Header: number + name
+        const header = document.createElement('div');
+        header.style.cssText = 'text-align:center;margin-bottom:15px;';
+        header.innerHTML = `<span style="color:#888;font-size:14px;">#${String(id).padStart(3, '0')}</span> <span style="color:#ffd700;font-size:20px;font-weight:bold;">${data.name}</span>`;
+        card.appendChild(header);
+
+        // Sprite
+        const spriteCanvas = document.createElement('canvas');
+        spriteCanvas.width = 96;
+        spriteCanvas.height = 96;
+        spriteCanvas.style.cssText = 'display:block;margin:0 auto 15px;';
+        const spriteCtx = spriteCanvas.getContext('2d');
+        SpriteRenderer.drawPokemon(spriteCtx, id, 0, 0, 96, 'front', false);
+        card.appendChild(spriteCanvas);
+
+        // Types
+        const typesDiv = document.createElement('div');
+        typesDiv.style.cssText = 'text-align:center;margin-bottom:12px;';
+        data.types.forEach(t => {
+            const badge = document.createElement('span');
+            badge.style.cssText = `display:inline-block;padding:3px 12px;border-radius:12px;font-size:12px;margin:0 4px;color:#fff;background:${TYPE_COLORS[t] || '#888'};`;
+            badge.textContent = (TYPE_NAMES_FR[t] || t).toUpperCase();
+            typesDiv.appendChild(badge);
+        });
+        card.appendChild(typesDiv);
+
+        // Description
+        if (data.desc) {
+            const descDiv = document.createElement('div');
+            descDiv.style.cssText = 'font-size:12px;color:#ccc;text-align:center;margin-bottom:15px;font-style:italic;';
+            descDiv.textContent = data.desc;
+            card.appendChild(descDiv);
+        }
+
+        // Base stats
+        const statsTitle = document.createElement('div');
+        statsTitle.style.cssText = 'font-weight:bold;color:#ffd700;margin-bottom:8px;font-size:13px;';
+        statsTitle.textContent = 'Stats de base';
+        card.appendChild(statsTitle);
+
+        const statLabels = { hp: 'PV', atk: 'Atq', def: 'Déf', spatk: 'Atq.S', spdef: 'Déf.S', spd: 'Vit' };
+        const maxStat = 150;
+        Object.entries(statLabels).forEach(([key, label]) => {
+            const val = data.baseStats[key] || 0;
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;margin-bottom:4px;font-size:11px;';
+            row.innerHTML = `<span style="width:45px;color:#aaa;">${label}</span><span style="width:30px;color:#fff;">${val}</span><div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100, val / maxStat * 100)}%;height:100%;background:${val >= 100 ? '#4CAF50' : val >= 70 ? '#FF9800' : '#F44336'};border-radius:3px;"></div></div>`;
+            card.appendChild(row);
+        });
+
+        panel.appendChild(card);
+
+        // Back button
+        const backBtn = document.createElement('button');
+        backBtn.className = 'menu-tab';
+        backBtn.style.cssText = 'display:block;margin:15px auto 0;padding:8px 30px;';
+        backBtn.textContent = 'Retour';
+        backBtn.addEventListener('click', () => {
+            panel.innerHTML = '';
+            this._renderPokedexTab(panel);
+        });
+        panel.appendChild(backBtn);
     },
 
     // -- Trainer Card Tab --

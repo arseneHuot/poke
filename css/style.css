@@ -248,12 +248,14 @@ body {
     bottom: 8px;
     right: 15px;
     color: #ffd700;
-    animation: bounce 1s infinite;
+    font-size: 16px;
+    animation: bounce 0.8s ease-in-out infinite;
+    text-shadow: 0 0 6px rgba(255,215,0,0.6);
 }
 
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(5px); }
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(6px); opacity: 0.5; }
 }
 
 /* Battle UI */

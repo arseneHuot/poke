@@ -131,8 +131,8 @@ const GameEngine = {
         const map = WorldData.getMap(state.currentMap);
         if (!map) return;
 
-        // Clear canvas
-        ctx.fillStyle = '#000';
+        // Clear canvas — use warm brown for indoor maps, black for outdoor
+        ctx.fillStyle = (map.music === 'indoor') ? '#1a100a' : '#000';
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         ctx.save();

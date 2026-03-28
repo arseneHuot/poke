@@ -7,7 +7,7 @@
 - ~~**Battle layout proportions**~~ **Done (2026-03-28)**: Responsive viewport scaling via `_scaleGame()` ensures the full 960px battle canvas is always visible, even on narrow displays. See Bug #12 fix.
 - ~~**Battle canvas gap**~~ **Done (2026-03-28)**: Battle render now fills entire canvas with `#1a1a2e` before drawing background. See Bug #33 fix.
 - **Lab interior map too small**: The prof's lab interior is 18×14 tiles (576×448px) inside a 960×640px canvas, leaving large black borders around the room. Interior maps should either be larger or the camera should be clamped to show a zoomed-in view that fills the screen.
-- **Starter selection layout**: The starter cards only use the upper half of the screen; the lower half is empty black. Cards could be centered vertically, or more information (base stats, move preview) could fill the space.
+- ~~**Starter selection layout**~~ **Done (2026-03-28)**: Starter cards now show base stats summary (PV, Atq, Déf, Vit) below the type label, filling the empty space.
 
 ---
 
@@ -28,7 +28,7 @@
 - ~~**Typo "sauvegardee" in Quitter tab and save notification**~~ **Done (2026-03-28)**: Fixed both remaining instances — save notification now reads `'Partie sauvegardée !'` and Quitter tab reads `'Votre partie sera sauvegardée automatiquement.'`
 - ~~**Item use notification typos**~~ **Done (2026-03-28)**: Fixed all four accents in `_useItemOnPokemon`: `"a déjà tous ses PV"`, `"récupère des PV"`, `"est ranimé"`, `"est soigné"`.
 - ~~**Clicking dialogue box does not advance dialogue**~~ **Done (2026-03-28)**: Added click event listener on `dialogueBox` in `UI.init()` — clicking the dialogue box now calls `advanceDialogue()`.
-- **Dialogue indicator (▼) starts hidden and only shows after typewriter finishes**: This is correct behaviour, but the indicator could pulse/animate more visibly to prompt the player.
+- ~~**Dialogue indicator pulse**~~ **Done (2026-03-28)**: Enhanced ▼ indicator with larger font, gold text-shadow glow, faster bounce (0.8s), and opacity pulse from 1→0.5.
 - ~~**Player name not validated**~~ **Done (2026-03-28)**: Empty name now shows red border and placeholder "Entrez un nom !" instead of silently defaulting to "Red".
 
 ---
@@ -38,7 +38,7 @@
 - ~~**Move types displayed in English in Pokémon detail view**~~ **Done (2026-03-28)**: Added `TYPE_NAMES_FR` mapping in `ui.js`, applied to both the detail view and party list.
 - ~~**Pokémon type in party list shows English**~~ **Done (2026-03-28)**: Party list now uses French type names ("Eau", "Feu", "Plante", etc.).
 - ~~**Battle HP bar color**~~ **Done (2026-03-28)**: HP bar already uses green > 50%, orange 20–50%, red < 20% via `backgroundColor` in `BattleSystem._updateUI()`.
-- **Black bars in interior maps**: When entering small indoor maps (lab, houses), large black rectangles appear to the sides due to the fixed 960px canvas being wider than the map. Filling with a solid color, a pattern, or a decorative border would look much more polished.
+- ~~**Black bars in interior maps**~~ **Done (2026-03-28)**: Canvas clear color now uses warm dark brown `#1a100a` for indoor maps (detected via `map.music === 'indoor'`), black for outdoor maps.
 
 ---
 
@@ -56,7 +56,7 @@
 - **Arrow keys don't register reliably for movement**: Key-down/key-up events are processed in a single frame, making held-key movement unreliable unless focus is on the canvas. Clicking the game canvas before using arrow keys is required.
 - ~~**Party HUD dots (top-right) not visible for badges**~~ **Done (2026-03-28)**: Unearned badge slots are now square with a faint ✦ icon; earned badges are round with gold gradient and ★ icon. Visually distinct from party HP dots.
 - **No loading indicator between maps**: Map transitions use a fade to black but there is no spinner or progress indicator. This is fine for small maps but could be extended for feel.
-- **Pokédex entries not clickable**: Clicking a seen or caught Pokémon in the Pokédex grid does nothing. A detail panel showing the Pokémon's type, base stats, and a short description would be a natural addition.
+- ~~**Pokédex entries not clickable**~~ **Done (2026-03-28)**: Clicking a seen/caught Pokédex entry opens a detail panel with sprite, type badges, French description, and base stat bars with color coding. Back button returns to grid.
 - ~~**Game not responsive / no mobile support**~~ **Done (2026-03-28)**: Added `_scaleGame()` in `main.js` — computes `Math.min(1, innerWidth/960, innerHeight/640)` and applies `transform: scale()` to `#game-container`. Runs on init and window resize. Fixes Bug #12.
 - ~~**Party detail view shows max HP only, not current/max**~~ **Done (2026-03-28)**: HP stat now shows `"PV: 16 / 20"` (current/max) in `_showPokemonDetail`. Also fixed accent typos in stat labels: "Défense", "Atq. Spé.", "Déf. Spé.".
 
