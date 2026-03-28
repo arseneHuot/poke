@@ -884,3 +884,31 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 **Root cause:** `_fillRect` fills the entire building area with BUILDING/GYM_BUILDING tiles (non-walkable), including the interior space where NPCs stand. The fix needs to carve walkable GYM_FLOOR tiles inside each building from the door to the NPCs.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #50 - Duplicate event listeners accumulate when returning to title and starting a new game
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**Files:** js/engine.js, js/ui.js
+
+**Description:** When the player returns to the title screen (via `game.returnToTitle()`) and then starts or continues a new game, `GameEngine.init()` and `UI.init()` are called again. Both functions add `window`/`document` event listeners for keyboard input and dialogue interaction without checking if they were already registered. After two or more restarts without a page reload, every keypress fires multiple event handlers, causing inputs to be processed 2–3× per keypress. Movement becomes erratic, dialogue advances multiple steps per click, and menu/escape toggles can fire out of sync.
+
+**Additionally:** `GameEngine.init()` did not reset transient engine state (`warping`, `encounterActive`, `inputLocked`, `repelSteps`, `keysDown`, etc.). Stale flags from a previous game session could persist into the next game.
+
+**Fix:** Added `_eventsBound: false` flag to both `GameEngine` and `UI`. Event listener registration is now guarded by `if (!this._eventsBound)` — only runs once per page load. Added explicit reset of all transient `GameEngine` state at the start of `init()`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #51 - No feedback when Pokémon's moveset is full and cannot learn a new move
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/battle.js (`_handleEnemyFaint`)
+
+**Description:** When a Pokémon levels up in battle and would learn a new move but already has 4 moves, `addExp()` emits a `newmove_full` event. This event was never handled in `battle.js` — the new move was silently dropped with no notification. The player had no indication that their Pokémon tried to learn a move.
+
+**Fix:** Added handler for `evt.type === 'newmove_full'` in `_handleEnemyFaint`. Queues message: `"X voudrait apprendre Y, mais a déjà 4 attaques !"`.
+
+**Found:** 2026-03-28

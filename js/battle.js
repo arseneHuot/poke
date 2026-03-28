@@ -1016,6 +1016,9 @@ const BattleSystem = {
             } else if (evt.type === 'newmove') {
                 const md = MOVES_DB[evt.move];
                 this._queueMessage(`${this.state.playerPokemon.nickname || this.state.playerPokemon.name} apprend ${md ? md.name : evt.move} !`);
+            } else if (evt.type === 'newmove_full') {
+                const md = MOVES_DB[evt.move];
+                this._queueMessage(`${this.state.playerPokemon.nickname || this.state.playerPokemon.name} voudrait apprendre ${md ? md.name : evt.move}, mais a déjà 4 attaques !`);
             } else if (evt.type === 'evolve') {
                 this.state.pendingEvolve = evt;
             }

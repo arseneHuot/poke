@@ -56,6 +56,8 @@ const UI = {
         active: false,
     },
 
+    _eventsBound: false,
+
     // ----------------------------------------------------------------
     // Initialization
     // ----------------------------------------------------------------
@@ -73,12 +75,15 @@ const UI = {
         };
 
         this._initBadgeSlots();
-        this._bindKeys();
 
-        // Click anywhere on dialogue box to advance
-        this.elements.dialogueBox.addEventListener('click', () => {
-            if (this.dialogue.active) this.advanceDialogue();
-        });
+        // Only bind events once to avoid duplicate listeners on game restart
+        if (!this._eventsBound) {
+            this._eventsBound = true;
+            this._bindKeys();
+            this.elements.dialogueBox.addEventListener('click', () => {
+                if (this.dialogue.active) this.advanceDialogue();
+            });
+        }
     },
 
     _initBadgeSlots() {

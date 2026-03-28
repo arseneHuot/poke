@@ -8,6 +8,7 @@ const GameEngine = {
     game: null,
     animFrame: 0,
     lastTime: 0,
+    _eventsBound: false,
 
     // Movement state
     moving: false,
@@ -48,16 +49,33 @@ const GameEngine = {
 
         this.ctx.imageSmoothingEnabled = false;
 
-        // Input handling — prevent default for game keys to avoid page scrolling
-        const gameKeys = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ']);
-        window.addEventListener('keydown', (e) => {
-            if (gameKeys.has(e.key)) e.preventDefault();
-            this.keysDown[e.key] = true;
-            this.handleInput(e.key, e);
-        });
-        window.addEventListener('keyup', (e) => {
-            this.keysDown[e.key] = false;
-        });
+        // Reset transient state between games
+        this.moving = false;
+        this.inputLocked = false;
+        this.warping = false;
+        this.warpFade = 0;
+        this.warpTarget = null;
+        this.encounterFlash = 0;
+        this.encounterActive = false;
+        this.repelSteps = 0;
+        this.keysDown = {};
+        this.lastSafeMap = null;
+        this.lastSafeX = null;
+        this.lastSafeY = null;
+
+        // Input handling — only bind once to avoid duplicate listeners on restart
+        if (!this._eventsBound) {
+            this._eventsBound = true;
+            const gameKeys = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ']);
+            window.addEventListener('keydown', (e) => {
+                if (gameKeys.has(e.key)) e.preventDefault();
+                this.keysDown[e.key] = true;
+                this.handleInput(e.key, e);
+            });
+            window.addEventListener('keyup', (e) => {
+                this.keysDown[e.key] = false;
+            });
+        }
 
         // Initialize camera to player position
         this._updateCamera();
