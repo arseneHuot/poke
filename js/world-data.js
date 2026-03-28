@@ -109,7 +109,7 @@ const WorldData = {
             encounters: [],
             npcs: [
                 { id: 'prof_oliva', type: 'professor', x: 28, y: 12, dir: DIR.DOWN, name: 'Prof. Oliva',
-                  dialogue: 'story_professor_intro', storyFlag: 'met_professor' },
+                  dialogue: 'story_professor_intro', storyFlag: 'met_professor', disappearAfter: true },
                 { id: 'mom', type: 'villager', x: 9, y: 10, dir: DIR.DOWN, name: 'Maman',
                   dialogue: 'mom_dialogue' },
                 { id: 'rival', type: 'rival', x: 30, y: 21, dir: DIR.DOWN, name: 'Kaël',
@@ -283,7 +283,7 @@ const WorldData = {
                 { id: 'merchant_porto', type: 'merchant', x: 29, y: 11, dir: DIR.DOWN, name: 'Vendeur',
                   dialogue: 'merchant_shop' },
                 { id: 'gym1_leader', type: 'gymleader', x: 38, y: 18, dir: DIR.DOWN, name: 'Champion Marco',
-                  dialogue: 'gym1_dialogue', team: [
+                  dialogue: 'gym1_dialogue', altDialogue: 'gym1_defeated', team: [
                     { id: 10, level: 12 }, { id: 11, level: 14 }
                   ], defeated: false, reward: 1800, badge: 0, storyReq: 'has_starter' },
                 { id: 'villager_porto1', type: 'villager', x: 24, y: 20, dir: DIR.LEFT, name: 'Marin',
@@ -431,7 +431,7 @@ const WorldData = {
                 { id: 'merchant_campo', type: 'merchant', x: 29, y: 9, dir: DIR.DOWN, name: 'Vendeuse',
                   dialogue: 'merchant_shop' },
                 { id: 'gym2_leader', type: 'gymleader', x: 10, y: 24, dir: DIR.DOWN, name: 'Championne Flora',
-                  dialogue: 'gym2_dialogue', team: [
+                  dialogue: 'gym2_dialogue', altDialogue: 'gym2_defeated', team: [
                     { id: 22, level: 18 }, { id: 63, level: 19 }, { id: 40, level: 21 }
                   ], defeated: false, reward: 2400, badge: 1, storyReq: 'badge_0' },
                 { id: 'villager_campo1', type: 'villager', x: 32, y: 24, dir: DIR.LEFT, name: 'Botaniste',
@@ -549,11 +549,11 @@ const WorldData = {
                 { id: 'merchant_rivalta', type: 'merchant', x: 31, y: 11, dir: DIR.DOWN, name: 'Vendeur',
                   dialogue: 'merchant_shop' },
                 { id: 'gym3_leader', type: 'gymleader', x: 34, y: 26, dir: DIR.DOWN, name: 'Champion Ondine',
-                  dialogue: 'gym3_dialogue', team: [
+                  dialogue: 'gym3_dialogue', altDialogue: 'gym3_defeated', team: [
                     { id: 20, level: 24 }, { id: 47, level: 25 }, { id: 68, level: 27 }
                   ], defeated: false, reward: 3200, badge: 2, storyReq: 'badge_1' },
                 { id: 'gym4_leader', type: 'gymleader', x: 10, y: 28, dir: DIR.DOWN, name: 'Champion Voltaire',
-                  dialogue: 'gym4_dialogue', team: [
+                  dialogue: 'gym4_dialogue', altDialogue: 'gym4_defeated', team: [
                     { id: 18, level: 27 }, { id: 49, level: 28 }, { id: 19, level: 30 }
                   ], defeated: false, reward: 3600, badge: 3, storyReq: 'badge_2' },
                 { id: 'villager_rivalta1', type: 'villager', x: 22, y: 22, dir: DIR.RIGHT, name: 'Chercheur',
@@ -693,11 +693,11 @@ const WorldData = {
                 { id: 'nurse_volcan', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
                 { id: 'merchant_volcan', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
                 { id: 'gym5_leader', type: 'gymleader', x: 10, y: 26, dir: DIR.DOWN, name: 'Champion Blaze',
-                  dialogue: 'gym5_dialogue', team: [
+                  dialogue: 'gym5_dialogue', altDialogue: 'gym5_defeated', team: [
                     { id: 30, level: 34 }, { id: 82, level: 35 }, { id: 59, level: 35 }, { id: 31, level: 37 }
                   ], defeated: false, reward: 4400, badge: 4, storyReq: 'badge_3' },
                 { id: 'gym6_leader', type: 'gymleader', x: 36, y: 26, dir: DIR.DOWN, name: 'Champion Terra',
-                  dialogue: 'gym6_dialogue', team: [
+                  dialogue: 'gym6_dialogue', altDialogue: 'gym6_defeated', team: [
                     { id: 33, level: 37 }, { id: 55, level: 37 }, { id: 25, level: 38 }, { id: 56, level: 40 }
                   ], defeated: false, reward: 4800, badge: 5, storyReq: 'badge_4' },
             ],
@@ -781,7 +781,7 @@ const WorldData = {
                 { id: 'nurse_glacia', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
                 { id: 'merchant_glacia', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
                 { id: 'gym7_leader', type: 'gymleader', x: 20, y: 26, dir: DIR.DOWN, name: 'Championne Crysta',
-                  dialogue: 'gym7_dialogue', team: [
+                  dialogue: 'gym7_dialogue', altDialogue: 'gym7_defeated', team: [
                     { id: 41, level: 40 }, { id: 84, level: 41 }, { id: 28, level: 42 }, { id: 42, level: 44 }
                   ], defeated: false, reward: 5200, badge: 6, storyReq: 'badge_5' },
             ],
@@ -866,7 +866,7 @@ const WorldData = {
                 { id: 'nurse_abyss', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
                 { id: 'merchant_abyss', type: 'merchant', x: 33, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
                 { id: 'gym8_leader', type: 'gymleader', x: 23, y: 28, dir: DIR.DOWN, name: 'Champion Drake',
-                  dialogue: 'gym8_dialogue', team: [
+                  dialogue: 'gym8_dialogue', altDialogue: 'gym8_defeated', team: [
                     { id: 66, level: 46 }, { id: 111, level: 47 }, { id: 89, level: 48 }, { id: 136, level: 48 }, { id: 67, level: 50 }
                   ], defeated: false, reward: 6000, badge: 7, storyReq: 'badge_6' },
             ],

@@ -180,14 +180,33 @@ body {
     width: 24px;
     height: 24px;
     background: rgba(0,0,0,0.5);
-    border: 2px solid rgba(255,255,255,0.2);
-    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    position: relative;
+}
+
+.badge-slot::after {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    color: rgba(255,255,255,0.15);
 }
 
 .badge-slot.earned {
     background: linear-gradient(135deg, #ffd700, #ff8c00);
     border-color: #ffd700;
+    border-radius: 50%;
     box-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+
+.badge-slot.earned::after {
+    content: '★';
+    color: #fff;
+    font-size: 12px;
+    text-shadow: 0 0 4px rgba(255,255,255,0.5);
 }
 
 /* Dialogue Box */

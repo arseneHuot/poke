@@ -97,8 +97,14 @@ const game = {
         input.select();
 
         const confirmName = () => {
-            const name = (input.value || 'Red').trim() || 'Red';
-            this._newGame(name);
+            const raw = input.value.trim();
+            if (!raw) {
+                input.style.borderColor = '#f44336';
+                input.setAttribute('placeholder', 'Entrez un nom !');
+                input.value = '';
+                return;
+            }
+            this._newGame(raw);
             titleScreen.classList.add('hidden');
         };
 
