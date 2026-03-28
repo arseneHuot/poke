@@ -732,6 +732,30 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 
 ---
 
+## Bug #42 - Evolved species not registered in Pokédex after evolution
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/pokemon-data.js (`evolvePokemon`), js/battle.js (evolution handling)
+
+**Description:** When a player's Pokémon evolves during battle (e.g. Aquali Lv15 → Aquanox at Lv16), the evolved species is not added to `game.state.pokedexSeen` or `game.state.pokedexCaught`. The pre-evolution entry remains marked as seen/caught, but the new species entry (e.g. Aquanox id:5) does not appear as caught or seen in the Pokédex. In standard Pokémon games, evolution registers the new species as owned/seen automatically.
+
+**Root cause:** `evolvePokemon()` in `pokemon-data.js` changes `pokemon.id` and `pokemon.name` but does not update `game.state.pokedexSeen` or `game.state.pokedexCaught`. The evolution handling in `battle.js` (around line 1039) calls `evolvePokemon()` but also does not add the new ID to the Pokédex sets.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #43 - Aquali back sprite suspected missing (needs verification)
+**Status:** Cannot Reproduce
+**Priority:** Low
+**File:** js/sprite-renderer.js
+
+**Description:** Bug #38 claimed Aquali's back sprite was not rendered in battle. Further testing confirms the sprite cache entry `4_112_back_false` contains 4709 non-transparent pixels and the back-facing sprite renders correctly. The original observation may have been made during battle initialisation before the sprite was cached, or during an animation state with `playerAnim.alpha = 0`. No persistent rendering failure detected.
+
+**Found:** 2026-03-28
+
+---
+
 ## Bug #41 - Stale nurse dialogue (with wrong health status) re-appears after map transition
 **Status:** Fixed (2026-03-28)
 **Priority:** Medium

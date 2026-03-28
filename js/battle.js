@@ -1037,6 +1037,12 @@ const BattleSystem = {
                             clearInterval(flashInterval);
                             this.state.evolveFlash = 0;
                             evolvePokemon(this.state.playerPokemon, evo.to);
+                            // Register evolved species in Pokédex
+                            const newId = this.state.playerPokemon.id;
+                            if (game && game.state) {
+                                game.state.pokedexSeen.add(newId);
+                                game.state.pokedexCaught.add(newId);
+                            }
                             const newName = this.state.playerPokemon.name;
                             this._queueMessage(`${oldName} a évolué en ${newName} !`);
                             this.state.pendingEvolve = null;
