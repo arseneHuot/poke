@@ -310,12 +310,40 @@ const BattleSystem = {
             if (!pkmn) return;
             const btn = document.createElement('button');
             btn.className = 'battle-btn';
+            btn.style.display = 'flex';
+            btn.style.flexDirection = 'column';
+            btn.style.alignItems = 'stretch';
+            btn.style.gap = '4px';
             const isCurrent = pkmn === this.state.playerPokemon;
             const fainted = pkmn.currentHp <= 0;
-            btn.textContent = `${pkmn.nickname || pkmn.name} Nv.${pkmn.level} ${Math.ceil(pkmn.currentHp)}/${pkmn.stats.hp} PV`;
             btn.disabled = isCurrent || fainted;
             if (fainted) btn.style.opacity = '0.5';
             if (isCurrent) btn.style.borderColor = '#FFD700';
+
+            // Name + level row
+            const nameRow = document.createElement('div');
+            nameRow.style.display = 'flex';
+            nameRow.style.justifyContent = 'space-between';
+            nameRow.style.fontSize = '13px';
+            nameRow.textContent = `${pkmn.nickname || pkmn.name} Nv.${pkmn.level}`;
+            const hpText = document.createElement('span');
+            hpText.style.fontSize = '11px';
+            hpText.style.opacity = '0.85';
+            hpText.textContent = `${Math.ceil(pkmn.currentHp)} / ${pkmn.stats.hp} PV`;
+            nameRow.appendChild(hpText);
+
+            // HP bar
+            const barBg = document.createElement('div');
+            barBg.style.cssText = 'background:rgba(0,0,0,0.4);border-radius:3px;height:5px;overflow:hidden;width:100%';
+            const pct = fainted ? 0 : Math.max(0, pkmn.currentHp / pkmn.stats.hp * 100);
+            const barColor = pct > 50 ? '#4CAF50' : pct > 20 ? '#FF9800' : '#F44336';
+            const barFill = document.createElement('div');
+            barFill.style.cssText = `height:100%;width:${pct}%;background:${barColor};border-radius:3px;transition:width 0.3s`;
+            barBg.appendChild(barFill);
+
+            btn.appendChild(nameRow);
+            btn.appendChild(barBg);
+
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('confirm');
                 this.switchPokemon(index);
@@ -1415,9 +1443,11 @@ const BattleSystem = {
             });
         }
         // Animate confetti for 2 seconds
-        const confettiTimer = setInterval(() => {
+        if (this.state.confettiTimer) clearInterval(this.state.confettiTimer);
+        this.state.confettiTimer = setInterval(() => {
             if (!this.state.confetti || this.state.confetti.length === 0) {
-                clearInterval(confettiTimer);
+                clearInterval(this.state.confettiTimer);
+                this.state.confettiTimer = null;
                 return;
             }
             this.state.confetti.forEach(p => {
@@ -1430,7 +1460,10 @@ const BattleSystem = {
         }, 30);
         setTimeout(() => {
             this.state.confetti = [];
-            clearInterval(confettiTimer);
+            if (this.state.confettiTimer) {
+                clearInterval(this.state.confettiTimer);
+                this.state.confettiTimer = null;
+            }
         }, 2500);
     },
 
@@ -1442,6 +1475,13 @@ const BattleSystem = {
         this.state.active = false;
         this.state.turnPhase = 'ended';
         this.state.battleResult = result;
+
+        // Clear confetti so it doesn't persist after returning to overworld
+        this.state.confetti = [];
+        if (this.state.confettiTimer) {
+            clearInterval(this.state.confettiTimer);
+            this.state.confettiTimer = null;
+        }
 
         // Clean up battle-specific flags on player party
         game.state.party.forEach(p => {

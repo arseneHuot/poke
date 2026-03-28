@@ -155,13 +155,13 @@
 
 - ~~**No money reward message after trainer victory**~~ **Done (2026-03-28)**: Already implemented — `battle.js` `_handleEnemyFaint` queues `"Vous recevez X₽ !"` message when `trainerNpc.reward` is set. Verified in code.
 
-- **Pokémon switch screen shows plain text, no HP bars**: The in-battle POKÉMON switch screen lists party members as "Name Nv.X X/X PV" plain text. Adding compact HP bars (like the overworld party screen) would let players quickly assess which Pokémon are healthy without reading numbers.
+- ~~**Pokémon switch screen shows plain text, no HP bars**~~ **Done (2026-03-28)**: Each party slot in the in-battle switch screen now shows a name/level row with current/max HP, plus a color-coded HP bar (green >50%, orange >20%, red ≤20%) below it.
 
 - **Battle area blank between turns**: The middle section of the battle screen (between the Pokémon sprites and the text log) is empty while messages are queuing. A subtle idle animation or a semi-visible previous-turn recap would fill this dead space.
 
 ### UX / Overworld
 
-- **No active Repel indicator**: When Repousse is active, there is no HUD indicator or step counter showing the player how many steps remain. Players have no way to tell if Repousse is active or how long it lasts without counting steps manually.
+- ~~**No active Repel indicator**~~ **Done (2026-03-28)**: Added `#repel-indicator` pill in the HUD (green, between badges and party dots). Shows "🌿 Repousse : N pas" when a Repel is active; hidden otherwise. Updated every frame via `UI.updatePartyDots()`.
 
 - ~~**Pokédex stat bars are all red**~~ **Done (2026-03-28)**: Already implemented — stat bars use color-coded backgrounds: green (`#4CAF50`) for stat ≥ 100, orange (`#FF9800`) for ≥ 70, red (`#F44336`) for < 70. Verified in `_showPokedexDetail` at ui.js line 1045.
 

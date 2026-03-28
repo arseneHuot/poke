@@ -994,9 +994,9 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 ---
 
 ## Bug #58 - Catch celebration confetti particles persist indefinitely on overworld
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Low
-**File:** js/battle.js or js/engine.js
+**File:** js/battle.js
 
 **Description:** After a successful Pokémon catch, colored confetti particles appear on the ground. When returning to the overworld those particles remain visible on the map and do not fade or despawn — they persist indefinitely across the session.
 
@@ -1004,6 +1004,8 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 1. Catch a Pokémon in a wild battle
 2. Return to the overworld
 3. Golden/pink confetti particles remain visibly on the ground near the player's position
+
+**Fix:** `endBattle()` now immediately clears `this.state.confetti = []` and calls `clearInterval(this.state.confettiTimer)` so confetti stops as soon as the battle ends. The `confettiTimer` reference is stored on `this.state` (was a local variable before) so `endBattle` can cancel it.
 
 **Found:** 2026-03-28
 

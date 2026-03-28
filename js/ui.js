@@ -1296,6 +1296,18 @@ const UI = {
             }
             container.appendChild(dot);
         }
+
+        // Update repel indicator
+        const repelEl = document.getElementById('repel-indicator');
+        if (repelEl) {
+            const steps = (typeof GameEngine !== 'undefined') ? GameEngine.repelSteps : 0;
+            if (steps > 0) {
+                repelEl.textContent = `🌿 Repousse : ${steps} pas`;
+                repelEl.classList.remove('hidden');
+            } else {
+                repelEl.classList.add('hidden');
+            }
+        }
     },
 
     // ----------------------------------------------------------------

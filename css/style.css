@@ -247,6 +247,26 @@ body {
     box-shadow: 0 0 6px rgba(244,67,54,0.6);
 }
 
+#repel-indicator {
+    background: rgba(0,180,80,0.85);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(255,255,255,0.3);
+    box-shadow: 0 0 6px rgba(0,200,80,0.4);
+    align-self: center;
+}
+
+#repel-indicator.hidden {
+    display: none;
+}
+
 /* Dialogue Box */
 #dialogue-box {
     position: absolute;
