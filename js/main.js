@@ -118,6 +118,10 @@ const game = {
     // New Game State
     // --------------------------------------------------------
     _newGame(playerName) {
+        // Reset world maps so NPC states (defeated, dir) don't bleed from a previous session
+        WorldData.maps = {};
+        WorldData.init();
+
         this.state = {
             playerName: playerName,
             playerX: 20,
@@ -166,6 +170,10 @@ const game = {
     // Load Game State
     // --------------------------------------------------------
     _loadGame(saveData) {
+        // Reset world maps so NPC states from any previous session don't bleed in
+        WorldData.maps = {};
+        WorldData.init();
+
         this.state = {
             playerName: saveData.playerName,
             playerX: saveData.playerX,

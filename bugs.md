@@ -1246,3 +1246,25 @@ if (newBtn.dataset.action === 'run') {
 **Fix:** Added an explicit player-faint check after `_doEnemyTurn` (to avoid applying status to an already-fainted Pokémon), followed by `_processStatusEndTurn` for both Pokémon, before calling `_checkFaintsAfterTurn`.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #72 - WorldData.maps not reset between game sessions — stale NPC state bleeds into new/loaded games
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/main.js (`_newGame`, `_loadGame`)
+
+**Description:** `WorldData.maps` is a global object populated lazily during gameplay. When the player returns to the title screen via `returnToTitle()` and then starts a new game or loads a save, `WorldData.maps` still holds all NPC objects from the previous session. Any mutable NPC state set during that session — most notably `npc.defeated = true` on beaten trainers — persists into the new session. A brand-new game would encounter trainers that say "Tu m'as déjà battu !" because they were defeated in the previous play session.
+
+**Steps to reproduce:**
+1. Start a new game, defeat "Gamin Thomas" on Route 1
+2. Open menu → Quitter → confirm → return to title
+3. Start a new game
+4. Walk to Route 1 and interact with "Gamin Thomas"
+5. He shows the post-defeat dialogue instead of initiating a battle
+
+**Root cause:** Neither `_newGame()` nor `_loadGame()` in `main.js` cleared or re-initialized `WorldData.maps` before use. The lazy-generated maps were reused as-is, including all NPC state mutations from the previous session.
+
+**Fix:** Added `WorldData.maps = {}; WorldData.init();` at the top of both `_newGame()` and `_loadGame()`. Clearing `maps` forces all maps to be regenerated fresh on first access, with clean NPC state. `WorldData.init()` recreates the 3 eagerly-generated maps (borgo, player_house, prof_lab) immediately.
+
+**Found:** 2026-03-28
