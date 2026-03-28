@@ -117,6 +117,6 @@
 
 ### UX / UI
 
-- **Fainted Pokémon visual feedback in battle**: When a Pokémon faints, the info panel still shows "0/17" but there's no strong visual cue (e.g., red flash, grey-out of the name panel). A more dramatic faint indication would improve the experience.
+- ~~**Fainted Pokémon visual feedback in battle**~~ **Done (2026-03-28)**: Info panel now gets `fainted` CSS class on KO — turns dark red, reduces opacity to 50%, and plays a brief white flash animation. Applied to both player and enemy panels.
 
-- **XP bar in battle victory screen**: After winning a battle, the XP gain message appears but there is no visual XP bar filling animation in the battle UI itself. Adding an animated XP bar below the player's HP bar during battle would give better feedback on leveling progress.
+- ~~**XP bar in battle victory screen**~~ **Done (2026-03-28)**: XP bar fill transition slowed to 1.2s ease-out (from 0.5s) so the fill animation is clearly visible during the "gagne X points d'exp." message. XP bar height increased to 5px for better visibility.

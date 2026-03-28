@@ -132,6 +132,13 @@ const BattleSystem = {
         const enemyHpText = document.getElementById('enemy-hp-text');
         if (enemyHpText) enemyHpText.textContent = `${Math.ceil(Math.max(0, this.state.hpAnimEnemy))}/${ep.stats.hp}`;
 
+        // Fainted visual feedback on enemy panel
+        const enemyInfo = document.getElementById('battle-enemy-info');
+        if (enemyInfo) {
+            if (ep.currentHp <= 0) enemyInfo.classList.add('fainted');
+            else enemyInfo.classList.remove('fainted');
+        }
+
         // Player info
         const playerName = document.getElementById('player-pokemon-name');
         const playerLevel = document.getElementById('player-pokemon-level');
@@ -146,6 +153,14 @@ const BattleSystem = {
             playerHp.style.backgroundColor = pct > 50 ? '#4CAF50' : pct > 20 ? '#FF9800' : '#F44336';
         }
         if (playerHpText) playerHpText.textContent = `${Math.ceil(Math.max(0, this.state.hpAnimPlayer))}/${pp.stats.hp}`;
+
+        // Fainted visual feedback on player panel
+        const playerInfo = document.getElementById('battle-player-info');
+        if (playerInfo) {
+            if (pp.currentHp <= 0) playerInfo.classList.add('fainted');
+            else playerInfo.classList.remove('fainted');
+        }
+
         if (playerXp) {
             const xpPct = getExpPercent(pp);
             playerXp.style.width = (xpPct * 100) + '%';
