@@ -235,7 +235,9 @@ const BattleSystem = {
             const typeColor = TYPE_COLORS[moveData.type] || '#888';
             const typeName = (typeof TYPE_NAMES_FR !== 'undefined' && TYPE_NAMES_FR[moveData.type]) || moveData.type;
             btn.style.borderLeft = `4px solid ${typeColor}`;
-            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:${typeColor};color:#fff;margin-left:6px;">${typeName}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10}</span>`;
+            const powerStr = moveData.power > 0 ? moveData.power : '—';
+            const accStr = moveData.accuracy < 100 ? moveData.accuracy + '%' : '100%';
+            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:${typeColor};color:#fff;margin-left:6px;">${typeName}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10} | Pw: ${powerStr} | Préc: ${accStr}</span>`;
             btn.disabled = ppLeft <= 0;
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('confirm');
@@ -1320,6 +1322,17 @@ const BattleSystem = {
         // Register in pokedex
         game.state.pokedexSeen.add(ep.id);
         game.state.pokedexCaught.add(ep.id);
+
+        // Check if caught Pokémon is at or above its evolution level
+        const evoTarget = (typeof checkEvolution !== 'undefined') ? checkEvolution(ep) : null;
+        if (evoTarget) {
+            const oldName = ep.nickname || ep.name;
+            evolvePokemon(ep, evoTarget);
+            game.state.pokedexSeen.add(ep.id);
+            game.state.pokedexCaught.add(ep.id);
+            this._queueMessage(`Hein ?! ${oldName} évolue !`);
+            this._queueMessage(`${oldName} a évolué en ${ep.name} !`);
+        }
 
         this._processMessageQueue(() => {
             this.endBattle('catch');

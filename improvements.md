@@ -170,3 +170,21 @@
 ### Menus
 
 - ~~**Save notification obscured by menu backdrop**~~ **Done (2026-03-28)**: Notification repositioned to `top: 50%; transform: translate(-50%, -50%)` — now centered in the viewport, fully visible over the menu overlay. See Bug #60 fix.
+
+---
+
+## New Suggestions (2026-03-28 QA session #5 — Gameplay & UX)
+
+### Battle
+
+- ~~**Battle move list: show base power and accuracy**~~ **Done (2026-03-29)**: Move buttons now show `Pw: N | Préc: N%` in the move-info line alongside PP. Status moves display `Pw: —`.
+
+### Shop / Items
+
+- ~~**Shop: show feedback when purchase fails due to insufficient funds**~~ **Done (2026-03-29)**: Already implemented — `_renderShopBuy` in ui.js calls `this.showNotification('Pas assez d\'argent !')` when `game.state.money < itemData.price`. Verified in code.
+
+- **Escape Rope: add guard against use in towns and routes** — The Escape Rope (Corde Sortie) can be used anywhere in the overworld — including towns and open routes — consuming the item and warping the player to `GameEngine.lastSafeMap` (defaulting to Borgo). In mainline Pokémon games, using an escape rope outside a cave/dungeon shows "This isn't the right place to use this!" and does not consume the item. Consider adding a map-type flag (e.g. `map.isDungeon`) and blocking escape rope use unless that flag is set.
+
+### Trainer Card
+
+- **Badge slots: show type silhouettes for unearned badges** — All 8 unearned badge slots in the Dresseur (Trainer Card) tab display a plain "?" character in a dark circle. Showing a faint silhouette of each badge type (based on the gym type: Normal, Plante, Eau, Electrik, Feu, Sol, Glace, Dragon) would hint at what each badge looks like and make the card feel more complete even with 0 badges earned.

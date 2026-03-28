@@ -897,10 +897,11 @@ const UI = {
                 delete game.state.bag[itemId];
             }
             AudioSystem.playSfx('select');
-            // Re-render menu after short delay
+            // Refresh item target panel immediately to show updated HP values
+            this._showItemUseTarget(itemId);
             setTimeout(() => {
                 this._renderMenu();
-            }, 300);
+            }, 800);
         }
     },
 

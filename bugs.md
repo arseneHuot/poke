@@ -1292,3 +1292,53 @@ if (newBtn.dataset.action === 'run') {
 **Fix:** Added `if (this._timer) { clearInterval(this._timer); this._timer = null; }` at the start of `_startAutoSave()` to ensure only one timer runs at a time.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #74 - Bag item use screen does not refresh HP display after applying a potion
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/ui.js (`_showItemUseTarget`, `_useItemOnPokemon`)
+
+**Description:** When a player opens the bag in the overworld, selects a healing item (Potion, Super Potion), and uses it on an injured Pokémon via the "Utiliser X sur..." screen, the underlying `pokemon.currentHp` value is updated correctly but the HP text displayed in the item-target list (`PV: X/Y`) is not refreshed. The stale value from when the screen was first rendered remains visible. The player must close and reopen the menu to see the updated HP.
+
+**Steps to reproduce:**
+1. Injure a Pokémon (e.g., Aquali at 20/53 HP)
+2. Open menu → Sac → click Potion
+3. The "Utiliser Potion sur..." list shows Aquali at "PV: 20/53"
+4. Click Aquali to apply the Potion
+5. The item-target list still shows "PV: 20/53" — HP was healed to 40/53 but the display was not updated
+
+**Expected:** After using a healing item, the Pokémon's HP display in the target list updates to reflect the new HP value.
+**Actual:** Stale HP displayed. `game.state.party[0].currentHp` = 40, but the rendered text still shows 20/53 until the menu is reopened.
+
+**Root cause:** `_useItemOnPokemon` in `ui.js` heals the Pokémon and calls `this.showNotification()` + closes the target sub-view, but does not re-render the "use item on..." list. The `.details` div in the rendered party list is created once and never updated in-place.
+
+**Fix:** After a successful item use, immediately call `_showItemUseTarget(itemId)` to re-render the panel with updated HP values. An 800ms timeout then navigates back to the main menu.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #75 - Pokémon caught at or above their evolution level do not auto-evolve
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/battle.js (`_handleExpGain`), js/pokemon-data.js (`createPokemon`)
+
+**Description:** When a Pokémon is obtained (caught in the wild or added to the party via `createPokemon`) at a level equal to or above its `evolveLevel`, no evolution is triggered. The evolution system only fires during a battle level-up event (`pendingEvolve` in `_handleExpGain`). If a Pokémon was never leveled up through battle while at its evolveLevel, it will remain unevolved indefinitely — even at levels 50+ — until the next time it levels up in battle.
+
+**Steps to reproduce:**
+1. Wild encounter: catch Insectyl (evolveLevel: 10) at exactly level 10
+2. Inspect it in the party — it is still Insectyl, not Chrysalyd
+3. Battle with Insectyl as lead; defeat a weak enemy to gain exp
+4. If Insectyl does not gain enough exp to level up, no evolution fires
+5. Only when Insectyl gains a level-up (reaching level 11+) in battle does the evolution trigger
+
+**Expected:** A Pokémon obtained at or above its evolution level should either evolve immediately (at time of capture) or prompt evolution at next level-up.
+**Actual:** No evolution occurs until the next battle level-up. At level 10 (= evolveLevel) nothing triggers; only at level 11+ does `pendingEvolve` fire.
+
+**Root cause:** `createPokemon` does not check `evolveLevel` after creating the Pokémon. `_executeCatch` → `_processCatchSuccess` also does not check or apply evolution. Evolution is exclusively handled via `pendingEvolve` events emitted by `_handleExpGain` when `newLevel >= data.evolveLevel`.
+
+**Fix:** Added evolution check in `_processCatchSuccess` (battle.js): after registering the caught Pokémon in the Pokédex, calls `checkEvolution(ep)`. If an evolution target exists, `evolvePokemon` is applied immediately, the new species is registered in the Pokédex, and evolution messages are queued before `endBattle('catch')`.
+
+**Found:** 2026-03-28
