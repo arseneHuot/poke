@@ -1148,6 +1148,9 @@ const BattleSystem = {
         ep.ot = game.state.playerName || 'Player';
         ep.caughtBall = 'pokeball';
 
+        // Start confetti celebration
+        this._startConfetti();
+
         if (game.state.party.length < 6) {
             game.state.party.push(ep);
             this._queueMessage(`${ep.nickname || ep.name} a été ajouté à l'équipe !`);
@@ -1323,6 +1326,55 @@ const BattleSystem = {
             ctx.fillStyle = `rgba(255, 255, 255, ${this.state.evolveFlash})`;
             ctx.fillRect(0, 0, cw, ch);
         }
+
+        // Confetti particles
+        if (this.state.confetti && this.state.confetti.length > 0) {
+            this.state.confetti.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle);
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                ctx.restore();
+            });
+        }
+    },
+
+    _startConfetti() {
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#FFD700', '#FF69B4', '#7B68EE'];
+        const cw = GameEngine.canvas ? GameEngine.canvas.width : 960;
+        const ch = GameEngine.canvas ? GameEngine.canvas.height : 640;
+        this.state.confetti = [];
+        for (let i = 0; i < 60; i++) {
+            this.state.confetti.push({
+                x: Math.random() * cw,
+                y: -10 - Math.random() * 100,
+                vx: (Math.random() - 0.5) * 3,
+                vy: 1 + Math.random() * 3,
+                size: 4 + Math.random() * 6,
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - 0.5) * 0.2,
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+        // Animate confetti for 2 seconds
+        const confettiTimer = setInterval(() => {
+            if (!this.state.confetti || this.state.confetti.length === 0) {
+                clearInterval(confettiTimer);
+                return;
+            }
+            this.state.confetti.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.angle += p.spin;
+                p.vy += 0.05; // gravity
+            });
+            this.state.confetti = this.state.confetti.filter(p => p.y < ch + 20);
+        }, 30);
+        setTimeout(() => {
+            this.state.confetti = [];
+            clearInterval(confettiTimer);
+        }, 2500);
     },
 
     // ----------------------------------------------------------

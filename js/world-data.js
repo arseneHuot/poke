@@ -5,30 +5,41 @@
 // Map generator - creates tile maps procedurally with controlled randomness
 const WorldData = {
     maps: {},
+    _generators: null,
 
     init() {
-        this._createBorgoVillage();
-        this._createRoute1();
-        this._createPortoCity();
-        this._createRoute2();
-        this._createGrotte1();
-        this._createCampoverde();
-        this._createRoute3();
-        this._createRivalta();
-        this._createRoute4();
-        this._createDesertRoute();
-        this._createVolcanCity();
-        this._createRoute6();
-        this._createGlaciaCity();
-        this._createRoute7();
-        this._createAbyssCity();
-        this._createVictoryRoad();
-        this._createPokemonLeague();
-        this._createProfLab();
-        this._createPlayerHouse();
+        // Register lazy generators — maps are built on first access
+        this._generators = {
+            borgo: () => this._createBorgoVillage(),
+            route1: () => this._createRoute1(),
+            porto: () => this._createPortoCity(),
+            route2: () => this._createRoute2(),
+            grotte1: () => this._createGrotte1(),
+            campoverde: () => this._createCampoverde(),
+            route3: () => this._createRoute3(),
+            rivalta: () => this._createRivalta(),
+            route4: () => this._createRoute4(),
+            desert_route: () => this._createDesertRoute(),
+            volcan_city: () => this._createVolcanCity(),
+            route6: () => this._createRoute6(),
+            glacia_city: () => this._createGlaciaCity(),
+            route7: () => this._createRoute7(),
+            abyss_city: () => this._createAbyssCity(),
+            victory_road: () => this._createVictoryRoad(),
+            pokemon_league: () => this._createPokemonLeague(),
+            prof_lab: () => this._createProfLab(),
+            player_house: () => this._createPlayerHouse(),
+        };
+        // Eagerly generate starting area for instant boot
+        this._generators.borgo();
+        this._generators.player_house();
+        this._generators.prof_lab();
     },
 
     getMap(mapId) {
+        if (!this.maps[mapId] && this._generators && this._generators[mapId]) {
+            this._generators[mapId]();
+        }
         return this.maps[mapId];
     },
 

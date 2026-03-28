@@ -139,16 +139,33 @@ const GameEngine = {
 
         ctx.save();
 
-        // Apply camera transform
-        const camOffX = -this.cameraX + CANVAS_WIDTH / 2;
-        const camOffY = -this.cameraY + CANVAS_HEIGHT / 2;
-        ctx.translate(Math.round(camOffX), Math.round(camOffY));
+        // Zoom in for small interior maps so they fill the screen
+        const mapPixelW = map.width * TILE_SIZE;
+        const mapPixelH = map.height * TILE_SIZE;
+        let camScale = 1;
+        if (mapPixelW < CANVAS_WIDTH || mapPixelH < CANVAS_HEIGHT) {
+            camScale = Math.max(CANVAS_WIDTH / mapPixelW, CANVAS_HEIGHT / mapPixelH);
+            camScale = Math.min(camScale, 2.5); // cap zoom
+        }
 
-        // Determine visible tile range
-        const startTileX = Math.max(0, Math.floor(this.cameraX / TILE_SIZE - TILES_X / 2) - 1);
-        const startTileY = Math.max(0, Math.floor(this.cameraY / TILE_SIZE - TILES_Y / 2) - 1);
-        const endTileX = Math.min(map.width, startTileX + TILES_X + 2);
-        const endTileY = Math.min(map.height, startTileY + TILES_Y + 2);
+        // Apply camera transform with optional zoom
+        if (camScale > 1) {
+            ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+            ctx.scale(camScale, camScale);
+            ctx.translate(-this.cameraX, -this.cameraY);
+        } else {
+            const camOffX = -this.cameraX + CANVAS_WIDTH / 2;
+            const camOffY = -this.cameraY + CANVAS_HEIGHT / 2;
+            ctx.translate(Math.round(camOffX), Math.round(camOffY));
+        }
+
+        // Determine visible tile range (account for zoom)
+        const visibleTilesX = Math.ceil(CANVAS_WIDTH / (TILE_SIZE * camScale));
+        const visibleTilesY = Math.ceil(CANVAS_HEIGHT / (TILE_SIZE * camScale));
+        const startTileX = Math.max(0, Math.floor(this.cameraX / TILE_SIZE - visibleTilesX / 2) - 1);
+        const startTileY = Math.max(0, Math.floor(this.cameraY / TILE_SIZE - visibleTilesY / 2) - 1);
+        const endTileX = Math.min(map.width, startTileX + visibleTilesX + 3);
+        const endTileY = Math.min(map.height, startTileY + visibleTilesY + 3);
 
         // Draw tiles
         for (let ty = startTileY; ty < endTileY; ty++) {

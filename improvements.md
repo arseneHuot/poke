@@ -6,7 +6,7 @@
 
 - ~~**Battle layout proportions**~~ **Done (2026-03-28)**: Responsive viewport scaling via `_scaleGame()` ensures the full 960px battle canvas is always visible, even on narrow displays. See Bug #12 fix.
 - ~~**Battle canvas gap**~~ **Done (2026-03-28)**: Battle render now fills entire canvas with `#1a1a2e` before drawing background. See Bug #33 fix.
-- **Lab interior map too small**: The prof's lab interior is 18×14 tiles (576×448px) inside a 960×640px canvas, leaving large black borders around the room. Interior maps should either be larger or the camera should be clamped to show a zoomed-in view that fills the screen.
+- ~~**Lab interior map too small**~~ **Done (2026-03-28)**: Camera now auto-zooms on small maps — calculates `camScale = max(canvasW/mapW, canvasH/mapH)` (capped at 2.5×) and applies `ctx.scale()` during render. Lab and player house now fill the screen.
 - ~~**Starter selection layout**~~ **Done (2026-03-28)**: Starter cards now show base stats summary (PV, Atq, Déf, Vit) below the type label, filling the empty space.
 
 ---
@@ -14,7 +14,7 @@
 ## Gameplay
 
 - ~~**No post-starter alternate dialogue for Prof. Oliva**~~ **Done (2026-03-28)**: Added `story_prof_postgame` dialogue and `altDialogue`/`altFlag` NPC fields. See Bug #8 fix.
-- **Catch rate feedback**: When a Poké Ball fails, the shake-count messages do exist ("Oh non ! Le Pokémon s'est libéré !", "Mince ! C'était presque !", "Argh ! Si près du but !"), but there is no success fanfare or confetti effect when a catch succeeds — just a silent party addition message. A visual/audio celebration would improve the feel.
+- ~~**Catch rate feedback**~~ **Done (2026-03-28)**: Added confetti particle celebration (60 colorful particles with gravity) on successful catch, alongside the existing `catch_success` SFX.
 - ~~**No "Gotcha!" catch success message**~~ **Done (2026-03-28)**: Battle system already shows `"Gotcha ! {name} est capturé !"` on successful catch.
 - ~~**No experience bar animation**~~ **Done (2026-03-28)**: `.xp-fill` already has `transition: width 0.5s ease` in CSS, providing smooth XP bar animation.
 - ~~**No evolution animation/sequence**~~ **Done (2026-03-28)**: Added evolution flash sequence — white screen pulses 3 times over 1.2s with "Hein ?! X évolue !" message before the transformation completes.
@@ -73,4 +73,4 @@
 ## Performance
 
 - ~~**Sprite cache LRU**~~ **Done (2026-03-28)**: Added `_cacheOrder` array and `_maxCacheSize: 200` limit — oldest entries are evicted when cache is full.
-- **`WorldData.init()` generates all maps at startup**: All 17+ maps are generated synchronously at game start. For a larger game this could cause noticeable startup lag. Consider lazy-loading maps on first visit.
+- ~~**`WorldData.init()` generates all maps at startup**~~ **Done (2026-03-28)**: Maps are now lazy-loaded on first visit via `_generators` registry. Only borgo, player_house, and prof_lab are eagerly generated at startup; all other 16 maps are deferred until `getMap()` is called.
