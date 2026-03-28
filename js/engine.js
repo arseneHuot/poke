@@ -385,9 +385,11 @@ const GameEngine = {
             AudioSystem.playSfx('confirm');
         }
 
-        // Resolve dialogue key — use altDialogue if condition flag is set
+        // Resolve dialogue key — defeated trainers use altDialogue; otherwise check altFlag
         let dialogueKey = npc.dialogue;
-        if (npc.altDialogue && npc.altFlag && state.storyFlags[npc.altFlag]) {
+        if (npc.defeated && npc.altDialogue) {
+            dialogueKey = npc.altDialogue;
+        } else if (npc.altDialogue && npc.altFlag && state.storyFlags[npc.altFlag]) {
             dialogueKey = npc.altDialogue;
         }
         if (!dialogueKey) return;
@@ -422,12 +424,10 @@ const GameEngine = {
             if (pokemon && pokemon.stats) {
                 pokemon.currentHp = pokemon.stats.hp;
                 pokemon.status = null;
-                // Restore PP if tracked
+                // Restore PP
                 if (pokemon.moves) {
                     for (const move of pokemon.moves) {
-                        if (move.maxPp !== undefined) {
-                            move.pp = move.maxPp;
-                        }
+                        move.ppUsed = 0;
                     }
                 }
             }

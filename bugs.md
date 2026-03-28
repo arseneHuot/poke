@@ -116,29 +116,18 @@ if (enemyFlinched) { ... }
 ## Bug #8 - Professor in lab always triggers starter selection even after starter chosen
 **Status:** Fixed (2026-03-28)
 **Priority:** Critical
-**File:** js/world-data.js, js/engine.js, js/story-data.js
+**File:** js/world-data.js, js/engine.js
 
-**Description:** After obtaining a starter and completing the post-starter dialogue, interacting with Prof. Oliva again in the lab always re-shows the `story_lab_starters` dialogue including the starter selection screen. The player can select a second (or third…) starter, adding extra Pokemon and extra Poké Balls each time.
+**Description:** After obtaining a starter and completing the post-starter dialogue, interacting with Prof. Oliva again in the lab always re-shows the `story_lab_starters` dialogue including the starter selection screen.
 
-**Steps to reproduce:**
-1. Start a new game, enter the lab, interact with Prof. Oliva
-2. Select a starter and advance through the post-starter dialogue
-3. Re-interact with Prof. Oliva (or press Space one extra time at end of dialogue)
-4. Starter selection screen reappears; selecting a Pokemon adds it to the party again
-
-**Expected:** After `has_starter` is set, Prof. Oliva should show a different "Bonne chance !" dialogue instead of re-triggering starter selection.
-**Actual:** Party grows beyond 1 starter; bag gains +5 Poké Balls with each re-selection. `starterSelectActive` and `dialogueActive` end up both `true` simultaneously.
-
-**Root cause:** NPC definition in `world-data.js` always uses `dialogue: 'story_lab_starters'` with no alternate for after `has_starter` is true. `interactWithNPC` in `engine.js` uses `npc.dialogue` unconditionally.
-
-**Fix:** Added `altDialogue: 'story_prof_postgame'` and `altFlag: 'has_starter'` fields to the Prof. Oliva NPC in `world-data.js`. Added logic in `engine.js:interactWithNPC` to select `altDialogue` when `altFlag` is set. Added `story_prof_postgame` dialogue to `story-data.js`.
+**Fix:** Prof. Oliva NPC in `world-data.js` now has `altDialogue: 'story_prof_postgame'` and `altFlag: 'has_starter'`. `interactWithNPC` in `engine.js` checks `npc.altFlag` and uses `npc.altDialogue` when the flag is true. Verified: re-interacting with Prof. after getting starter shows "Tu as déjà ton Pokémon !" dialogue instead of starter selection.
 
 ---
 
 ## Bug #9 - Dialogue box bleeds through menu and battle screens
-**Status:** Fixed (2026-03-28)
+**Status:** Open
 **Priority:** Major
-**File:** js/ui.js, js/main.js
+**File:** js/ui.js
 
 **Description:** When a dialogue is pending/active and the player opens the menu or a battle starts, the dialogue box text remains visible at the bottom of the screen, overlapping the menu and battle UI.
 
@@ -150,45 +139,41 @@ if (enemyFlinched) { ... }
 **Expected:** Dialogue box is hidden when menu or battle opens.
 **Actual:** "Excellent choix ! Prends aussi ce Pokédex…" shows at the bottom of every menu tab and the battle screen.
 
-**Fix:** `openMenu()` now force-hides and resets the dialogue box before opening the menu. `startBattle()` in `main.js` now hides the dialogue box when a battle begins.
-
 ---
 
-## Bug #10 - Move name "Pistolet à Eau" truncated in battle move list
-**Status:** Fixed (2026-03-28)
+## Bug #10 - Move names and PP merged in battle move list
+**Status:** Visually Fixed (2026-03-28)
 **Priority:** Minor
-**File:** js/pokemon-data.js
+**File:** js/ui.js (battle move rendering), js/pokemon-data.js
 
-**Description:** Aquali's move "Pistolet à Eau" displays as "Pistolet à OPP 25/25" — the name is cut off and the "PP" label is merged directly into the truncated name.
+**Description:** In the battle ATTAQUE menu, move names and the "PP" label are concatenated without separator: "ChargePP 35/35", "RugissementPP 40/40", "Pistolet à OPP 25/25".
+
+**Additionally:** The move "Pistolet à Eau" (Water Gun) is stored with the wrong name `'Pistolet à O'` in `pokemon-data.js:40` — "Eau" is truncated to "O".
+
+**Fix:** `.move-btn` now uses `display: flex; flex-direction: column` so the name and PP info render on separate lines. `watergun` move name corrected to `'Pistolet à Eau'` (see Bug #20).
 
 **Steps to reproduce:**
 1. Enter a battle with Aquali
 2. Click ATTAQUE
-3. Observe the third move button
+3. Observe all three move buttons
 
-**Expected:** "Pistolet à Eau | PP 25/25"
-**Actual:** "Pistolet à OPP 25/25"
-
-**Root cause:** Move name in `pokemon-data.js` was stored as `'Pistolet à O'` (truncated). The missing " Eau" caused the PP span to visually merge.
-
-**Fix:** Corrected move name to `'Pistolet à Eau'` in `pokemon-data.js`.
+**Expected:** "Charge | PP 35/35", "Rugissement | PP 40/40", "Pistolet à Eau | PP 25/25"
+**Actual:** "ChargePP 35/35", "RugissementPP 40/40", "Pistolet à OPP 25/25"
 
 ---
 
-## Bug #11 - No visual feedback after manual save
-**Status:** Fixed (2026-03-28)
+## Bug #11 - Save notification not visible through menu overlay
+**Status:** Open
 **Priority:** Minor
 **File:** js/ui.js (save tab)
 
-**Description:** Clicking "Sauvegarder maintenant" produces no notification or visual confirmation that the save succeeded.
+**Description:** Clicking "Sauvegarder maintenant" shows `showNotification('Partie sauvegardee !')` and changes the button text to "Sauvegarde OK !" briefly. However the notification toast is hidden behind the menu overlay and is never seen. The button text change does work but uses the "sauvegardee" typo (missing accent).
 
 **Steps to reproduce:**
 1. Open menu → Sauvegarder tab → click "Sauvegarder maintenant"
 
-**Expected:** A brief notification "Partie sauvegardée !" appears.
-**Actual:** Nothing visible happens.
-
-**Fix:** `showNotification('Partie sauvegardee !')` was already called in the button click handler. The notification z-index (80) is above the menu overlay (60) so it renders correctly. Also fixed accent typo in save tab info text: "sauvegardee" → "sauvegardée".
+**Expected:** A visible notification "Partie sauvegardée !" appears above the menu.
+**Actual:** Notification renders behind the menu overlay; button text flash is the only confirmation and contains the typo "sauvegardee".
 
 ---
 
@@ -210,7 +195,7 @@ if (enemyFlinched) { ... }
 
 ---
 
-## Bug #8 - Battle party screen crashes with null party slots
+## Bug #13 - Battle party screen crashes with null party slots
 **Status:** Fixed (2026-03-28)
 **Priority:** High
 **File:** js/battle.js
@@ -223,7 +208,7 @@ if (enemyFlinched) { ... }
 
 ---
 
-## Bug #9 - Back button shown during forced switch after Pokemon faints
+## Bug #14 - Back button shown during forced switch after Pokemon faints
 **Status:** Fixed (2026-03-28)
 **Priority:** Medium
 **File:** js/battle.js
@@ -236,7 +221,7 @@ if (enemyFlinched) { ... }
 
 ---
 
-## Bug #10 - endBattle crashes with null party slots
+## Bug #15 - endBattle crashes with null party slots
 **Status:** Fixed (2026-03-28)
 **Priority:** Medium
 **File:** js/battle.js
@@ -249,7 +234,7 @@ if (enemyFlinched) { ... }
 
 ---
 
-## Bug #11 - pokemon-data.js functions crash on invalid Pokemon ID
+## Bug #16 - pokemon-data.js functions crash on invalid Pokemon ID
 **Status:** Fixed (2026-03-28)
 **Priority:** Medium
 **File:** js/pokemon-data.js
@@ -262,7 +247,7 @@ if (enemyFlinched) { ... }
 
 ---
 
-## Bug #12 - _deserializePokemon crashes on unknown Pokemon ID in save
+## Bug #17 - _deserializePokemon crashes on unknown Pokemon ID in save
 **Status:** Fixed (2026-03-28)
 **Priority:** Medium
 **File:** js/save-system.js
@@ -272,3 +257,224 @@ if (enemyFlinched) { ... }
 **Root cause:** No null check after `getPokemonById(data.id)` in `_deserializePokemon`.
 
 **Fix:** Added a null check — if `getPokemonById` returns null, `_deserializePokemon` returns null instead of crashing. The load/party code already handles null party entries gracefully.
+
+---
+
+## Bug #18 - Game loop freezes permanently when tab loses visibility
+**Status:** Open
+**Priority:** Major
+**File:** js/main.js
+
+**Description:** The game loop runs via `requestAnimationFrame`, which browsers pause when the tab is hidden (`document.visibilityState === 'hidden'`). The game has no `visibilitychange` event handler to restart the loop when the tab regains focus. Once the tab loses focus and `rAF` pauses, the game freezes: `playTime` stops incrementing, movement stops, and the game becomes unresponsive even after the tab is brought back into view.
+
+**Steps to reproduce:**
+1. Start a new game
+2. Switch to another tab or minimize the browser for a few seconds
+3. Return to the game tab
+4. Observe that the game loop has stopped (player cannot move, timer frozen)
+
+**Expected:** Game resumes normally when the tab regains visibility.
+**Actual:** Game loop is permanently frozen; only a page reload recovers it.
+
+**Root cause:** No `document.addEventListener('visibilitychange', ...)` handler in `main.js` to re-schedule `requestAnimationFrame` when `document.visibilityState` becomes `'visible'`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #19 - Missing accents on "Pokemon", "Pokedex", "Equipe" in UI
+**Status:** Open
+**Priority:** Cosmetic
+**File:** js/ui.js
+
+**Description:** Multiple strings in the UI are missing French accents: "Pokemon" (should be "Pokémon"), "Pokedex" (should be "Pokédex"), and "Equipe" (should be "Équipe"). This affects the starter selection title, menu tabs, section headers, and the Dresseur card stats.
+
+**Affected locations (js/ui.js):**
+- Line 298: `'Choisissez votre Pokemon !'` → `'Choisissez votre Pokémon !'`
+- Line 412: `label: 'Equipe'` → `label: 'Équipe'`
+- Line 414: `label: 'Pokedex'` → `label: 'Pokédex'`
+- Line 827: `title.textContent = 'Pokedex'` → `'Pokédex'`
+- Lines 912–913: `'Pokedex (vus)'`, `'Pokedex (captures)'` → `'Pokédex (vus)'`, `'Pokédex (captures)'`
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #20 - Wrong move name: "Pistolet à O" instead of "Pistolet à Eau"
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/pokemon-data.js
+
+**Description:** The Water Gun move (`watergun`) has its name stored as `'Pistolet à O'` instead of the correct `'Pistolet à Eau'`. The word "Eau" (water in French) is truncated to just "O". This appears everywhere the move name is shown: the party Pokémon detail view, the battle move list, and battle messages.
+
+**Steps to reproduce:**
+1. Obtain Aquali as starter
+2. Open menu → Équipe → click Aquali → view Attaques section
+3. Observe third move: "Pistolet à O | WATER | Puiss. 40 | PP 25/25"
+
+**Expected:** `'Pistolet à Eau'`
+**Actual:** `'Pistolet à O'`
+
+**Root cause:** Data error at `js/pokemon-data.js:40`:
+```js
+watergun: { name: 'Pistolet à O', ... }  // should be 'Pistolet à Eau'
+```
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #21 - `_handlePlayerFaint` crashes with null party entries
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/battle.js
+
+**Description:** `BattleSystem._handlePlayerFaint()` calls `game.state.party.filter(p => p.currentHp > 0)` without guarding against null party entries. If the party contains a null slot (which can happen after loading a save with an unknown Pokémon ID — see Bug #17), accessing `p.currentHp` on null throws a TypeError, crashing the game mid-battle.
+
+**Steps to reproduce:**
+1. Load a save where at least one party slot is null
+2. Enter a wild battle
+3. Let the active Pokémon's HP drop to 0
+
+**Expected:** The game shows the forced-switch screen or blackout message.
+**Actual:** `Uncaught TypeError: Cannot read properties of null (reading 'currentHp')`
+
+**Root cause:** Line `game.state.party.filter(p => p.currentHp > 0)` in `_handlePlayerFaint` (js/battle.js:1032) — missing null guard (should be `p && p.currentHp > 0`).
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #22 - PC tile healing does not restore move PP
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/engine.js (`_healParty`)
+
+**Description:** When the player interacts with a PC tile directly (without a nurse NPC in front of it, as in the Borgo Pokémon Center), `GameEngine._healParty()` is called. This method restores all Pokémon HP to full but does NOT restore PP. The PP restoration code in `_healParty` is broken: it checks `if (move.maxPp !== undefined)` (a field that never exists in the move data model) and sets `move.pp` instead of resetting `move.ppUsed = 0`.
+
+Contrast with nurse NPC healing via `UI._healAllPokemon()`, which correctly restores PP with `m.ppUsed = 0`. This creates an inconsistency between the two healing paths.
+
+**Steps to reproduce:**
+1. Start a new game in Borgo village
+2. Use some moves in battle to deplete PP
+3. Walk to the PC tile in Borgo (at tile position x=8, y=17) and press Space
+4. Open the menu → Équipe → check move PP
+
+**Expected:** All Pokémon HP and PP fully restored.
+**Actual:** HP restored, but ppUsed values unchanged (PP not restored).
+
+**Root cause:** `js/engine.js:_healParty` — PP loop checks `move.maxPp !== undefined` (always false) and sets `move.pp` (wrong field). Should be `move.ppUsed = 0`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #23 - Repel items purchasable but unusable
+**Status:** Open
+**Priority:** Major
+**File:** js/ui.js (`_renderBagTab`), js/engine.js (`useRepel`)
+
+**Description:** The "Repousse" (Repel) item is sold in every Pokémart and is saved/loaded correctly. However there is no usage pathway: `_renderBagTab` only adds click handlers for items of type `'heal'`, `'revive'`, `'status'`, and `'levelup'`. Repel items (type `'repel'`) appear in the bag as unclickable rows. `GameEngine.useRepel(steps)` exists but is never called from any UI handler.
+
+**Steps to reproduce:**
+1. Go to any Pokémart and purchase a Repousse (350 $)
+2. Open the menu → Sac
+3. The item is listed but has no pointer cursor and cannot be clicked
+
+**Expected:** Clicking the Repel in the bag activates it for 100 steps, preventing wild encounters.
+**Actual:** Item appears in bag but is unresponsive.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #24 - Escape Rope (Corde Sortie) has no usage handler
+**Status:** Open
+**Priority:** Minor
+**File:** js/ui.js, js/constants.js
+
+**Description:** The "Corde Sortie" (Escape Rope) item is defined in ITEMS with type `'escape'` but no code handles this type in either the overworld bag menu or the battle bag. The item cannot be activated. It is not sold in any shop currently, but the definition exists and could be added.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #25 - Defeated trainer state not persisted between sessions
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/battle.js, js/engine.js, js/save-system.js
+
+**Description:** When a trainer is defeated, `BattleSystem.endBattle` sets `trainerNpc.defeated = true` on the in-memory NPC object. However, the `game.state.defeatedTrainers` Set — which is serialized in the save file — is **never populated**. After a page reload, `WorldData.init()` re-creates all NPC objects with `defeated: false`, resetting all trainer defeats. The saved `defeatedTrainers` Set is also never read to restore the defeated state on NPCs, making it completely unused.
+
+**Steps to reproduce:**
+1. Defeat any route trainer (e.g., "Gamin Thomas" on Route 1)
+2. Save and reload the page
+3. Walk back to the trainer — they challenge the player again
+
+**Expected:** Previously defeated trainers do not re-battle; they show a post-defeat dialogue.
+**Actual:** All trainers reset to undefeated state on reload.
+
+**Root cause:** `battle.js:1339` sets `trainerNpc.defeated = true` but never calls `game.state.defeatedTrainers.add(npc.id)`. `interactWithNPC` in `engine.js` never checks `npc.defeated` or the `defeatedTrainers` Set.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #26 - Re-challenging a defeated trainer starts battle with 0-HP enemy
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/engine.js (`interactWithNPC`), js/battle.js (`startTrainerBattle`)
+
+**Description:** In the same session (before a reload), a defeated trainer can be re-challenged. `interactWithNPC` has no check for `npc.defeated`, so the trainer battle dialogue fires again. `startTrainerBattle` detects that `trainerNpc.party` is already built (from the previous battle) and reuses it without checking HP. The battle starts with the trainer's Pokémon at 0 HP, causing an immediate win condition and a second reward payout.
+
+**Steps to reproduce:**
+1. Defeat any trainer (e.g., "Gamin Thomas" on Route 1)
+2. Interact with the same trainer again immediately
+3. A battle starts — the enemy Pokémon has 0 HP
+
+**Expected:** Defeated trainer shows a post-defeat dialogue ("Bien joué !") and cannot be re-battled.
+**Actual:** Battle starts with a dead enemy; player wins instantly and may receive rewards again.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #27 - Gym badges are never awarded after defeating a gym leader
+**Status:** Fixed (2026-03-28)
+**Priority:** Critical
+**Files:** js/battle.js, js/ui.js, js/engine.js
+
+**Description:** Defeating a gym leader never awards the corresponding badge. `BattleSystem.endBattle` only sets `trainerNpc.defeated = true` and adds the money reward, but never updates `game.state.badges` or the `badge_N` story flags. Since subsequent gym leaders gate behind `storyReq: 'badge_N'`, they never appear — only the first gym is accessible.
+
+**Steps to reproduce:**
+1. Reach Porto City and defeat gym leader Marco
+2. Open menu → Dresseur — Badges shows "0 / 8"
+3. Travel to Campoverde — gym 2 leader (Flora) is invisible due to `storyReq: 'badge_0'` never being set
+
+**Expected:** Defeating Marco awards Badge 0, sets `storyFlag.badge_0 = true`, adds `0` to `game.state.badges`, and Champion Flora appears in Campoverde.
+**Actual:** No badge awarded, `badge_0` stays `false`, gym 2 leader never spawns, story progression is permanently blocked past gym 1.
+
+**Root cause:** No code in `battle.js`, `engine.js`, or `ui.js` reads `trainerNpc.badge` and applies the badge after a gym leader victory. The `badge` property exists on gym leader NPC definitions in `world-data.js` but is never consumed.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #28 - Using a heal/revive item from the overworld bag crashes with undefined `container`
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/ui.js (`_showItemUseTarget`)
+
+**Description:** Clicking a Potion, Rappel, or other usable item in the overworld Sac menu opens a "Utiliser X sur..." screen but the party list and Back button never render. The function crashes on `container.appendChild(list)` because `container` is never defined — the correct variable is `panel`.
+
+**Steps to reproduce:**
+1. Have at least one Potion (or other heal item) in the bag
+2. Open menu → Sac → click the Potion
+3. Screen shows "Utiliser Potion sur..." with no Pokémon listed and no Back button
+
+**Expected:** Party list appears so player can choose which Pokémon to heal; Back button returns to the bag.
+**Actual:** `ReferenceError: container is not defined` is silently swallowed; the panel shows only the title. The item is NOT consumed, so there is no permanent softlock (Escape closes the menu), but items can never be used from the overworld bag.
+
+**Root cause:** `js/ui.js:740` — `container.appendChild(list)` should be `panel.appendChild(list)`. The variable `panel` is declared at line 685 but line 740 mistakenly uses `container`.
+
+**Found:** 2026-03-28

@@ -74,6 +74,11 @@ const UI = {
 
         this._initBadgeSlots();
         this._bindKeys();
+
+        // Click anywhere on dialogue box to advance
+        this.elements.dialogueBox.addEventListener('click', () => {
+            if (this.dialogue.active) this.advanceDialogue();
+        });
     },
 
     _initBadgeSlots() {
@@ -377,12 +382,10 @@ const UI = {
     // ----------------------------------------------------------------
     openMenu() {
         if (this.shop.active || this.starterSelect.active) return;
-        // Force-hide dialogue box in case it is lingering without active flag
-        if (this.dialogue.active) {
-            this._clearTypewriter();
-            this.elements.dialogueBox.classList.add('hidden');
-            this.dialogue.active = false;
-        }
+        // Always hide dialogue box when opening menu
+        this._clearTypewriter();
+        this.elements.dialogueBox.classList.add('hidden');
+        this.dialogue.active = false;
         if (game) game.state.gameMode = 'menu';
 
         this.menu.open = true;
@@ -734,7 +737,7 @@ const UI = {
             list.appendChild(row);
         });
 
-        container.appendChild(list);
+        panel.appendChild(list);
 
         // Back button
         const backBtn = document.createElement('button');
@@ -761,13 +764,13 @@ const UI = {
                     return;
                 }
                 if (pokemon.stats && pokemon.currentHp >= pokemon.stats.hp) {
-                    this.showNotification(data.name + ' a deja tous ses PV !');
+                    this.showNotification(data.name + ' a déjà tous ses PV !');
                     return;
                 }
                 const maxHp = pokemon.stats ? pokemon.stats.hp : 999;
                 pokemon.currentHp = Math.min(maxHp, pokemon.currentHp + itemData.healAmount);
                 used = true;
-                this.showNotification(data.name + ' recupere des PV !');
+                this.showNotification(data.name + ' récupère des PV !');
                 break;
 
             case 'revive':
@@ -779,7 +782,7 @@ const UI = {
                 pokemon.currentHp = reviveHp;
                 pokemon.status = null;
                 used = true;
-                this.showNotification(data.name + ' est ranime !');
+                this.showNotification(data.name + ' est ranimé !');
                 break;
 
             case 'status':
@@ -789,7 +792,7 @@ const UI = {
                 }
                 pokemon.status = null;
                 used = true;
-                this.showNotification(data.name + ' est soigne !');
+                this.showNotification(data.name + ' est soigné !');
                 break;
 
             case 'levelup':
@@ -981,7 +984,7 @@ const UI = {
         saveBtn.addEventListener('click', () => {
             SaveSystem.save();
             AudioSystem.playSfx('select');
-            this.showNotification('Partie sauvegardee !');
+            this.showNotification('Partie sauvegardée !');
             saveBtn.textContent = 'Sauvegarde OK !';
             setTimeout(() => {
                 saveBtn.textContent = 'Sauvegarder maintenant';
@@ -1003,7 +1006,7 @@ const UI = {
 
         const info = document.createElement('p');
         info.style.cssText = 'text-align:center;color:#888;margin-bottom:20px;font-size:12px;';
-        info.textContent = 'Votre partie sera sauvegardee automatiquement.';
+        info.textContent = 'Votre partie sera sauvegardée automatiquement.';
         container.appendChild(info);
 
         const btnRow = document.createElement('div');

@@ -183,7 +183,7 @@ const BattleSystem = {
             const btn = document.createElement('button');
             btn.className = 'battle-btn move-btn';
             btn.style.borderLeft = `4px solid ${TYPE_COLORS[moveData.type] || '#888'}`;
-            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-pp">PP ${ppLeft}/${moveData.pp || 10}</span>`;
+            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10}</span>`;
             btn.disabled = ppLeft <= 0;
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('confirm');
@@ -1029,7 +1029,7 @@ const BattleSystem = {
         this._queueMessage(`${pp.nickname || pp.name} est K.O. !`);
 
         // Check for other alive pokemon
-        const alivePokemon = game.state.party.filter(p => p.currentHp > 0);
+        const alivePokemon = game.state.party.filter(p => p && p.currentHp > 0);
         if (alivePokemon.length > 0) {
             // Force switch
             this._processMessageQueue(() => {
@@ -1337,6 +1337,18 @@ const BattleSystem = {
         // Mark trainer as defeated
         if (result === 'win' && this.state.isTrainer && this.state.trainerNpc) {
             this.state.trainerNpc.defeated = true;
+            // Persist defeated state
+            if (game.state.defeatedTrainers && this.state.trainerNpc.id) {
+                game.state.defeatedTrainers.add(this.state.trainerNpc.id);
+            }
+            // Award gym badge if this trainer has one
+            if (this.state.trainerNpc.badge !== undefined) {
+                const badgeIndex = this.state.trainerNpc.badge;
+                if (!game.state.badges.includes(badgeIndex)) {
+                    game.state.badges.push(badgeIndex);
+                }
+                game.state.storyFlags['badge_' + badgeIndex] = true;
+            }
         }
 
         // Heal if lost (teleport to last center)

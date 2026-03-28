@@ -13,16 +13,20 @@
 ## Gameplay
 
 - ~~**No post-starter alternate dialogue for Prof. Oliva**~~ **Done (2026-03-28)**: Added `story_prof_postgame` dialogue and `altDialogue`/`altFlag` NPC fields. See Bug #8 fix.
-- **Catch rate feedback**: When a Poké Ball fails, there is no message indicating how many "shakes" occurred or any hint of how close the catch was. Adding a "Oh non ! Le Pokémon s'est échappé !" or shake count message would improve clarity.
+- **Catch rate feedback**: When a Poké Ball fails, the shake-count messages do exist ("Oh non ! Le Pokémon s'est libéré !", "Mince ! C'était presque !", "Argh ! Si près du but !"), but there is no success fanfare or confetti effect when a catch succeeds — just a silent party addition message. A visual/audio celebration would improve the feel.
+- **No "Gotcha!" catch success message**: After catching a Pokémon the message reads only "X a été ajouté à l'équipe !" with no "Attrapé !" headline. Classic Pokémon games show a celebratory banner.
 - **No experience bar animation**: After a battle, the XP bar updates instantly. A smooth fill animation would make leveling-up feel more rewarding.
 - **No evolution animation/sequence**: If a Pokemon evolves after battle, consider adding a visual evolution sequence rather than a silent update.
+- **Trainers need post-defeat dialogue**: After defeating a trainer, interacting with them again immediately re-triggers the battle (Bug #26). Each trainer NPC needs an `altDialogue` (e.g., "Bien joué ! Tu m'as eu !") set after the `defeated` flag is true, preventing re-battles. See also Bug #25.
+- **Borgo Pokémon Center is a bare tile**: The Borgo PC tile (`TILE.PC` at x=8, y=17) sits alone on the path with no building frame, no nurse NPC, and uses `_healParty()` which doesn't restore PP (Bug #22). The other cities all have a proper Pokémon Center building with a nurse NPC. Borgo should follow the same pattern.
 
 ---
 
 ## Dialogues
 
-- ~~**Typo in save screen**~~ **Done (2026-03-28)**: Fixed "sauvegardee" → "sauvegardée" in save tab info text.
-- **Clicking dialogue box does not advance dialogue**: The player must use Space or Enter. Clicking anywhere on the dialogue box should also advance it — this is standard UX for RPGs.
+- ~~**Typo "sauvegardee" in Quitter tab and save notification**~~ **Done (2026-03-28)**: Fixed both remaining instances — save notification now reads `'Partie sauvegardée !'` and Quitter tab reads `'Votre partie sera sauvegardée automatiquement.'`
+- ~~**Item use notification typos**~~ **Done (2026-03-28)**: Fixed all four accents in `_useItemOnPokemon`: `"a déjà tous ses PV"`, `"récupère des PV"`, `"est ranimé"`, `"est soigné"`.
+- ~~**Clicking dialogue box does not advance dialogue**~~ **Done (2026-03-28)**: Added click event listener on `dialogueBox` in `UI.init()` — clicking the dialogue box now calls `advanceDialogue()`.
 - **Dialogue indicator (▼) starts hidden and only shows after typewriter finishes**: This is correct behaviour, but the indicator could pulse/animate more visibly to prompt the player.
 - **Player name not validated**: An empty name silently defaults to "Red" with no feedback. Consider showing a short validation hint like "Nom invalide" if the field is left blank.
 
@@ -32,7 +36,7 @@
 
 - ~~**Move types displayed in English in Pokémon detail view**~~ **Done (2026-03-28)**: Added `TYPE_NAMES_FR` mapping in `ui.js`, applied to both the detail view and party list.
 - ~~**Pokémon type in party list shows English**~~ **Done (2026-03-28)**: Party list now uses French type names ("Eau", "Feu", "Plante", etc.).
-- **Battle HP bar color**: HP bar is always green regardless of HP percentage. Standard Pokémon games use green > 50%, yellow 20–50%, red < 20%. This would add important visual clarity during battle.
+- ~~**Battle HP bar color**~~ **Done (2026-03-28)**: HP bar already uses green > 50%, orange 20–50%, red < 20% via `backgroundColor` in `BattleSystem._updateUI()`.
 - **Black bars in interior maps**: When entering small indoor maps (lab, houses), large black rectangles appear to the sides due to the fixed 960px canvas being wider than the map. Filling with a solid color, a pattern, or a decorative border would look much more polished.
 
 ---
@@ -47,11 +51,11 @@
 ## UX / UI
 
 - **Menu cannot be closed with Escape when sub-view is active**: Pressing Escape while on the Sauvegarder tab goes back to the Equipe tab rather than closing the menu. A second Escape should close the menu entirely.
-- **No save confirmation notification**: After pressing "Sauvegarder maintenant", no visual toast/notification confirms the save. Add a brief "Sauvegarde réussie !" notification (see Bug #11).
+- **Save confirmation UX**: The save button text changes to "Sauvegarde OK !" briefly after clicking — this provides some visual feedback. However the `showNotification()` toast is not visually observable while the menu is open (it appears behind the menu overlay). Consider either making notifications render above the menu, or keeping the button text change as the primary feedback (which works).
 - **Arrow keys don't register reliably for movement**: Key-down/key-up events are processed in a single frame, making held-key movement unreliable unless focus is on the canvas. Clicking the game canvas before using arrow keys is required.
 - **Party HUD dots (top-right) not visible for badges**: The badge slots in the HUD show 8 empty grey circles even when no badges are earned, which looks identical to the party HP indicator. Differentiate visually (e.g., star outline for empty badge, filled star for earned).
-- **"Quitter" tab in menu has no confirmation**: Clicking Quitter should ask "Quitter sans sauvegarder ?" to prevent accidental data loss.
 - **No loading indicator between maps**: Map transitions use a fade to black but there is no spinner or progress indicator. This is fine for small maps but could be extended for feel.
+- **Pokédex entries not clickable**: Clicking a seen or caught Pokémon in the Pokédex grid does nothing. A detail panel showing the Pokémon's type, base stats, and a short description would be a natural addition.
 - **Game not responsive / no mobile support**: The game container is a fixed 960×640px with no `max-width`, `overflow: hidden`, or `transform: scale()`. On mobile or in small browser windows, content is clipped. Consider wrapping the container in a scaler that fits the viewport while maintaining aspect ratio.
 
 ---

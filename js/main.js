@@ -173,6 +173,20 @@ const game = {
             UI.showLocationName(map.name);
         }
 
+        // Restore defeated state on NPC objects from persisted set
+        if (this.state.defeatedTrainers && this.state.defeatedTrainers.size > 0) {
+            for (const mapId in WorldData.maps) {
+                const map = WorldData.maps[mapId];
+                if (map && map.npcs) {
+                    for (const npc of map.npcs) {
+                        if (npc.id && this.state.defeatedTrainers.has(npc.id)) {
+                            npc.defeated = true;
+                        }
+                    }
+                }
+            }
+        }
+
         // Update badge display
         UI.updateBadges();
     },
