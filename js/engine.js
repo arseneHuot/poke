@@ -567,6 +567,22 @@ const GameEngine = {
         const state = this.game.state;
         const target = this.warpTarget;
 
+        // Clear any stale dialogue/input state before map transition
+        if (typeof UI !== 'undefined') {
+            if (UI.dialogue && UI.dialogue.active) {
+                UI.dialogue.active = false;
+                if (UI.dialogue.typewriterTimer) {
+                    clearInterval(UI.dialogue.typewriterTimer);
+                    UI.dialogue.typewriterTimer = null;
+                }
+                if (UI.elements && UI.elements.dialogueBox) {
+                    UI.elements.dialogueBox.classList.add('hidden');
+                }
+            }
+        }
+        this.inputLocked = false;
+        if (state) state.gameMode = 'overworld';
+
         state.currentMap = target.map;
         state.playerX = target.x;
         state.playerY = target.y;

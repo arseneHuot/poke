@@ -90,3 +90,19 @@
 ### Gameplay
 
 - ~~**Party HP dots colour coding**~~ **Done (2026-03-28)**: Added 6 colour-coded dots to the HUD (`#party-dots`). Green > 50% HP, orange 20–50%, red < 20%, grey for fainted, dim for empty slots. Updated every frame via `UI.updatePartyDots()`.
+
+### Battle
+
+- ~~**Whiteout sequence**~~ **Done (2026-03-28)**: On loss, party is healed + PP restored, player warps to last heal location after 1.5s delay, loses half money. Notification "Vous avez perdu connaissance..." shown.
+
+- **Trainer battle intro differentiation**: Trainer battles currently look identical to wild battles. Consider adding a brief trainer intro sequence (e.g. trainer sprite sliding in, "Gamin Thomas veut se battre !" dialogue box) before the first Pokémon is sent out.
+
+- ~~**Potion unusable feedback**~~ **Done (2026-03-28)**: Already implemented — notification "a déjà tous ses PV !" shown for full HP, "est K.O. ! Utilisez un Rappel." for fainted. Verified in code.
+
+- ~~**Run button visibility in trainer battles**~~ **Done (2026-03-28)**: FUITE button is now `disabled` with `opacity: 0.4` and tooltip text in trainer battles.
+
+### UX / Menus
+
+- ~~**Item descriptions in bag (overworld)**~~ **Done (2026-03-28)**: Already implemented — `.item-desc` div with `itemData.desc` shown for every bag item. Verified in code + CSS.
+
+- ~~**Pokémon detail level/nature display**~~ **Done (2026-03-28)**: Added level, type badges (colored pills), and nature to the party detail view header between the name and sprite.

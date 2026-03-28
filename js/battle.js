@@ -155,6 +155,12 @@ const BattleSystem = {
         btns.forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
+            // Grey out run button in trainer battles
+            if (newBtn.dataset.action === 'run' && this.state.isTrainer) {
+                newBtn.disabled = true;
+                newBtn.style.opacity = '0.4';
+                newBtn.title = 'Impossible de fuir un combat de dresseur';
+            }
             newBtn.addEventListener('click', () => {
                 AudioSystem.playSfx('select');
                 const action = newBtn.dataset.action;

@@ -66,11 +66,13 @@ const SpriteRenderer = {
 
         // Back-facing: overlay dorsal markings and hide face
         if (isBack) {
+            const bodyCol = colors.body || colors.primary || '#888';
+            const accentCol = colors.belly || colors.secondary || bodyCol;
             // Cover face area with body color (hide eyes/mouth)
-            ctx.fillStyle = colors[0];
+            ctx.fillStyle = bodyCol;
             ctx.fillRect(s * 20, s * 10, s * 24, s * 14);
             // Draw dorsal stripe / spine marking
-            ctx.fillStyle = colors[1] || colors[0];
+            ctx.fillStyle = accentCol;
             ctx.globalAlpha = 0.5;
             ctx.fillRect(s * 29, s * 14, s * 6, s * 28);
             // Small dorsal spots

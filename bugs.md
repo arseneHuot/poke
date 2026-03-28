@@ -690,3 +690,55 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 **Fix needed:** Implement `game.returnToTitle()` in `main.js` that resets game state and returns to the title screen without a full page reload (e.g., stop the game loop, hide `#game-container`, show `#title-screen`, reset `game.state`).
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #38 - Aquali back sprite not rendered in battle
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js, js/sprite-renderer.js
+
+**Description:** When Aquali is the active player Pokémon in battle, its back sprite does not appear on the player-side platform. Only the brown mound platform is visible. Other Pokémon (e.g. Rondelet) correctly show their back sprite. The issue appears to be specific to Aquali (species id 4).
+
+**Root cause:** Likely a missing or incorrectly keyed back-sprite entry for species id 4 in SpriteRenderer, or a rendering condition that skips drawing when the back-sprite canvas/image is undefined for that species.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #39 - Using a Potion on a full-HP Pokémon silently fails with no feedback
+**Status:** Fixed (2026-03-28) — Already handled: notification "a déjà tous ses PV !" at line 814
+**Priority:** Medium
+**File:** js/ui.js (`_useItemOnPokemon` or `_showItemUseTarget`)
+
+**Description:** In the overworld bag menu, selecting "Potion" and then clicking a Pokémon at full HP silently does nothing — the item is not consumed, the target selector stays open, and no message or visual feedback is shown. The player has no indication of why the item did not work.
+
+**Root cause:** The usage guard likely returns early without triggering any notification or error dialogue when `currentHp >= maxHp`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #40 - After losing a trainer battle (all Pokémon KO), player is not warped to last Pokémon Center
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js (battle result / whiteout handling)
+
+**Description:** When the player's entire team faints during a trainer battle, the game heals the party (correct) and shows "Vous n'avez plus de Pokémon apte au combat !" but does NOT warp the player back to the last visited Pokémon Center. The player remains at the location where the battle took place (e.g. Route 1). In standard Pokémon games this triggers a "whiteout" that transports the player back to the nearest PC.
+
+**Root cause:** The whiteout handler heals the party but is missing the warp-to-last-PC step. No `lastHealMap`/`lastHealX`/`lastHealY` coordinates appear to be tracked or applied.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #41 - Stale nurse dialogue (with wrong health status) re-appears after map transition
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/ui.js (dialogue state management), js/engine.js (warp handling)
+
+**Description:** After interacting with the nurse in Borgo (which sets `inputLocked` and opens a dialogue), navigating away via a teleport or warp without properly dismissing the dialogue can cause the nurse's second message ("Vos Pokémon sont en pleine forme ! Bonne continuation !") to surface later on a different map (Route 1). This occurs even when the party Pokémon are not at full HP, so the message content is also inaccurate in that context.
+
+**Root cause:** Dialogue state (`inputLocked`, open dialogue queue) is not cleared/reset when the player warps between maps. If the dialogue callback fires after a warp, it uses the last registered speaker/text regardless of current context.
+
+**Found:** 2026-03-28

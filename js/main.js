@@ -299,11 +299,37 @@ const game = {
 
         // Handle result
         if (result === 'lose') {
-            // Heal and return to start
+            // Heal party
             this.state.party.forEach(p => {
-                if (p) { p.currentHp = p.stats.hp; p.status = null; }
+                if (p) {
+                    p.currentHp = p.stats.hp;
+                    p.status = null;
+                    if (p.moves) p.moves.forEach(m => { m.ppUsed = 0; });
+                }
             });
+
+            // Whiteout: warp to last heal location
+            const healMap = GameEngine.lastSafeMap || 'borgo';
+            const healX = GameEngine.lastSafeX || 20;
+            const healY = GameEngine.lastSafeY || 16;
+
             UI.showNotification('Vous avez perdu connaissance...');
+
+            // Brief delay then warp
+            setTimeout(() => {
+                this.state.currentMap = healMap;
+                this.state.playerX = healX;
+                this.state.playerY = healY;
+                this.state.playerDir = DIR.DOWN;
+                GameEngine.snapCamera();
+                const newMap = WorldData.getMap(healMap);
+                if (newMap) {
+                    AudioSystem.playMusic(newMap.music || 'town');
+                    UI.showLocationName(newMap.name);
+                }
+                // Lose half money
+                this.state.money = Math.floor(this.state.money / 2);
+            }, 1500);
         }
 
         SaveSystem.save();

@@ -586,6 +586,29 @@ const UI = {
         title.textContent = pokemon.nickname || data.name;
         panel.appendChild(title);
 
+        // Level and type info
+        const infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'text-align:center;margin-bottom:10px;';
+        const levelSpan = document.createElement('span');
+        levelSpan.style.cssText = 'color:#aaa;font-size:14px;margin-right:10px;';
+        levelSpan.textContent = 'Nv. ' + pokemon.level;
+        infoDiv.appendChild(levelSpan);
+        if (data.types) {
+            data.types.forEach(t => {
+                const badge = document.createElement('span');
+                badge.style.cssText = `display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;margin:0 3px;color:#fff;background:${TYPE_COLORS[t] || '#888'};`;
+                badge.textContent = (TYPE_NAMES_FR[t] || t).toUpperCase();
+                infoDiv.appendChild(badge);
+            });
+        }
+        if (pokemon.nature) {
+            const natureSpan = document.createElement('span');
+            natureSpan.style.cssText = 'color:#aaa;font-size:12px;margin-left:10px;';
+            natureSpan.textContent = pokemon.nature;
+            infoDiv.appendChild(natureSpan);
+        }
+        panel.appendChild(infoDiv);
+
         // Sprite
         const spriteCanvas = document.createElement('canvas');
         spriteCanvas.width = 96;
