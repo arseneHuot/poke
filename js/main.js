@@ -223,6 +223,11 @@ const game = {
     // --------------------------------------------------------
     startBattle(type, data) {
         this.state.gameMode = 'battle';
+        // Hide dialogue box if it was left visible
+        if (typeof UI !== 'undefined' && UI.elements && UI.elements.dialogueBox) {
+            UI.elements.dialogueBox.classList.add('hidden');
+            UI.dialogue.active = false;
+        }
         if (type === 'wild') {
             const wildPokemon = createPokemon(data.pokemonId, data.level, true);
             if (wildPokemon) {

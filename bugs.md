@@ -113,6 +113,103 @@ if (enemyFlinched) { ... }
 
 ---
 
+## Bug #8 - Professor in lab always triggers starter selection even after starter chosen
+**Status:** Fixed (2026-03-28)
+**Priority:** Critical
+**File:** js/world-data.js, js/engine.js, js/story-data.js
+
+**Description:** After obtaining a starter and completing the post-starter dialogue, interacting with Prof. Oliva again in the lab always re-shows the `story_lab_starters` dialogue including the starter selection screen. The player can select a second (or third…) starter, adding extra Pokemon and extra Poké Balls each time.
+
+**Steps to reproduce:**
+1. Start a new game, enter the lab, interact with Prof. Oliva
+2. Select a starter and advance through the post-starter dialogue
+3. Re-interact with Prof. Oliva (or press Space one extra time at end of dialogue)
+4. Starter selection screen reappears; selecting a Pokemon adds it to the party again
+
+**Expected:** After `has_starter` is set, Prof. Oliva should show a different "Bonne chance !" dialogue instead of re-triggering starter selection.
+**Actual:** Party grows beyond 1 starter; bag gains +5 Poké Balls with each re-selection. `starterSelectActive` and `dialogueActive` end up both `true` simultaneously.
+
+**Root cause:** NPC definition in `world-data.js` always uses `dialogue: 'story_lab_starters'` with no alternate for after `has_starter` is true. `interactWithNPC` in `engine.js` uses `npc.dialogue` unconditionally.
+
+**Fix:** Added `altDialogue: 'story_prof_postgame'` and `altFlag: 'has_starter'` fields to the Prof. Oliva NPC in `world-data.js`. Added logic in `engine.js:interactWithNPC` to select `altDialogue` when `altFlag` is set. Added `story_prof_postgame` dialogue to `story-data.js`.
+
+---
+
+## Bug #9 - Dialogue box bleeds through menu and battle screens
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/ui.js, js/main.js
+
+**Description:** When a dialogue is pending/active and the player opens the menu or a battle starts, the dialogue box text remains visible at the bottom of the screen, overlapping the menu and battle UI.
+
+**Steps to reproduce:**
+1. Trigger the post-starter dialogue from Prof. Oliva
+2. While dialogue is active, press Escape to open the menu
+3. Navigate through menu tabs — dialogue text is visible behind/below all tabs
+
+**Expected:** Dialogue box is hidden when menu or battle opens.
+**Actual:** "Excellent choix ! Prends aussi ce Pokédex…" shows at the bottom of every menu tab and the battle screen.
+
+**Fix:** `openMenu()` now force-hides and resets the dialogue box before opening the menu. `startBattle()` in `main.js` now hides the dialogue box when a battle begins.
+
+---
+
+## Bug #10 - Move name "Pistolet à Eau" truncated in battle move list
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/pokemon-data.js
+
+**Description:** Aquali's move "Pistolet à Eau" displays as "Pistolet à OPP 25/25" — the name is cut off and the "PP" label is merged directly into the truncated name.
+
+**Steps to reproduce:**
+1. Enter a battle with Aquali
+2. Click ATTAQUE
+3. Observe the third move button
+
+**Expected:** "Pistolet à Eau | PP 25/25"
+**Actual:** "Pistolet à OPP 25/25"
+
+**Root cause:** Move name in `pokemon-data.js` was stored as `'Pistolet à O'` (truncated). The missing " Eau" caused the PP span to visually merge.
+
+**Fix:** Corrected move name to `'Pistolet à Eau'` in `pokemon-data.js`.
+
+---
+
+## Bug #11 - No visual feedback after manual save
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/ui.js (save tab)
+
+**Description:** Clicking "Sauvegarder maintenant" produces no notification or visual confirmation that the save succeeded.
+
+**Steps to reproduce:**
+1. Open menu → Sauvegarder tab → click "Sauvegarder maintenant"
+
+**Expected:** A brief notification "Partie sauvegardée !" appears.
+**Actual:** Nothing visible happens.
+
+**Fix:** `showNotification('Partie sauvegardee !')` was already called in the button click handler. The notification z-index (80) is above the menu overlay (60) so it renders correctly. Also fixed accent typo in save tab info text: "sauvegardee" → "sauvegardée".
+
+---
+
+## Bug #12 - Enemy Pokémon sprite off-screen in battle on sub-960px viewports
+**Status:** Open
+**Priority:** Major
+**File:** js/battle.js, css/style.css
+
+**Description:** The game canvas is fixed at 960×640px with no responsive scaling. The enemy Pokémon sprite is drawn at 70% of canvas width (x ≈ 624–720px). On any screen narrower than ~720px, the enemy sprite is entirely invisible.
+
+**Steps to reproduce:**
+1. Open the game in a browser window narrower than 960px
+2. Start any battle
+
+**Expected:** Both the player's and enemy's Pokémon are visible.
+**Actual:** Only the player's Pokémon (at x ≈ 184px) is visible. The enemy sprite is off-screen to the right. The HTML HP cards (positioned with CSS) remain visible, but the canvas sprites do not.
+
+**Found:** 2026-03-28
+
+---
+
 ## Bug #8 - Battle party screen crashes with null party slots
 **Status:** Fixed (2026-03-28)
 **Priority:** High

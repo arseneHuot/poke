@@ -2,6 +2,14 @@
 // POKEMON NOVARA - UI System
 // ============================================================
 
+const TYPE_NAMES_FR = {
+    normal: 'Normal', fire: 'Feu', water: 'Eau', grass: 'Plante',
+    electric: 'Électrik', ice: 'Glace', fighting: 'Combat', poison: 'Poison',
+    ground: 'Sol', flying: 'Vol', psychic: 'Psy', bug: 'Insecte',
+    rock: 'Roche', ghost: 'Spectre', dragon: 'Dragon', dark: 'Ténèbres',
+    steel: 'Acier', fairy: 'Fée',
+};
+
 const UI = {
     // DOM references
     elements: {},
@@ -368,7 +376,13 @@ const UI = {
     // Menu System
     // ----------------------------------------------------------------
     openMenu() {
-        if (this.dialogue.active || this.shop.active || this.starterSelect.active) return;
+        if (this.shop.active || this.starterSelect.active) return;
+        // Force-hide dialogue box in case it is lingering without active flag
+        if (this.dialogue.active) {
+            this._clearTypewriter();
+            this.elements.dialogueBox.classList.add('hidden');
+            this.dialogue.active = false;
+        }
         if (game) game.state.gameMode = 'menu';
 
         this.menu.open = true;
@@ -500,7 +514,7 @@ const UI = {
 
             const details = document.createElement('div');
             details.className = 'details';
-            const typeNames = data.types.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/');
+            const typeNames = data.types.map(t => TYPE_NAMES_FR[t] || t.charAt(0).toUpperCase() + t.slice(1)).join('/');
             details.textContent = 'Nv. ' + pokemon.level + ' | ' + typeNames;
             info.appendChild(details);
 
@@ -591,7 +605,7 @@ const UI = {
                 const ppLeft = (move.pp || 10) - (moveObj.ppUsed || 0);
                 const moveDiv = document.createElement('div');
                 moveDiv.style.cssText = 'font-size:12px;color:#ccc;margin-bottom:4px;padding:4px 8px;background:rgba(255,255,255,0.05);border-radius:4px;';
-                moveDiv.textContent = move.name + ' | ' + move.type.toUpperCase() + ' | Puiss. ' + (move.power || '-') + ' | PP ' + ppLeft + '/' + (move.pp || 10);
+                moveDiv.textContent = move.name + ' | ' + (TYPE_NAMES_FR[move.type] || move.type).toUpperCase() + ' | Puiss. ' + (move.power || '-') + ' | PP ' + ppLeft + '/' + (move.pp || 10);
                 panel.appendChild(moveDiv);
             });
         }
@@ -957,7 +971,7 @@ const UI = {
 
         const info = document.createElement('p');
         info.style.cssText = 'text-align:center;color:#aaa;margin-bottom:20px;';
-        info.textContent = 'Votre partie est sauvegardee automatiquement. Vous pouvez aussi sauvegarder manuellement.';
+        info.textContent = 'Votre partie est sauvegardée automatiquement. Vous pouvez aussi sauvegarder manuellement.';
         container.appendChild(info);
 
         const saveBtn = document.createElement('button');

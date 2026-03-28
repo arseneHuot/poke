@@ -42,6 +42,11 @@ const DIALOGUES = {
         { action: 'choose_starter' }
     ],
 
+    story_prof_postgame: [
+        { name: "Prof. Oliva", text: "Tu as déjà ton Pokémon ! Je compte sur toi pour compléter le Pokédex de Novara." },
+        { name: "Prof. Oliva", text: "Bonne chance dans ton aventure ! N'hésite pas à revenir me voir si tu as des questions." },
+    ],
+
     story_after_starter: [
         { name: "Prof. Oliva", text: "Excellent choix ! Prends aussi ce Pokédex, il enregistrera toutes les espèces que tu rencontreras." },
         { name: "Prof. Oliva", text: "Et voici 5 Poké Balls pour commencer ta collection !" },

@@ -385,8 +385,11 @@ const GameEngine = {
             AudioSystem.playSfx('confirm');
         }
 
-        // Resolve dialogue key
-        const dialogueKey = npc.dialogue;
+        // Resolve dialogue key — use altDialogue if condition flag is set
+        let dialogueKey = npc.dialogue;
+        if (npc.altDialogue && npc.altFlag && state.storyFlags[npc.altFlag]) {
+            dialogueKey = npc.altDialogue;
+        }
         if (!dialogueKey) return;
 
         const dialogue = DIALOGUES[dialogueKey];

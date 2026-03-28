@@ -37,7 +37,7 @@ const MOVES_DB = {
     inferno: { name: 'Feu d\'Enfer', type: 'fire', category: 'special', power: 100, accuracy: 50, pp: 5, effect: { type: 'status', status: 'burn', chance: 100 } },
 
     // Water
-    watergun: { name: 'Pistolet à O', type: 'water', category: 'special', power: 40, accuracy: 100, pp: 25 },
+    watergun: { name: 'Pistolet à Eau', type: 'water', category: 'special', power: 40, accuracy: 100, pp: 25 },
     bubble: { name: 'Écume', type: 'water', category: 'special', power: 40, accuracy: 100, pp: 30, effect: { type: 'stat', stat: 'spd', stages: -1, target: 'enemy', chance: 10 } },
     aquajet: { name: 'Aqua-Jet', type: 'water', category: 'physical', power: 40, accuracy: 100, pp: 20, priority: 1 },
     surf: { name: 'Surf', type: 'water', category: 'special', power: 90, accuracy: 100, pp: 15 },

@@ -163,7 +163,8 @@ const WorldData = {
             music: 'indoor', encounters: [],
             npcs: [
                 { id: 'prof_lab', type: 'professor', x: 9, y: 5, dir: DIR.DOWN, name: 'Prof. Oliva',
-                  dialogue: 'story_lab_starters', storyFlag: 'choose_starter', storyReq: 'met_professor' },
+                  dialogue: 'story_lab_starters', storyFlag: 'choose_starter', storyReq: 'met_professor',
+                  altDialogue: 'story_prof_postgame', altFlag: 'has_starter' },
                 { id: 'assistant', type: 'trainer', x: 14, y: 6, dir: DIR.LEFT, name: 'Assistant',
                   dialogue: 'lab_assistant' }
             ],
