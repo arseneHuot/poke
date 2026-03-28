@@ -209,6 +209,44 @@ body {
     text-shadow: 0 0 4px rgba(255,255,255,0.5);
 }
 
+#party-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.party-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: background-color 0.3s;
+}
+
+.party-dot.empty {
+    background: rgba(255,255,255,0.1);
+}
+
+.party-dot.fainted {
+    background: #666;
+}
+
+.party-dot.hp-green {
+    background: #4CAF50;
+    box-shadow: 0 0 4px rgba(76,175,80,0.5);
+}
+
+.party-dot.hp-orange {
+    background: #FF9800;
+    box-shadow: 0 0 4px rgba(255,152,0,0.5);
+}
+
+.party-dot.hp-red {
+    background: #F44336;
+    box-shadow: 0 0 6px rgba(244,67,54,0.6);
+}
+
 /* Dialogue Box */
 #dialogue-box {
     position: absolute;

@@ -243,6 +243,11 @@ const game = {
         if (this.state.gameMode === 'battle') {
             BattleSystem.update(dt);
         }
+
+        // Update party HP dots in HUD
+        if (typeof UI !== 'undefined' && UI.updatePartyDots) {
+            UI.updatePartyDots();
+        }
     },
 
     render(timestamp) {
@@ -307,6 +312,48 @@ const game = {
     // --------------------------------------------------------
     // Helpers
     // --------------------------------------------------------
+    returnToTitle() {
+        // Stop music
+        AudioSystem.stopMusic();
+
+        // Reset game state
+        this.state = null;
+
+        // Hide game elements, show title screen
+        const battleUI = document.getElementById('battle-ui');
+        if (battleUI) battleUI.classList.add('hidden');
+        if (UI.elements.dialogueBox) UI.elements.dialogueBox.classList.add('hidden');
+        if (UI.elements.menuOverlay) UI.elements.menuOverlay.classList.add('hidden');
+
+        // Reset title menu to original buttons
+        const titleScreen = document.getElementById('title-screen');
+        const menu = document.getElementById('title-menu');
+        menu.innerHTML = '';
+
+        const btnNew = document.createElement('button');
+        btnNew.id = 'btn-new-game';
+        btnNew.className = 'title-btn';
+        btnNew.textContent = 'Nouvelle Partie';
+        btnNew.addEventListener('click', () => this._showNameInput());
+        menu.appendChild(btnNew);
+
+        if (SaveSystem.hasSave()) {
+            const btnContinue = document.createElement('button');
+            btnContinue.id = 'btn-continue';
+            btnContinue.className = 'title-btn';
+            btnContinue.textContent = 'Continuer';
+            btnContinue.addEventListener('click', () => {
+                const loaded = SaveSystem.load();
+                if (!loaded) { alert('Sauvegarde corrompue.'); return; }
+                this._loadGame(loaded);
+                titleScreen.classList.add('hidden');
+            });
+            menu.appendChild(btnContinue);
+        }
+
+        titleScreen.classList.remove('hidden');
+    },
+
     getFormattedPlayTime() {
         const total = Math.floor(this.state.playTime);
         const hours = Math.floor(total / 3600);

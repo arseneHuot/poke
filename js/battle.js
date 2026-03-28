@@ -182,8 +182,10 @@ const BattleSystem = {
             const ppLeft = (moveData.pp || 10) - (move.ppUsed || 0);
             const btn = document.createElement('button');
             btn.className = 'battle-btn move-btn';
-            btn.style.borderLeft = `4px solid ${TYPE_COLORS[moveData.type] || '#888'}`;
-            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10}</span>`;
+            const typeColor = TYPE_COLORS[moveData.type] || '#888';
+            const typeName = (typeof TYPE_NAMES_FR !== 'undefined' && TYPE_NAMES_FR[moveData.type]) || moveData.type;
+            btn.style.borderLeft = `4px solid ${typeColor}`;
+            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:${typeColor};color:#fff;margin-left:6px;">${typeName}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10}</span>`;
             btn.disabled = ppLeft <= 0;
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('confirm');

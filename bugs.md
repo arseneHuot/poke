@@ -673,3 +673,20 @@ While `caughtBall` is currently not displayed anywhere in the UI, it is saved/lo
 **Fix needed:** Pass `ballId` to `_processCatchSuccess(ballId)` and use it: `ep.caughtBall = ballId;`
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #37 - "Quitter" uses full page reload instead of in-app navigation
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/ui.js (`_renderQuitterTab`), js/main.js
+
+**Description:** When the player confirms "Oui, quitter" in the Quitter menu tab, the game saves and then reloads the entire page via `location.reload()`. This causes a visible browser reload rather than a smooth return to the title screen.
+
+**Root cause:** `ui.js` checks `if (game && typeof game.returnToTitle === 'function') { game.returnToTitle(); } else { location.reload(); }`. The `game.returnToTitle` function is never defined in `main.js`, so the fallback `location.reload()` is always triggered.
+
+The save does occur before the reload (correct behaviour), but the UX is jarring — the browser briefly shows a blank page before the title screen re-renders.
+
+**Fix needed:** Implement `game.returnToTitle()` in `main.js` that resets game state and returns to the title screen without a full page reload (e.g., stop the game loop, hide `#game-container`, show `#title-screen`, reset `game.state`).
+
+**Found:** 2026-03-28

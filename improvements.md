@@ -74,3 +74,19 @@
 
 - ~~**Sprite cache LRU**~~ **Done (2026-03-28)**: Added `_cacheOrder` array and `_maxCacheSize: 200` limit — oldest entries are evicted when cache is full.
 - ~~**`WorldData.init()` generates all maps at startup**~~ **Done (2026-03-28)**: Maps are now lazy-loaded on first visit via `_generators` registry. Only borgo, player_house, and prof_lab are eagerly generated at startup; all other 16 maps are deferred until `getMap()` is called.
+
+---
+
+## New Suggestions (2026-03-28 QA session)
+
+### UX / UI
+
+- ~~**In-app title screen return**~~ **Done (2026-03-28)**: Implemented `game.returnToTitle()` — stops music, resets state, rebuilds title menu with New/Continue buttons, no page reload.
+
+- ~~**Battle move type indicator**~~ **Done (2026-03-28)**: Move buttons now show a coloured type badge (e.g., "Feu", "Eau") next to the move name using `TYPE_NAMES_FR` and `TYPE_COLORS`.
+
+- ~~**Caught ball display in Pokédex detail**~~ **Done (2026-03-28)**: Pokédex detail now shows "Capturé avec : [ball name]" below type badges for caught Pokémon, using the `caughtBall` field.
+
+### Gameplay
+
+- ~~**Party HP dots colour coding**~~ **Done (2026-03-28)**: Added 6 colour-coded dots to the HUD (`#party-dots`). Green > 50% HP, orange 20–50%, red < 20%, grey for fainted, dim for empty slots. Updated every frame via `UI.updatePartyDots()`.

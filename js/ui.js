@@ -984,6 +984,16 @@ const UI = {
         });
         card.appendChild(typesDiv);
 
+        // Caught ball info
+        if (game && game.state && game.state.pokedexCaught.has(id)) {
+            const caughtPkmn = (game.state.party || []).concat(game.state.pc || []).find(p => p && p.id === id && p.caughtBall);
+            const ballName = caughtPkmn && caughtPkmn.caughtBall && ITEMS[caughtPkmn.caughtBall] ? ITEMS[caughtPkmn.caughtBall].name : 'Poké Ball';
+            const caughtDiv = document.createElement('div');
+            caughtDiv.style.cssText = 'text-align:center;font-size:11px;color:#aaa;margin-bottom:10px;';
+            caughtDiv.textContent = `Capturé avec : ${ballName}`;
+            card.appendChild(caughtDiv);
+        }
+
         // Description
         if (data.desc) {
             const descDiv = document.createElement('div');
@@ -1016,8 +1026,7 @@ const UI = {
         backBtn.style.cssText = 'display:block;margin:15px auto 0;padding:8px 30px;';
         backBtn.textContent = 'Retour';
         backBtn.addEventListener('click', () => {
-            panel.innerHTML = '';
-            this._renderPokedexTab(panel);
+            this._renderMenu();
         });
         panel.appendChild(backBtn);
     },
@@ -1230,6 +1239,27 @@ const UI = {
                 slot.classList.remove('earned');
             }
         });
+    },
+
+    updatePartyDots() {
+        const container = document.getElementById('party-dots');
+        if (!container || !game || !game.state) return;
+
+        container.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'party-dot';
+            const pkmn = game.state.party[i];
+            if (!pkmn) {
+                dot.classList.add('empty');
+            } else if (pkmn.currentHp <= 0) {
+                dot.classList.add('fainted');
+            } else {
+                const pct = pkmn.currentHp / pkmn.stats.hp * 100;
+                dot.classList.add(pct > 50 ? 'hp-green' : pct > 20 ? 'hp-orange' : 'hp-red');
+            }
+            container.appendChild(dot);
+        }
     },
 
     // ----------------------------------------------------------------
