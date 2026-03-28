@@ -869,8 +869,8 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 
 ---
 
-## Bug #47 - Gym leaders, Elite 4, and Champion unreachable inside solid buildings
-**Status:** Open
+## Bug #49 - Gym leaders, Elite 4, and Champion unreachable inside solid buildings
+**Status:** Fixed (2026-03-28)
 **Priority:** Critical
 **File:** js/world-data.js
 

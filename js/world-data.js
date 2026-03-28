@@ -478,6 +478,7 @@ const WorldData = {
 
         // GYM 2 - Grass type
         this._fillRect(tiles, 6, 20, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 7, 21, 6, 6, TILE.GYM_FLOOR);
         tiles[27][10] = TILE.DOOR;
 
         // Lots of flowers and trees
@@ -606,10 +607,12 @@ const WorldData = {
 
         // GYM 3 - Water type
         this._fillRect(tiles, 30, 22, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 31, 23, 6, 6, TILE.GYM_FLOOR);
         tiles[29][34] = TILE.DOOR;
 
         // GYM 4 - Electric type
         this._fillRect(tiles, 6, 24, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 7, 25, 6, 6, TILE.GYM_FLOOR);
         tiles[31][10] = TILE.DOOR;
 
         // Water features
@@ -761,10 +764,12 @@ const WorldData = {
 
         // GYM 5 - Fire
         this._fillRect(tiles, 6, 22, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 7, 23, 6, 6, TILE.GYM_FLOOR);
         tiles[29][10] = TILE.DOOR;
 
         // GYM 6 - Ground
         this._fillRect(tiles, 32, 22, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 33, 23, 6, 6, TILE.GYM_FLOOR);
         tiles[29][36] = TILE.DOOR;
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.ROCK; tiles[y][w-1] = TILE.ROCK; }
@@ -869,6 +874,7 @@ const WorldData = {
 
         // GYM 7 - Ice
         this._fillRect(tiles, 16, 22, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 17, 23, 6, 6, TILE.GYM_FLOOR);
         tiles[29][20] = TILE.DOOR;
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.ROCK; tiles[y][w-1] = TILE.ROCK; }
@@ -968,6 +974,7 @@ const WorldData = {
 
         // GYM 8 - Dragon
         this._fillRect(tiles, 18, 24, 10, 10, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 19, 25, 8, 8, TILE.GYM_FLOOR);
         tiles[33][23] = TILE.DOOR;
 
         this._fillRect(tiles, 4, 28, 10, 8, TILE.WATER);
@@ -1073,10 +1080,12 @@ const WorldData = {
 
         // Elite Four
         this._fillRect(tiles, 30, 8, 8, 6, TILE.BUILDING);
+        this._fillRect(tiles, 31, 9, 6, 4, TILE.GYM_FLOOR);
         tiles[13][34] = TILE.DOOR;
 
         // Champion room
         this._fillRect(tiles, 16, 2, 12, 8, TILE.BUILDING);
+        this._fillRect(tiles, 17, 3, 10, 6, TILE.GYM_FLOOR);
         tiles[9][22] = TILE.DOOR;
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.WALL; tiles[y][w-1] = TILE.WALL; }
