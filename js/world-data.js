@@ -245,6 +245,11 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
 
+        // Environmental variety
+        tiles[20][8] = TILE.ROCK; tiles[20][9] = TILE.ROCK;
+        tiles[28][30] = TILE.ROCK;
+        this._fillRect(tiles, 30, 22, 3, 2, TILE.WATER); // small pond
+
         this.maps['route1'] = {
             id: 'route1', name: 'Route 1', width: w, height: h, tiles,
             music: 'route', encounters: [
@@ -379,6 +384,11 @@ const WorldData = {
         // Signs
         tiles[19][w-3] = TILE.SIGN;
         tiles[19][3] = TILE.SIGN;
+
+        // Environmental variety
+        tiles[10][25] = TILE.ROCK; tiles[10][26] = TILE.ROCK;
+        tiles[25][15] = TILE.ROCK;
+        this._fillRect(tiles, 35, 10, 2, 3, TILE.WATER); // small pond
 
         this.maps['route2'] = {
             id: 'route2', name: 'Route 2', width: w, height: h, tiles,
@@ -526,6 +536,11 @@ const WorldData = {
         // Signs
         tiles[35][19] = TILE.SIGN;
         tiles[5][19] = TILE.SIGN;
+
+        // Environmental variety
+        tiles[18][10] = TILE.ROCK; tiles[18][11] = TILE.ROCK;
+        tiles[32][30] = TILE.ROCK; tiles[33][30] = TILE.ROCK;
+        this._fillRect(tiles, 6, 14, 2, 2, TILE.FLOWER); // flower patch
 
         this.maps['route3'] = {
             id: 'route3', name: 'Route 3', width: w, height: h, tiles,
@@ -793,6 +808,10 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+        // Environmental variety
+        tiles[12][8] = TILE.ROCK; tiles[12][9] = TILE.ROCK;
+        tiles[30][28] = TILE.ROCK;
+        this._fillRect(tiles, 28, 18, 3, 2, TILE.WATER);
 
         this.maps['route6'] = {
             id: 'route6', name: 'Route 6', width: w, height: h, tiles,
@@ -888,6 +907,11 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+        // Environmental variety
+        tiles[15][10] = TILE.ROCK; tiles[16][10] = TILE.ROCK;
+        tiles[24][32] = TILE.ROCK;
+        this._fillRect(tiles, 30, 8, 2, 3, TILE.WATER);
+        this._fillRect(tiles, 8, 16, 3, 2, TILE.FLOWER);
 
         this.maps['route7'] = {
             id: 'route7', name: 'Route 7', width: w, height: h, tiles,

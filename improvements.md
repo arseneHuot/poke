@@ -139,7 +139,7 @@
 
 - ~~**Desert route green grass inconsistency**~~ **Done (2026-03-28)**: Added `theme.tallGrass` color config to desert maps (Route 4 and Route 5). Tall grass on sand now renders with sandy brown colors instead of green, using the theme system in `SpriteRenderer.drawTile`.
 
-- **Route environmental objects**: Routes are mostly flat with just grass patches and trees. Adding variety — rocks, bushes, small ponds, fallen logs — would make routes more interesting to explore.
+- ~~**Route environmental objects**~~ **Done (2026-03-28)**: Added scattered rocks, small ponds, and flower patches to Routes 1, 2, 3, 6, and 7. Each route now has 2-3 rock formations, a small water pond or flower patch for visual variety beyond just grass and trees.
 
 ### Buildings / Interiors
 
