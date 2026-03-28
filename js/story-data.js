@@ -149,6 +149,21 @@ const DIALOGUES = {
     sign_rivalta: [
         { text: "Rivalta - Ville des Deux Arènes. Maîtrisez l'eau et l'électricité pour progresser !" }
     ],
+    sign_porto: [
+        { text: "Porto City - Le port commercial de Novara. Arène de type Normal." }
+    ],
+    sign_volcan: [
+        { text: "Volcania - La cité forgée dans le feu. Arène de type Feu." }
+    ],
+    sign_glacia: [
+        { text: "Glacia - La ville éternellement gelée. Arène de type Glace." }
+    ],
+    sign_abyss: [
+        { text: "Abyssia - La ville des abysses. Arène de type Ténèbres." }
+    ],
+    sign_league: [
+        { text: "Ligue Pokémon de Novara - Seuls les meilleurs Dresseurs peuvent entrer." }
+    ],
 
     // === NURSE & MERCHANT ===
     nurse_heal: [

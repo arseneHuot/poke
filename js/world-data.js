@@ -288,6 +288,9 @@ const WorldData = {
             if (x < 17 || x > 21) tiles[h-1][x] = TILE.WATER;
         }
 
+        // City entrance sign
+        tiles[26][18] = TILE.SIGN;
+
         this.maps['porto'] = {
             id: 'porto', name: 'Porto City', width: w, height: h, tiles,
             music: 'city',
@@ -312,6 +315,7 @@ const WorldData = {
                   dialogue: 'porto_enfant' },
                 { id: 'villager_porto5', type: 'villager', x: 30, y: 15, dir: DIR.DOWN, name: 'Dame',
                   dialogue: 'porto_dame' },
+                { id: 'sign_porto', type: 'sign', x: 18, y: 26, dialogue: 'sign_porto' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route1', targetX: 20, targetY: 1 },
@@ -702,6 +706,7 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.ROCK; tiles[h-1][x] = TILE.ROCK; }
         }
+        tiles[26][18] = TILE.SIGN;
 
         this.maps['volcan_city'] = {
             id: 'volcan_city', name: 'Volcania', width: w, height: h, tiles,
@@ -719,6 +724,7 @@ const WorldData = {
                   dialogue: 'gym6_dialogue', altDialogue: 'gym6_defeated', team: [
                     { id: 33, level: 37 }, { id: 55, level: 37 }, { id: 25, level: 38 }, { id: 56, level: 40 }
                   ], defeated: false, reward: 4800, badge: 5, storyReq: 'badge_4' },
+                { id: 'sign_volcan', type: 'sign', x: 18, y: 26, dialogue: 'sign_volcan' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'desert_route', targetX: 20, targetY: 1 },
@@ -791,6 +797,7 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.ROCK; tiles[h-1][x] = TILE.ROCK; }
         }
+        tiles[26][18] = TILE.SIGN;
 
         this.maps['glacia_city'] = {
             id: 'glacia_city', name: 'Glacia', width: w, height: h, tiles,
@@ -804,6 +811,7 @@ const WorldData = {
                   dialogue: 'gym7_dialogue', altDialogue: 'gym7_defeated', team: [
                     { id: 41, level: 40 }, { id: 84, level: 41 }, { id: 28, level: 42 }, { id: 42, level: 44 }
                   ], defeated: false, reward: 5200, badge: 6, storyReq: 'badge_5' },
+                { id: 'sign_glacia', type: 'sign', x: 18, y: 26, dialogue: 'sign_glacia' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route6', targetX: 20, targetY: 1 },
@@ -877,6 +885,7 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+        tiles[26][18] = TILE.SIGN;
 
         this.maps['abyss_city'] = {
             id: 'abyss_city', name: 'Abyssia', width: w, height: h, tiles,
@@ -890,6 +899,7 @@ const WorldData = {
                   dialogue: 'gym8_dialogue', altDialogue: 'gym8_defeated', team: [
                     { id: 66, level: 46 }, { id: 111, level: 47 }, { id: 89, level: 48 }, { id: 136, level: 48 }, { id: 67, level: 50 }
                   ], defeated: false, reward: 6000, badge: 7, storyReq: 'badge_6' },
+                { id: 'sign_abyss', type: 'sign', x: 18, y: 26, dialogue: 'sign_abyss' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route7', targetX: 20, targetY: 1 },
@@ -973,6 +983,7 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) tiles[h-1][x] = TILE.WALL;
         }
+        tiles[35][18] = TILE.SIGN;
 
         this.maps['pokemon_league'] = {
             id: 'pokemon_league', name: 'Ligue Pokémon de Novara', width: w, height: h, tiles,
@@ -1001,6 +1012,7 @@ const WorldData = {
                   dialogue: 'champion_dialogue', team: [
                     { id: 138, level: 58 }, { id: 93, level: 58 }, { id: 67, level: 59 }, { id: 85, level: 59 }, { id: 91, level: 60 }, { id: 147, level: 62 }
                   ], defeated: false, reward: 20000 },
+                { id: 'sign_league', type: 'sign', x: 18, y: 35, dialogue: 'sign_league' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'victory_road', targetX: 20, targetY: 1 },

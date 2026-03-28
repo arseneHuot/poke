@@ -131,7 +131,7 @@
 
 - **City decorative elements**: Cities feel empty with just buildings and NPCs. Add decorative tile types — fountains, benches, lampposts, flower beds, statues — to make cities feel lived-in. Even 2-3 decorative elements per city would help.
 
-- **City entrance signs**: Add a sign post tile at each city entrance showing the city name. In classic Pokémon games, every city has a sign at the entrance. This helps with navigation and immersion.
+- ~~**City entrance signs**~~ **Done (2026-03-28)**: Added sign tiles and sign NPCs with city description dialogues to Porto, Volcania, Glacia, Abyssia, and Pokémon League entrances. Each sign shows the city name and a brief description.
 
 - **More NPCs with flavor dialogue per city**: Most cities only have 2-3 NPCs. Adding 2-3 more ambient NPCs per city with short flavor text about the city's theme/lore would make the world feel more populated and alive.
 
