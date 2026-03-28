@@ -264,6 +264,7 @@ const BattleSystem = {
         movesDiv.innerHTML = '';
 
         game.state.party.forEach((pkmn, index) => {
+            if (!pkmn) return;
             const btn = document.createElement('button');
             btn.className = 'battle-btn';
             const isCurrent = pkmn === this.state.playerPokemon;
@@ -279,14 +280,17 @@ const BattleSystem = {
             movesDiv.appendChild(btn);
         });
 
-        const backBtn = document.createElement('button');
-        backBtn.className = 'battle-btn';
-        backBtn.textContent = 'RETOUR';
-        backBtn.addEventListener('click', () => {
-            AudioSystem.playSfx('cancel');
-            this._showActions();
-        });
-        movesDiv.appendChild(backBtn);
+        // Don't show back button during forced switch (player must pick a Pokemon)
+        if (this.state.turnPhase !== 'forced_switch') {
+            const backBtn = document.createElement('button');
+            backBtn.className = 'battle-btn';
+            backBtn.textContent = 'RETOUR';
+            backBtn.addEventListener('click', () => {
+                AudioSystem.playSfx('cancel');
+                this._showActions();
+            });
+            movesDiv.appendChild(backBtn);
+        }
     },
 
     _hideMenus() {
@@ -1308,6 +1312,7 @@ const BattleSystem = {
 
         // Clean up battle-specific flags on player party
         game.state.party.forEach(p => {
+            if (!p) return;
             delete p._flinched;
             delete p._protected;
             delete p._seeded;
@@ -1337,6 +1342,7 @@ const BattleSystem = {
         // Heal if lost (teleport to last center)
         if (result === 'lose') {
             game.state.party.forEach(p => {
+                if (!p) return;
                 p.currentHp = p.stats.hp;
                 p.status = null;
                 p.moves.forEach(m => m.ppUsed = 0);

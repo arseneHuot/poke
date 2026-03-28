@@ -115,9 +115,11 @@ const SaveSystem = {
 
     _deserializePokemon(data) {
         if (!data) return null;
+        const pokemonData = getPokemonById(data.id);
+        if (!pokemonData) return null;
         const pokemon = {
             id: data.id,
-            name: getPokemonById(data.id).name,
+            name: pokemonData.name,
             nickname: data.nickname,
             level: data.level,
             exp: data.exp,

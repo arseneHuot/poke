@@ -110,3 +110,68 @@ if (enemyFlinched) { ... }
 **Root cause:** The dialogue action was `{ action: 'rival_battle_r7' }`, an undefined action key. `UI._handleDialogueAction` only handles the `'trainer_battle'` action for trainer battles; `'rival_battle_r7'` fell through to the `default` case which simply advanced the dialogue index, skipping the battle entirely.
 
 **Fix:** Changed `{ action: 'rival_battle_r7' }` to `{ action: 'trainer_battle' }` in `story-data.js`.
+
+---
+
+## Bug #8 - Battle party screen crashes with null party slots
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js
+
+**Description:** Opening the party screen during battle crashed if any party slot was null. The game supports null party entries, but `_showParty` accessed `pkmn.currentHp` etc. without a null check.
+
+**Root cause:** `game.state.party.forEach((pkmn, index) => { ... })` accessed properties on `pkmn` without checking if it was null first.
+
+**Fix:** Added `if (!pkmn) return;` guard at the top of the forEach callback in `_showParty`.
+
+---
+
+## Bug #9 - Back button shown during forced switch after Pokemon faints
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/battle.js
+
+**Description:** When the player's active Pokemon fainted, the party screen showed a "Back" button. Clicking it returned to the action menu without any active Pokemon, causing an inconsistent game state.
+
+**Root cause:** `_showParty` always added the back button unconditionally, even during `forced_switch` phase.
+
+**Fix:** Back button is now only added when `this.state.turnPhase !== 'forced_switch'`.
+
+---
+
+## Bug #10 - endBattle crashes with null party slots
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/battle.js
+
+**Description:** `BattleSystem.endBattle()` iterated over the party to clean up battle flags and to heal on loss, but did not guard against null party entries.
+
+**Root cause:** Both `forEach` loops accessed properties on `p` without null checks.
+
+**Fix:** Added `if (!p) return;` guards in both forEach loops in `endBattle`.
+
+---
+
+## Bug #11 - pokemon-data.js functions crash on invalid Pokemon ID
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/pokemon-data.js
+
+**Description:** Six functions — `recalcStats`, `checkEvolution`, `addExp`, `evolvePokemon`, `getExpPercent`, `calcExpGain` — all call `getPokemonById(id)` and immediately access properties on the result without checking for null. If an invalid or unknown Pokemon ID is passed, they all crash.
+
+**Root cause:** Missing null guards after `getPokemonById` calls throughout the module.
+
+**Fix:** Added `if (!data) return ...;` (with appropriate return value) at the top of each function after the `getPokemonById` call.
+
+---
+
+## Bug #12 - _deserializePokemon crashes on unknown Pokemon ID in save
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/save-system.js
+
+**Description:** Loading a save file that contains a Pokemon whose ID no longer exists in POKEMON_DB caused a crash: `getPokemonById(data.id).name` throws because the result is null.
+
+**Root cause:** No null check after `getPokemonById(data.id)` in `_deserializePokemon`.
+
+**Fix:** Added a null check — if `getPokemonById` returns null, `_deserializePokemon` returns null instead of crashing. The load/party code already handles null party entries gracefully.

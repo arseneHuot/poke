@@ -1039,6 +1039,7 @@ function createPokemon(id, level, isWild = true) {
 
 function recalcStats(pokemon) {
     const data = getPokemonById(pokemon.id);
+    if (!data) return;
     const base = data.baseStats;
     const iv = pokemon.ivs;
     const ev = pokemon.evs;
@@ -1068,6 +1069,7 @@ function recalcStats(pokemon) {
 // Check evolution
 function checkEvolution(pokemon) {
     const data = getPokemonById(pokemon.id);
+    if (!data) return null;
     if (data.evolvesTo && data.evolveLevel && pokemon.level >= data.evolveLevel) {
         return data.evolvesTo;
     }
@@ -1078,6 +1080,7 @@ function checkEvolution(pokemon) {
 function addExp(pokemon, amount) {
     pokemon.exp += amount;
     const data = getPokemonById(pokemon.id);
+    if (!data) return [];
     const expGroup = EXP_GROUPS[data.expGroup] || EXP_GROUPS.medium_fast;
     const events = [];
 
@@ -1121,8 +1124,9 @@ function addExp(pokemon, amount) {
 }
 
 function evolvePokemon(pokemon, newId) {
-    const oldName = pokemon.name;
     const newData = getPokemonById(newId);
+    if (!newData) return;
+    const oldName = pokemon.name;
     pokemon.id = newId;
     pokemon.name = newData.name;
     if (!pokemon.nickname || pokemon.nickname === oldName) {
@@ -1134,6 +1138,7 @@ function evolvePokemon(pokemon, newId) {
 
 function getExpPercent(pokemon) {
     const data = getPokemonById(pokemon.id);
+    if (!data) return 0;
     const expGroup = EXP_GROUPS[data.expGroup] || EXP_GROUPS.medium_fast;
     const currLevelExp = expGroup(pokemon.level);
     const nextLevelExp = expGroup(pokemon.level + 1);
@@ -1142,6 +1147,7 @@ function getExpPercent(pokemon) {
 
 function calcExpGain(defeatedPokemon, isTrainer = false) {
     const data = getPokemonById(defeatedPokemon.id);
+    if (!data) return 0;
     const base = Object.values(data.baseStats).reduce((a, b) => a + b, 0) / 6;
     const trainerBonus = isTrainer ? 1.5 : 1;
     return Math.floor((base * defeatedPokemon.level * trainerBonus) / 7);
