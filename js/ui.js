@@ -10,6 +10,14 @@ const TYPE_NAMES_FR = {
     steel: 'Acier', fairy: 'Fée',
 };
 
+const NATURE_NAMES_FR = {
+    Hardy: 'Hardi', Lonely: 'Solitaire', Brave: 'Brave', Adamant: 'Rigide', Naughty: 'Coquin',
+    Bold: 'Assuré', Docile: 'Docile', Relaxed: 'Relax', Impish: 'Malin', Lax: 'Lâche',
+    Timid: 'Timide', Hasty: 'Hâtif', Serious: 'Sérieux', Jolly: 'Jovial', Naive: 'Naïf',
+    Modest: 'Modeste', Mild: 'Doux', Quiet: 'Calme', Bashful: 'Pudique', Rash: 'Bizarre',
+    Calm: 'Sage', Gentle: 'Gentil', Sassy: 'Malpoli', Careful: 'Prudent', Quirky: 'Vif',
+};
+
 const UI = {
     // DOM references
     elements: {},
@@ -609,7 +617,7 @@ const UI = {
         if (pokemon.nature) {
             const natureSpan = document.createElement('span');
             natureSpan.style.cssText = 'color:#aaa;font-size:12px;margin-left:10px;';
-            natureSpan.textContent = pokemon.nature;
+            natureSpan.textContent = NATURE_NAMES_FR[pokemon.nature] || pokemon.nature;
             infoDiv.appendChild(natureSpan);
         }
         panel.appendChild(infoDiv);

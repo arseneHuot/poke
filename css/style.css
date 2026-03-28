@@ -743,10 +743,10 @@ body {
 /* Notification */
 .notification {
     position: absolute;
-    top: 50px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.9);
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.95);
     border: 2px solid #ffd700;
     border-radius: 8px;
     padding: 12px 24px;
@@ -758,8 +758,8 @@ body {
 }
 
 @keyframes notifIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from { opacity: 0; transform: translate(-50%, calc(-50% - 20px)); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
 }
 
 @keyframes notifOut {

@@ -753,12 +753,12 @@ const BattleSystem = {
         this._hideMenus();
 
         if (item.type === 'ball') {
+            game.state.bag[itemId]--;
             if (this.state.isTrainer) {
                 this._queueMessage(`On ne peut pas capturer le Pokémon d'un dresseur !`);
-                this._processMessageQueue(() => this._showActions());
+                this._executeTurn({ type: 'item' });
                 return;
             }
-            game.state.bag[itemId]--;
             this._executeCatch(itemId);
         } else if (item.type === 'heal') {
             game.state.bag[itemId]--;

@@ -146,3 +146,27 @@
 - ~~**Gym visual differentiation**~~ **Done (2026-03-28)**: Added `TILE.GYM_BUILDING` (26) tile type with red roof stripe and gold badge star. All 8 gym buildings now use this tile, making them visually distinct from regular buildings while still using the city's theme colors.
 
 - ~~**Interior furniture and detail**~~ **Done (2026-03-28)**: Added 3 new tile types (TABLE, RUG walkable, BOOKSHELF with colored book spines). Player house now has bookshelves, dining table, and a red rug. Lab tables upgraded from WALL to TABLE tiles, bookshelves added along the back wall.
+
+---
+
+## New Suggestions (2026-03-28 QA session #4 — Gameplay & UX)
+
+### Battle
+
+- ~~**No money reward message after trainer victory**~~ **Done (2026-03-28)**: Already implemented — `battle.js` `_handleEnemyFaint` queues `"Vous recevez X₽ !"` message when `trainerNpc.reward` is set. Verified in code.
+
+- **Pokémon switch screen shows plain text, no HP bars**: The in-battle POKÉMON switch screen lists party members as "Name Nv.X X/X PV" plain text. Adding compact HP bars (like the overworld party screen) would let players quickly assess which Pokémon are healthy without reading numbers.
+
+- **Battle area blank between turns**: The middle section of the battle screen (between the Pokémon sprites and the text log) is empty while messages are queuing. A subtle idle animation or a semi-visible previous-turn recap would fill this dead space.
+
+### UX / Overworld
+
+- **No active Repel indicator**: When Repousse is active, there is no HUD indicator or step counter showing the player how many steps remain. Players have no way to tell if Repousse is active or how long it lasts without counting steps manually.
+
+- ~~**Pokédex stat bars are all red**~~ **Done (2026-03-28)**: Already implemented — stat bars use color-coded backgrounds: green (`#4CAF50`) for stat ≥ 100, orange (`#FF9800`) for ≥ 70, red (`#F44336`) for < 70. Verified in `_showPokedexDetail` at ui.js line 1045.
+
+- ~~**Nature names in English in party detail**~~ **Done (2026-03-28)**: Added `NATURE_NAMES_FR` mapping in `ui.js` (all 25 natures). `_showPokemonDetail` now shows French nature names. See Bug #61 fix.
+
+### Menus
+
+- ~~**Save notification obscured by menu backdrop**~~ **Done (2026-03-28)**: Notification repositioned to `top: 50%; transform: translate(-50%, -50%)` — now centered in the viewport, fully visible over the menu overlay. See Bug #60 fix.

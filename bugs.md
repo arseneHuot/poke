@@ -964,11 +964,13 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 ---
 
 ## Bug #56 - Poké Ball throw in trainer battle skips turn AND does not consume the ball
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Medium
-**File:** js/battle.js (or js/ui.js)
+**File:** js/battle.js
 
 **Description:** Throwing a Poké Ball at a trainer's Pokémon correctly shows "On ne peut pas capturer le Pokémon d'un dresseur !" but immediately returns to the action menu — the turn is NOT consumed and the Poké Ball quantity remains unchanged. In mainline Pokémon games the throw wastes the player's turn (enemy still attacks) and the ball is consumed.
+
+**Fix:** Moved `game.state.bag[itemId]--` before the trainer check so the ball is always consumed. Changed the trainer-battle branch to call `this._executeTurn({ type: 'item' })` instead of `_processMessageQueue(() => _showActions())` — enemy now attacks after the failed throw.
 
 **Steps to reproduce:**
 1. Enter a trainer battle
@@ -981,18 +983,11 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 ---
 
 ## Bug #57 - Using Repousse (Repel) from bag shows no notification or feedback
-**Status:** Open
+**Status:** Fixed (2026-03-28) — Already handled: `_renderBagTab` repel handler at js/ui.js calls `this.showNotification('Repousse activée pour ' + (itemData.steps || 100) + ' pas !')` after activating the repel. Verified in code.
 **Priority:** Low
 **File:** js/ui.js
 
 **Description:** Clicking Repousse in the overworld bag closes the menu and silently activates the 100-step repel counter with no notification. The player receives no on-screen confirmation that Repousse was used or how many steps remain.
-
-**Root cause:** The bag item handler calls `engine.repelSteps = 100` (or equivalent) and closes the menu without calling `UI.showNotification()`.
-
-**Steps to reproduce:**
-1. Open menu → Sac → click Repousse
-2. Menu closes, overworld resumes
-3. No notification appears confirming repel is active
 
 **Found:** 2026-03-28
 
@@ -1009,5 +1004,42 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 1. Catch a Pokémon in a wild battle
 2. Return to the overworld
 3. Golden/pink confetti particles remain visibly on the ground near the player's position
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #59 - Badge count always 0 — two separate badge tracking systems out of sync
+**Status:** Fixed (2026-03-28) — Resolved as part of Bug #27 fix. `BattleSystem.endBattle()` at js/battle.js lines 1478–1485 now sets BOTH `game.state.storyFlags['badge_N'] = true` AND `game.state.badges.push(badgeIndex)` when a gym leader is defeated. Both systems are synced. `UI.updateBadges()` is called immediately after to refresh the HUD.
+**Priority:** High
+**File:** js/battle.js
+
+**Description:** The Dresseur (trainer card) tab shows "Badges: 0 / 8" and all 8 badge slots show "?" regardless of how many gyms have been defeated. The HUD badge row also never shows any earned badges. All 8 gym badge story flags (`badge_0` through `badge_7`) are correctly set in `storyFlags`, but the UI reads from a separate `game.state.badges[]` array which is never populated.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #60 - Save notification hidden behind dark menu overlay backdrop
+**Status:** Fixed (2026-03-28)
+**Priority:** Low
+**File:** css/style.css
+
+**Description:** The "Partie sauvegardée !" notification fires correctly when clicking "Sauvegarder maintenant" (z-index:80 > menu z-index:60) and appears in the DOM, but it is rendered at `top: 50px` within `#ui-layer`, which visually falls inside the semi-transparent dark menu backdrop. The dark-on-dark placement makes the notification effectively invisible to the player while the menu is open.
+
+**Fix:** Changed `.notification` position from `top: 50px; transform: translateX(-50%)` to `top: 50%; transform: translate(-50%, -50%)`. Notification now appears centered in the viewport, overlapping the menu panel where it is clearly visible. Animation keyframe updated to match new centered transform.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #61 - Pokémon nature displayed in English in party detail view
+**Status:** Fixed (2026-03-28)
+**Priority:** Low
+**File:** js/ui.js (_showPokemonDetail)
+
+**Description:** The party Pokémon detail screen shows the nature in English (e.g. "Naughty") instead of French ("Coquin"). All other UI text in this view is in French.
+
+**Fix:** Added `NATURE_NAMES_FR` mapping at the top of `ui.js` (all 25 natures translated to French). `_showPokemonDetail` now renders `NATURE_NAMES_FR[pokemon.nature] || pokemon.nature` instead of `pokemon.nature` directly.
 
 **Found:** 2026-03-28
