@@ -416,6 +416,8 @@ const GameEngine = {
 
         // Check for NPC at the facing tile
         for (const npc of map.npcs) {
+            if (npc.storyReq && !state.storyFlags[npc.storyReq]) continue;
+            if (npc.storyFlag && npc.disappearAfter && state.storyFlags[npc.storyFlag]) continue;
             if (Math.round(npc.x) === checkX && Math.round(npc.y) === checkY) {
                 this.interactWithNPC(npc);
                 return;

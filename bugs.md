@@ -1171,3 +1171,38 @@ if (newBtn.dataset.action === 'run') {
 **Root cause (suspected):** On level-up, `addExp()` recalculates `stats.hp` to a new maximum. If `currentHp` is updated to the new max but the UI reads `pokemon.currentHp` before it is set, or if the stat recalculation assigns `NaN` to `currentHp` during the HP scaling formula (e.g., dividing by zero or using an undefined ratio), the display value becomes NaN. The `_updateUI` function likely renders `pokemon.currentHp` directly without a `Number.isFinite()` guard.
 
 **Found:** 2026-03-28
+---
+
+## Bug #68 - Invisible NPCs (storyReq not met) still interactable via keyboard
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/engine.js (`_handleInteraction`)
+
+**Description:** NPCs with an unmet `storyReq` (e.g., `gym1_leader` with `storyReq: 'has_starter'`) are correctly skipped during rendering and movement collision, but the `_handleInteraction` function did not check `storyReq` or `disappearAfter` before calling `interactWithNPC`. A player facing the tile of an invisible NPC and pressing Space would still trigger its dialogue and potentially start a battle.
+
+**Example:** The Porto gym leader (`gym1_leader`) is invisible until `has_starter` flag is set. A player who skipped the starter and reached Porto could stand at (38, 19) facing north, press Space, and trigger the gym leader battle with no Pokémon in their party.
+
+**Root cause:** `_handleInteraction`'s NPC loop at line 418 had no `storyReq` or `disappearAfter` guards, unlike the rendering loop (line 208) and collision loop (line 394-396).
+
+**Fix:** Added `if (npc.storyReq && !state.storyFlags[npc.storyReq]) continue;` and `if (npc.storyFlag && npc.disappearAfter && state.storyFlags[npc.storyFlag]) continue;` to the NPC loop in `_handleInteraction`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #69 - returnToTitle causes crash on next Space press / dialogue state not cleared
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**Files:** js/ui.js (`_endDialogue`), js/main.js (`returnToTitle`)
+
+**Description:** Two related issues:
+
+1. `_endDialogue()` at line 235 calls `game.state.gameMode = 'overworld'` with only `if (game)` guard. After `returnToTitle()` sets `game.state = null`, any lingering dialogue callback or action that triggered `_endDialogue` would throw `TypeError: Cannot set properties of null` on `game.state.gameMode`.
+
+2. `returnToTitle()` did not clear `UI.dialogue.active`, `UI.dialogue.callback`, `UI.menu.open`, or `GameEngine.inputLocked`. If the player quit while a dialogue was active, `UI.dialogue.active` would remain `true`. On the title screen, the `advanceDialogue()` could still be triggered by Space, eventually calling `_endDialogue()` which would then crash at `game.state.gameMode`.
+
+**Fix:**
+- Changed `if (game) game.state.gameMode = 'overworld'` to `if (game && game.state) game.state.gameMode = 'overworld'` in `_endDialogue` (all 3 occurrences).
+- Added cleanup to `returnToTitle()`: clears `UI.dialogue.active`, `UI.dialogue.callback`, `UI.menu.open`, and `GameEngine.inputLocked`.
+
+**Found:** 2026-03-28

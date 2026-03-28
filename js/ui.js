@@ -232,7 +232,7 @@ const UI = {
         this.elements.dialogueBox.classList.add('hidden');
         this.dialogue.active = false;
 
-        if (game) game.state.gameMode = 'overworld';
+        if (game && game.state) game.state.gameMode = 'overworld';
 
         if (this.dialogue.callback) {
             const cb = this.dialogue.callback;
@@ -428,7 +428,7 @@ const UI = {
         this.menu.open = false;
         this.elements.menuOverlay.classList.add('hidden');
         this.elements.menuPanel.innerHTML = '';
-        if (game) game.state.gameMode = 'overworld';
+        if (game && game.state) game.state.gameMode = 'overworld';
         AudioSystem.playSfx('select');
     },
 
@@ -1341,7 +1341,7 @@ const UI = {
                 this._endDialogue();
             }
         } else {
-            if (game) game.state.gameMode = 'overworld';
+            if (game && game.state) game.state.gameMode = 'overworld';
         }
     },
 

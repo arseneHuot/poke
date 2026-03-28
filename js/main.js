@@ -349,8 +349,12 @@ const game = {
         // Hide game elements, show title screen
         const battleUI = document.getElementById('battle-ui');
         if (battleUI) battleUI.classList.add('hidden');
-        if (UI.elements.dialogueBox) UI.elements.dialogueBox.classList.add('hidden');
-        if (UI.elements.menuOverlay) UI.elements.menuOverlay.classList.add('hidden');
+        if (UI.elements && UI.elements.dialogueBox) UI.elements.dialogueBox.classList.add('hidden');
+        if (UI.elements && UI.elements.menuOverlay) UI.elements.menuOverlay.classList.add('hidden');
+        // Clear any lingering UI state
+        if (UI.dialogue) { UI.dialogue.active = false; UI.dialogue.callback = null; }
+        if (UI.menu) UI.menu.open = false;
+        if (typeof GameEngine !== 'undefined') GameEngine.inputLocked = false;
 
         // Reset title menu to original buttons
         const titleScreen = document.getElementById('title-screen');
