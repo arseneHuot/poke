@@ -874,8 +874,12 @@ const UI = {
                 this.showNotification(data.name + ' est ranimé !');
                 break;
 
-            case 'status':
-                if (!pokemon.status || pokemon.status !== itemData.cures) {
+            case 'status': {
+                const statusCured = pokemon.status && (
+                    pokemon.status === itemData.cures ||
+                    (itemData.cures === 'poison' && pokemon.status === 'badly_poisoned')
+                );
+                if (!statusCured) {
                     this.showNotification('Cela n\'aura aucun effet.');
                     return;
                 }
@@ -883,6 +887,7 @@ const UI = {
                 used = true;
                 this.showNotification(data.name + ' est soigné !');
                 break;
+            }
 
             case 'levelup':
                 if (pokemon.currentHp <= 0) {
@@ -903,8 +908,10 @@ const UI = {
                 delete game.state.bag[itemId];
             }
             AudioSystem.playSfx('select');
-            // Refresh item target panel immediately to show updated HP values
-            this._showItemUseTarget(itemId);
+            // Only refresh item target panel if item still in stock; otherwise go straight to menu
+            if (game.state.bag[itemId] > 0) {
+                this._showItemUseTarget(itemId);
+            }
             setTimeout(() => {
                 this._renderMenu();
             }, 800);

@@ -1342,3 +1342,53 @@ if (newBtn.dataset.action === 'run') {
 **Fix:** Added evolution check in `_processCatchSuccess` (battle.js): after registering the caught Pokémon in the Pokédex, calls `checkEvolution(ep)`. If an evolution target exists, `evolvePokemon` is applied immediately, the new species is registered in the Pokédex, and evolution messages are queued before `endBattle('catch')`.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #76 - Item free-use exploit after last item consumed
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/ui.js (`_useItemOnPokemon`)
+
+**Description:** When using the last item of a stack from the overworld bag (e.g., the only Potion), the item quantity drops to 0 and the item is deleted from `game.state.bag`. Immediately afterward, `_showItemUseTarget(itemId)` was called to refresh the HP display panel. This re-rendered the item-use target screen using static data from `ITEMS` (not the bag), showing the panel as if the item still existed. During the 800ms window before `_renderMenu()` navigated away, the player could click a second Pokémon and apply the item effect again for free — without any bag entry being decremented.
+
+**Steps to reproduce:**
+1. Have exactly 1 Potion in the bag
+2. Open menu → Sac → click Potion → click an injured Pokémon
+3. The item target screen refreshes; within 800ms, click a second injured Pokémon
+4. The second Pokémon is healed without consuming any item
+
+**Root cause:** `_useItemOnPokemon` unconditionally called `this._showItemUseTarget(itemId)` after decrement, even when the item had just been deleted from the bag.
+
+**Fix:** Added a check: only call `_showItemUseTarget(itemId)` if `game.state.bag[itemId] > 0` after the decrement. Otherwise, the 800ms `setTimeout` to `_renderMenu` fires alone.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #77 - Antidote cannot cure badly_poisoned (Toxic) status
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**Files:** js/ui.js (`_useItemOnPokemon`), js/battle.js (`selectItem`)
+
+**Description:** The Antidote item has `cures: 'poison'`. The game tracks two distinct poison statuses: `'poison'` (regular) and `'badly_poisoned'` (Toxic, from the `toxic` move). The status cure check used strict equality (`pokemon.status === item.cures`), so an Antidote used on a Pokémon with `badly_poisoned` status would show "Cela n'aura aucun effet." and fail to cure it. This applies in both the overworld bag and the in-battle bag.
+
+**Steps to reproduce:**
+1. Let a Pokémon get badly poisoned by an enemy using the Toxic move
+2. In overworld: open menu → Sac → use Antidote on the poisoned Pokémon → message "Cela n'aura aucun effet."
+3. In battle: open SAC → use Antidote → "Ça n'a aucun effet !"
+
+**Expected:** Antidote cures both `poison` and `badly_poisoned` statuses.
+**Actual:** Antidote only cures `poison`; `badly_poisoned` is not cured.
+
+**Root cause:** Strict equality check: `pokemon.status !== itemData.cures`. Never matches when status is `'badly_poisoned'` and `cures` is `'poison'`.
+
+**Fix:** Changed both locations to also allow curing when `item.cures === 'poison'` and status is `'badly_poisoned'`:
+```js
+const statusCured = pokemon.status && (
+    pokemon.status === itemData.cures ||
+    (itemData.cures === 'poison' && pokemon.status === 'badly_poisoned')
+);
+```
+
+**Found:** 2026-03-29

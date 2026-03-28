@@ -810,15 +810,19 @@ const BattleSystem = {
             this._queueMessage(`${pp.nickname || pp.name} récupère ${healed} PV !`);
             this._executeTurn({ type: 'item' });
         } else if (item.type === 'status') {
-            if (this.state.playerPokemon.status === item.cures) {
+            const pp = this.state.playerPokemon;
+            const statusCured = pp.status && (
+                pp.status === item.cures ||
+                (item.cures === 'poison' && pp.status === 'badly_poisoned')
+            );
+            if (statusCured) {
                 game.state.bag[itemId]--;
-                this.state.playerPokemon.status = null;
+                pp.status = null;
                 AudioSystem.playSfx('heal');
-                this._queueMessage(`${this.state.playerPokemon.nickname || this.state.playerPokemon.name} est soigné !`);
+                this._queueMessage(`${pp.nickname || pp.name} est soigné !`);
                 this._executeTurn({ type: 'item' });
             } else {
                 this._queueMessage(`Ça n'a aucun effet !`);
-                game.state.bag[itemId]; // Don't consume if not effective
                 this._processMessageQueue(() => this._showActions());
                 return;
             }
