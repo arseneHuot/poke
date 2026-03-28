@@ -912,3 +912,102 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 **Fix:** Added handler for `evt.type === 'newmove_full'` in `_handleEnemyFaint`. Queues message: `"X voudrait apprendre Y, mais a déjà 4 attaques !"`.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #52 - Save action produces no visible confirmation feedback
+**Status:** Fixed (2026-03-28) — Already handled: `_renderSaveTab` in ui.js calls `this.showNotification('Partie sauvegardée !')` and sets button text to "Sauvegarde OK !" on click. Verified in code.
+**Priority:** Medium
+**File:** js/ui.js
+
+**Description:** Clicking "Sauvegarder maintenant" in the pause menu saves the game silently with no toast, message, or animation. The player has no way to know whether the save succeeded or failed.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #53 - MART tile interaction does nothing — shop unreachable via tile
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/engine.js
+
+**Description:** Standing in front of the MART tile at Porto (29,12) and pressing Space/Enter does nothing. The shop is only accessible by interacting with the Vendeur NPC at (29,11). Players who approach the MART entrance naturally will get no response and may not realise a merchant NPC is present.
+
+**Root cause:** `_handleInteraction()` only looked for `sign` NPCs at the MART tile position. No sign NPC exists there; the merchant NPC is at a different coordinate. The shop action never fired from the tile.
+
+**Fix:** Added merchant NPC lookup when a MART tile is faced: if the facing tile is TILE.MART and no sign NPC is found there, the code now searches for any `merchant` NPC in the map and calls `interactWithNPC(npc)` on it — triggering the standard shop dialogue and shop UI.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #54 - Holding arrow key only advances one tile (browser key-repeat ignored)
+**Status:** Fixed (2026-03-28) — Already handled: `_checkMovementKeys()` is called every frame in `GameEngine.update()` when `!this.moving && !this.inputLocked`. It samples `this.keysDown` (maintained by keydown/keyup events), so held keys produce continuous movement without relying on key-repeat events.
+**Priority:** Medium
+**File:** js/engine.js
+
+**Description:** Holding an arrow key moves the player exactly one tile then stops. The player must tap the key repeatedly to continue moving. Browser key-repeat events fire while the key is held but are all dropped because the engine gates movement on `!this.moving`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #55 - No location name banner after warp transitions
+**Status:** Fixed (2026-03-28) — Already handled: `_executeWarp()` in engine.js calls `UI.showLocationName(newMap.name)` after every map transition. `showLocationName` displays the banner for 3s with CSS fade. Verified in code.
+**Priority:** Low
+**File:** js/engine.js, js/ui.js
+
+**Description:** Transitioning between any two maps (Borgo → Route 2, entering/exiting any building) shows no location name overlay. The player has no visual confirmation of where they have arrived.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #56 - Poké Ball throw in trainer battle skips turn AND does not consume the ball
+**Status:** Open
+**Priority:** Medium
+**File:** js/battle.js (or js/ui.js)
+
+**Description:** Throwing a Poké Ball at a trainer's Pokémon correctly shows "On ne peut pas capturer le Pokémon d'un dresseur !" but immediately returns to the action menu — the turn is NOT consumed and the Poké Ball quantity remains unchanged. In mainline Pokémon games the throw wastes the player's turn (enemy still attacks) and the ball is consumed.
+
+**Steps to reproduce:**
+1. Enter a trainer battle
+2. Open SAC → click Poké Ball
+3. Message appears, returns to action menu
+4. HP unchanged (enemy did not attack), ball count unchanged
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #57 - Using Repousse (Repel) from bag shows no notification or feedback
+**Status:** Open
+**Priority:** Low
+**File:** js/ui.js
+
+**Description:** Clicking Repousse in the overworld bag closes the menu and silently activates the 100-step repel counter with no notification. The player receives no on-screen confirmation that Repousse was used or how many steps remain.
+
+**Root cause:** The bag item handler calls `engine.repelSteps = 100` (or equivalent) and closes the menu without calling `UI.showNotification()`.
+
+**Steps to reproduce:**
+1. Open menu → Sac → click Repousse
+2. Menu closes, overworld resumes
+3. No notification appears confirming repel is active
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #58 - Catch celebration confetti particles persist indefinitely on overworld
+**Status:** Open
+**Priority:** Low
+**File:** js/battle.js or js/engine.js
+
+**Description:** After a successful Pokémon catch, colored confetti particles appear on the ground. When returning to the overworld those particles remain visible on the map and do not fade or despawn — they persist indefinitely across the session.
+
+**Steps to reproduce:**
+1. Catch a Pokémon in a wild battle
+2. Return to the overworld
+3. Golden/pink confetti particles remain visibly on the ground near the player's position
+
+**Found:** 2026-03-28

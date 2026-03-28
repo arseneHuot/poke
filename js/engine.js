@@ -422,7 +422,7 @@ const GameEngine = {
         // Check for sign on the player's tile or facing tile
         const tile = map.tiles[checkY] && map.tiles[checkY][checkX];
         if (tile === TILE.SIGN || tile === TILE.PC || tile === TILE.MART) {
-            // Find sign/PC/mart NPC data
+            // Find sign NPC at the facing tile
             for (const npc of map.npcs) {
                 if (npc.type === 'sign' && Math.round(npc.x) === checkX && Math.round(npc.y) === checkY) {
                     this.interactWithNPC(npc);
@@ -432,6 +432,16 @@ const GameEngine = {
             // PC healing without NPC
             if (tile === TILE.PC) {
                 this._healParty();
+                return;
+            }
+            // MART tile: find a merchant NPC in this map and open their shop
+            if (tile === TILE.MART) {
+                for (const npc of map.npcs) {
+                    if (npc.type === 'merchant') {
+                        this.interactWithNPC(npc);
+                        return;
+                    }
+                }
             }
         }
     },
