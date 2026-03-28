@@ -124,7 +124,7 @@ const SaveSystem = {
             level: data.level,
             exp: data.exp,
             nature: data.nature,
-            ivs: data.ivs,
+            ivs: data.ivs || { hp: 0, atk: 0, def: 0, spatk: 0, spdef: 0, spd: 0 },
             evs: data.evs || { hp: 0, atk: 0, def: 0, spatk: 0, spdef: 0, spd: 0 },
             moves: data.moves,
             currentHp: data.currentHp,

@@ -147,6 +147,7 @@ const BattleSystem = {
         const playerXp = document.getElementById('player-xp');
         if (playerName) playerName.textContent = pp.nickname || pp.name;
         if (playerLevel) playerLevel.textContent = `Nv.${pp.level}`;
+        if (isNaN(this.state.hpAnimPlayer)) this.state.hpAnimPlayer = Math.max(0, pp.currentHp || 0);
         if (playerHp) {
             const pct = Math.max(0, this.state.hpAnimPlayer / pp.stats.hp * 100);
             playerHp.style.width = pct + '%';
@@ -190,11 +191,17 @@ const BattleSystem = {
         btns.forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
-            // Grey out run button in trainer battles
-            if (newBtn.dataset.action === 'run' && this.state.isTrainer) {
-                newBtn.disabled = true;
-                newBtn.style.opacity = '0.4';
-                newBtn.title = 'Impossible de fuir un combat de dresseur';
+            // Grey out run button in trainer battles; always reset in wild battles
+            if (newBtn.dataset.action === 'run') {
+                if (this.state.isTrainer) {
+                    newBtn.disabled = true;
+                    newBtn.style.opacity = '0.4';
+                    newBtn.title = 'Impossible de fuir un combat de dresseur';
+                } else {
+                    newBtn.disabled = false;
+                    newBtn.style.opacity = '1';
+                    newBtn.title = '';
+                }
             }
             newBtn.addEventListener('click', () => {
                 AudioSystem.playSfx('select');
@@ -265,7 +272,7 @@ const BattleSystem = {
             if (qty <= 0) return false;
             const item = ITEMS[id];
             if (!item) return false;
-            return item.type === 'ball' || item.type === 'heal' || item.type === 'status';
+            return item.type === 'ball' || item.type === 'heal' || item.type === 'status' || item.type === 'revive';
         });
 
         if (battleItems.length === 0) {
@@ -811,7 +818,60 @@ const BattleSystem = {
                 this._processMessageQueue(() => this._showActions());
                 return;
             }
+        } else if (item.type === 'revive') {
+            this._showReviveTarget(itemId);
+            return;
         }
+    },
+
+    _showReviveTarget(itemId) {
+        const item = ITEMS[itemId];
+        const actions = document.getElementById('battle-actions');
+        const movesDiv = document.getElementById('battle-moves');
+        if (actions) actions.classList.add('hidden');
+        if (!movesDiv) return;
+        movesDiv.classList.remove('hidden');
+        movesDiv.innerHTML = '';
+
+        const title = document.createElement('div');
+        title.className = 'battle-msg';
+        title.textContent = `Utiliser ${item.name} sur...`;
+        movesDiv.appendChild(title);
+
+        let hasFainted = false;
+        game.state.party.forEach((pkmn, index) => {
+            if (!pkmn || pkmn.currentHp > 0) return;
+            hasFainted = true;
+            const btn = document.createElement('button');
+            btn.className = 'battle-btn';
+            btn.textContent = `${pkmn.nickname || pkmn.name} Nv.${pkmn.level} (K.O.)`;
+            btn.addEventListener('click', () => {
+                AudioSystem.playSfx('heal');
+                game.state.bag[itemId]--;
+                const healPct = item.healPercent || 0.5;
+                pkmn.currentHp = Math.max(1, Math.floor(pkmn.stats.hp * healPct));
+                this._queueMessage(`${pkmn.nickname || pkmn.name} est ranimé !`);
+                this._hideMenus();
+                this._executeTurn({ type: 'item' });
+            });
+            movesDiv.appendChild(btn);
+        });
+
+        if (!hasFainted) {
+            const msg = document.createElement('div');
+            msg.className = 'battle-msg';
+            msg.textContent = 'Aucun Pokémon KO !';
+            movesDiv.appendChild(msg);
+        }
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'battle-btn';
+        backBtn.textContent = 'RETOUR';
+        backBtn.addEventListener('click', () => {
+            AudioSystem.playSfx('cancel');
+            this._showBag();
+        });
+        movesDiv.appendChild(backBtn);
     },
 
     switchPokemon(partyIndex) {
@@ -1327,6 +1387,24 @@ const BattleSystem = {
         // Fill entire canvas with dark color first to prevent overworld bleed-through
         ctx.fillStyle = '#1a1a2e';
         ctx.fillRect(0, 0, cw, ch);
+
+        // Subtle animated background panel below battle scene (fills dead space between sprites and HTML overlay)
+        const panelY = battleHeight;
+        const panelH = ch - panelY;
+        const grad2 = ctx.createLinearGradient(0, panelY, 0, panelY + panelH);
+        grad2.addColorStop(0, '#1e2240');
+        grad2.addColorStop(1, '#12152e');
+        ctx.fillStyle = grad2;
+        ctx.fillRect(0, panelY, cw, panelH);
+        // Animated horizontal shimmer lines
+        const shimmerOffset = (time * 0.0003) % 1;
+        ctx.globalAlpha = 0.07;
+        for (let i = 0; i < 4; i++) {
+            const ly = panelY + ((shimmerOffset + i / 4) % 1) * panelH;
+            ctx.fillStyle = '#7090ff';
+            ctx.fillRect(0, ly, cw, 2);
+        }
+        ctx.globalAlpha = 1.0;
 
         // Sky gradient
         const grad = ctx.createLinearGradient(0, 0, 0, battleHeight);

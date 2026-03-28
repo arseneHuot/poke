@@ -1046,12 +1046,15 @@ function recalcStats(pokemon) {
     const level = pokemon.level;
     const nature = NATURES[pokemon.nature] || {};
 
+    const getIv = (s) => (iv && typeof iv[s] === 'number') ? iv[s] : 0;
+    const getEv = (s) => (ev && typeof ev[s] === 'number') ? ev[s] : 0;
+
     const calcStat = (stat, baseStat) => {
         if (stat === 'hp') {
-            return Math.floor(((2 * baseStat + iv.hp + Math.floor(ev.hp / 4)) * level) / 100) + level + 10;
+            return Math.floor(((2 * baseStat + getIv('hp') + Math.floor(getEv('hp') / 4)) * level) / 100) + level + 10;
         }
         const natMod = nature[stat] || 1;
-        return Math.floor((Math.floor(((2 * baseStat + iv[stat] + Math.floor(ev[stat] / 4)) * level) / 100) + 5) * natMod);
+        return Math.floor((Math.floor(((2 * baseStat + getIv(stat) + Math.floor(getEv(stat) / 4)) * level) / 100) + 5) * natMod);
     };
 
     pokemon.stats = {

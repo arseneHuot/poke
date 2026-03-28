@@ -157,7 +157,7 @@
 
 - ~~**Pokémon switch screen shows plain text, no HP bars**~~ **Done (2026-03-28)**: Each party slot in the in-battle switch screen now shows a name/level row with current/max HP, plus a color-coded HP bar (green >50%, orange >20%, red ≤20%) below it.
 
-- **Battle area blank between turns**: The middle section of the battle screen (between the Pokémon sprites and the text log) is empty while messages are queuing. A subtle idle animation or a semi-visible previous-turn recap would fill this dead space.
+- ~~**Battle area blank between turns**~~ **Done (2026-03-28)**: Added subtle animated gradient panel with slow-scrolling shimmer lines in the canvas area below the battle scene. The area now has a deep blue gradient background with barely-visible scanning lines, eliminating the dead space.
 
 ### UX / Overworld
 

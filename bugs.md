@@ -1045,3 +1045,129 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 **Fix:** Added `NATURE_NAMES_FR` mapping at the top of `ui.js` (all 25 natures translated to French). `_showPokemonDetail` now renders `NATURE_NAMES_FR[pokemon.nature] || pokemon.nature` instead of `pokemon.nature` directly.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #64 - Overworld menu opens during trainer battle intro
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**Files:** js/engine.js, js/ui.js
+
+**Description:** When the player presses Space/Enter to interact with a trainer NPC, the in-game overworld menu (Équipe/Sac/Pokédex tabs) appears on top of the trainer battle screen. The battle starts correctly in the background, but the menu overlay is also visible, blocking the battle UI.
+
+**Steps to reproduce:**
+1. Stand adjacent to a trainer NPC (e.g. trainer_r1_1 on Route 1)
+2. Press Space to interact
+3. The trainer battle begins AND the menu overlay opens simultaneously
+
+**Root cause (suspected):** The Space keydown event is handled by both `GameEngine.handleInput()` (to start the interaction) and `UI._bindKeys()` (to advance dialogue). When the interaction fires and immediately creates a trainer dialogue, `advanceDialogue()` runs in the same event tick and rapidly processes the `{action:'trainer_battle'}` step. During this rapid transition, the menu state or gameMode may briefly enter an unexpected state that causes the menu overlay to open.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #67 - Rappel (Revive) not usable from battle bag
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js (`_showBag`, line ~268)
+
+**Description:** The Rappel (Revive) item cannot be used during battle even when the player has them in their bag. The in-battle SAC screen only shows item types: `'ball'`, `'heal'`, and `'status'`. The Rappel has type `'revive'`, so it is silently excluded. Players cannot revive a fainted Pokémon mid-battle.
+
+**Steps to reproduce:**
+1. Have Rappel ×N in bag
+2. Enter any battle and click SAC
+3. Rappel does not appear in the battle bag list
+
+**Root cause:** `_showBag()` at line 268 filters: `item.type === 'ball' || item.type === 'heal' || item.type === 'status'`. The `'revive'` type is not included. `ITEMS.revive` = `{name:'Rappel', type:'revive', healPercent:0.5, price:1500}`.
+
+**Fix:** Add `|| item.type === 'revive'` to the filter in `_showBag()`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #65 - FUITE button permanently disabled after any trainer battle
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js (`_showActions`)
+
+**Description:** After fighting a trainer battle (where FUITE is correctly disabled), every subsequent wild battle also has FUITE permanently disabled. The run button appears greyed out and unclickable for the rest of the session. Players have no way to escape from wild Pokémon using the UI button, though calling `BattleSystem.tryRun()` directly confirms the escape logic itself works correctly.
+
+**Steps to reproduce:**
+1. Fight any trainer battle (FUITE correctly greys out)
+2. After winning/losing, enter a wild Pokémon battle
+3. FUITE button remains disabled (opacity 0.4) despite being a wild encounter
+
+**Root cause:** In `_showActions()` (line ~191), buttons are cloned via `btn.cloneNode(true)`. `cloneNode(true)` preserves all attributes including `disabled=true` from the previous trainer battle. The code then only sets `disabled=true` when `isTrainer=true` — it never explicitly resets `disabled=false` for wild battles. The stale disabled state from the clone persists.
+
+**Fix:** Add an explicit reset in `_showActions()` for non-trainer battles:
+```js
+if (newBtn.dataset.action === 'run') {
+    if (this.state.isTrainer) {
+        newBtn.disabled = true;
+        newBtn.style.opacity = '0.4';
+    } else {
+        newBtn.disabled = false;     // ← add this
+        newBtn.style.opacity = '1';  // ← add this
+    }
+}
+```
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #66 - Active dialogue persists into next battle (stale dialogue overlay)
+**Status:** Fixed (2026-03-28)
+**Priority:** Medium
+**File:** js/ui.js, js/battle.js
+
+**Description:** If a dialogue is still open (e.g., a trainer's post-defeat dialogue) when a new battle is started programmatically, the dialogue box remains visible on top of the battle screen. The text from the previous interaction continues to show in the dialogue overlay.
+
+**Steps to reproduce:**
+1. Defeat a trainer and interact with them again — get post-defeat dialogue
+2. Without fully dismissing the dialogue, trigger another battle
+3. The old dialogue text is visible over the battle UI
+
+**Root cause:** Neither `game.startBattle()` nor `BattleSystem.startWildBattle()` checks if `UI.dialogue.active` is true and clears the dialogue before starting. The dialogue box is only hidden when `_handleDialogueAction('trainer_battle')` is called, not in the general battle-start path.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #62 - Porto south exit unreachable — warp tiles placed on non-walkable water
+**Status:** Fixed (2026-03-28)
+**Priority:** Critical
+**File:** js/world-data.js (porto map generation)
+
+**Description:** Porto's south edge contains warp tiles intended to lead to Route 1, but they are placed at y=39 on water tiles (tile type 3, WATER). Water tiles are not in the WALKABLE_TILES set, so the player cannot reach them. The southernmost walkable row in Porto is y=29. Players have no way to exit Porto to the south through normal gameplay.
+
+**Steps to reproduce:**
+1. Start in Porto and try to walk south past y=29
+2. Movement is blocked by water tiles
+3. The warp to Route 1 at y=39 is completely unreachable on foot
+
+**Root cause:** Porto's map generator places south-exit warp targets at y=39 but fills tiles between y=29 and y=38 with WATER (tile 3) without placing a walkable path or bridge leading to the warp.
+
+**Workaround:** Directly call `GameEngine.warp('route1', x, y)` in the browser console.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #63 - HP displays as "NaN/50" after leveling up mid-battle
+**Status:** Fixed (2026-03-28)
+**Priority:** Critical
+**File:** js/battle.js
+
+**Description:** During a trainer battle (Eclipse Grunt on Route 3), after Aquanox leveled up by defeating the Grunt's first Pokémon, the HP display in the player's battle status card showed "NaN/50" for the remainder of the battle. The party dot for Aquanox also turned red (critical HP), as if the HP value was numerically interpreted as NaN < threshold. The HP bar itself appeared visually correct, but the numeric HP text was broken.
+
+**Steps to reproduce:**
+1. Have Aquanox near a level-up threshold (e.g., Nv.16 → 17)
+2. Fight the Eclipse Grunt on Route 3
+3. Defeat the Grunt's first Pokémon, triggering a level-up
+4. The HP display switches to "NaN/50" for the rest of the battle
+
+**Root cause (suspected):** On level-up, `addExp()` recalculates `stats.hp` to a new maximum. If `currentHp` is updated to the new max but the UI reads `pokemon.currentHp` before it is set, or if the stat recalculation assigns `NaN` to `currentHp` during the HP scaling formula (e.g., dividing by zero or using an undefined ratio), the display value becomes NaN. The `_updateUI` function likely renders `pokemon.currentHp` directly without a `Number.isFinite()` guard.
+
+**Found:** 2026-03-28

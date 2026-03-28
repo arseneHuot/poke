@@ -313,10 +313,13 @@ const GameEngine = {
         const state = this.game.state;
         if (!state) return;
 
-        // Interaction keys
+        // Interaction keys — only in overworld/dialogue modes, not during battle or menu
         if (key === ' ' || key === 'Enter') {
             if (event) event.preventDefault();
-            this._handleInteraction();
+            const gm = state.gameMode;
+            if (gm === 'overworld' || gm === 'dialogue') {
+                this._handleInteraction();
+            }
             return;
         }
 

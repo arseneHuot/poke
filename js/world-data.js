@@ -317,6 +317,7 @@ const WorldData = {
         // Water (port)
         this._fillRect(tiles, 0, 30, 50, 10, TILE.WATER);
         this._fillRect(tiles, 10, 28, 30, 2, TILE.PATH); // Dock
+        this._fillRect(tiles, 18, 30, 4, 10, TILE.PATH); // Pier leading south to Route 1 warp
 
         // Trees border
         for (let y = 0; y < h; y++) {
