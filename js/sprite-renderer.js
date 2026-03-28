@@ -41,8 +41,11 @@ const SpriteRenderer = {
         // Body shape based on pokemon type and ID
         const bodyType = this._getBodyType(pokemonId, types);
 
+        const isBack = facing === 'back';
+
         ctx.save();
-        if (facing === 'back') {
+        if (isBack) {
+            // Mirror + slight vertical shift to show "from behind" perspective
             ctx.translate(size, 0);
             ctx.scale(-1, 1);
         }
@@ -59,6 +62,25 @@ const SpriteRenderer = {
             case 'dragon': this._drawDragon(ctx, s, colors, types, pokemonId); break;
             case 'mineral': this._drawMineral(ctx, s, colors, types, pokemonId); break;
             default: this._drawBiped(ctx, s, colors, types, pokemonId); break;
+        }
+
+        // Back-facing: overlay dorsal markings and hide face
+        if (isBack) {
+            // Cover face area with body color (hide eyes/mouth)
+            ctx.fillStyle = colors[0];
+            ctx.fillRect(s * 20, s * 10, s * 24, s * 14);
+            // Draw dorsal stripe / spine marking
+            ctx.fillStyle = colors[1] || colors[0];
+            ctx.globalAlpha = 0.5;
+            ctx.fillRect(s * 29, s * 14, s * 6, s * 28);
+            // Small dorsal spots
+            for (let i = 0; i < 3; i++) {
+                const sy = s * (18 + i * 8);
+                ctx.beginPath();
+                ctx.arc(s * 32, sy, s * 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
         }
 
         // Shiny sparkle effect

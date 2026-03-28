@@ -236,10 +236,44 @@ const GameEngine = {
 
         ctx.restore();
 
-        // Warp fade overlay
+        // Warp fade overlay with spinning Poké Ball indicator
         if (this.warping && this.warpFade > 0) {
             ctx.fillStyle = `rgba(0, 0, 0, ${this.warpFade})`;
             ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            // Draw spinning Poké Ball when fully faded
+            if (this.warpFade > 0.8) {
+                const cx = CANVAS_WIDTH / 2;
+                const cy = CANVAS_HEIGHT / 2;
+                const r = 16;
+                const angle = (this.animFrame * 3) % (Math.PI * 2);
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, (this.warpFade - 0.8) * 5);
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+                // Top half red
+                ctx.fillStyle = '#F44336';
+                ctx.beginPath();
+                ctx.arc(0, 0, r, Math.PI, 0);
+                ctx.fill();
+                // Bottom half white
+                ctx.fillStyle = '#FFF';
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI);
+                ctx.fill();
+                // Center line
+                ctx.fillStyle = '#333';
+                ctx.fillRect(-r, -1.5, r * 2, 3);
+                // Center button
+                ctx.fillStyle = '#FFF';
+                ctx.beginPath();
+                ctx.arc(0, 0, 5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#333';
+                ctx.beginPath();
+                ctx.arc(0, 0, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
         }
 
         // Encounter flash overlay

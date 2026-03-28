@@ -94,8 +94,9 @@ const WorldData = {
         this._fillRect(tiles, 24, 8, 8, 6, TILE.BUILDING);
         tiles[13][28] = TILE.DOOR;
 
-        // Pokémon Center
-        tiles[17][8] = TILE.PC;
+        // Pokémon Center building
+        this._fillRect(tiles, 5, 14, 6, 5, TILE.BUILDING);
+        tiles[18][8] = TILE.PC;
 
         // Flowers
         this._fillRect(tiles, 10, 20, 5, 3, TILE.FLOWER);
@@ -125,6 +126,8 @@ const WorldData = {
                   dialogue: 'mom_dialogue' },
                 { id: 'rival', type: 'rival', x: 30, y: 21, dir: DIR.DOWN, name: 'Kaël',
                   dialogue: 'story_rival_intro', storyFlag: 'met_rival' },
+                { id: 'nurse_borgo', type: 'nurse', x: 8, y: 17, dir: DIR.DOWN, name: 'Infirmière',
+                  dialogue: 'nurse_heal' },
                 { id: 'sign1', type: 'sign', x: 19, y: 14,
                   dialogue: 'sign_borgo' },
                 { id: 'villager1', type: 'villager', x: 14, y: 20, dir: DIR.LEFT, name: 'Habitant',

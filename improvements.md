@@ -19,7 +19,7 @@
 - ~~**No experience bar animation**~~ **Done (2026-03-28)**: `.xp-fill` already has `transition: width 0.5s ease` in CSS, providing smooth XP bar animation.
 - ~~**No evolution animation/sequence**~~ **Done (2026-03-28)**: Added evolution flash sequence — white screen pulses 3 times over 1.2s with "Hein ?! X évolue !" message before the transformation completes.
 - ~~**Trainers need post-defeat dialogue**~~ **Done (2026-03-28)**: All 8 gym leaders now have `altDialogue` and `gym{N}_defeated` entries. Re-interacting with a defeated gym leader shows their post-defeat dialogue instead of re-triggering the battle. See Bug #26 fix.
-- **Borgo Pokémon Center is a bare tile**: The Borgo PC tile (`TILE.PC` at x=8, y=17) sits alone on the path with no building frame and no nurse NPC (the other cities all have a proper Pokémon Center building). The `_healParty()` path does restore HP and PP correctly (Bug #22 fixed), but the visual presentation is inconsistent with the rest of the game. Borgo should have a proper Center building with a nurse NPC using the same `nurse_heal` dialogue.
+- ~~**Borgo Pokémon Center is a bare tile**~~ **Done (2026-03-28)**: Added 6×5 building frame around the PC tile and a `nurse_borgo` NPC with `nurse_heal` dialogue, matching the pattern used by Porto and other cities.
 
 ---
 
@@ -44,7 +44,7 @@
 
 ## Characters
 
-- **No back/front sprite differentiation visible for player**: In battle, the player's Pokémon is drawn with `facing: 'back'` (mirrored horizontally), but for many sprite types the result looks nearly identical to the front. Distinct back-sprite designs would improve visual clarity.
+- ~~**No back/front sprite differentiation visible for player**~~ **Done (2026-03-28)**: Back-facing sprites now overlay dorsal markings (spine stripe + spots) and cover the face area with body color, making them visually distinct from front sprites.
 - ~~**Prof. Oliva NPC visible in outdoor overworld**~~ **Done (2026-03-28)**: Added `disappearAfter: true` to outdoor Prof. Oliva NPC — she vanishes from the overworld after `met_professor` flag is set.
 
 ---
@@ -55,7 +55,7 @@
 - ~~**Save confirmation UX**~~ **Done (2026-03-28)**: Notification toast renders correctly above the menu overlay (z-index:80 vs menu z-index:60). Save notification is fully visible during the menu. Bug #11 closed.
 - ~~**Arrow keys don't register reliably for movement**~~ **Done (2026-03-28)**: Added `e.preventDefault()` for arrow keys and spacebar in the window keydown handler, preventing browser scrolling from stealing focus.
 - ~~**Party HUD dots (top-right) not visible for badges**~~ **Done (2026-03-28)**: Unearned badge slots are now square with a faint ✦ icon; earned badges are round with gold gradient and ★ icon. Visually distinct from party HP dots.
-- **No loading indicator between maps**: Map transitions use a fade to black but there is no spinner or progress indicator. This is fine for small maps but could be extended for feel.
+- ~~**No loading indicator between maps**~~ **Done (2026-03-28)**: Added spinning Poké Ball indicator during warp fade (appears when fade > 80%). Red/white ball with center button rotates smoothly during map transition.
 - ~~**Pokédex entries not clickable**~~ **Done (2026-03-28)**: Clicking a seen/caught Pokédex entry opens a detail panel with sprite, type badges, French description, and base stat bars with color coding. Back button returns to grid.
 - ~~**Game not responsive / no mobile support**~~ **Done (2026-03-28)**: Added `_scaleGame()` in `main.js` — computes `Math.min(1, innerWidth/960, innerHeight/640)` and applies `transform: scale()` to `#game-container`. Runs on init and window resize. Fixes Bug #12.
 - ~~**Party detail view shows max HP only, not current/max**~~ **Done (2026-03-28)**: HP stat now shows `"PV: 16 / 20"` (current/max) in `_showPokemonDetail`. Also fixed accent typos in stat labels: "Défense", "Atq. Spé.", "Déf. Spé.".
