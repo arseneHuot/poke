@@ -211,6 +211,32 @@ const DIALOGUES = {
         { action: 'trainer_battle' }
     ],
 
+    // === GYM LEADER POST-DEFEAT DIALOGUES ===
+    gym1_defeated: [
+        { name: "Champion Marco", text: "Bien joué ! Tu m'as impressionné. Ton Pokémon mérite ce Badge Normalité." },
+    ],
+    gym2_defeated: [
+        { name: "Championne Flora", text: "Incroyable... Ta stratégie a surpassé la mienne. Tu mérites le Badge Verdure." },
+    ],
+    gym3_defeated: [
+        { name: "Champion Ondine", text: "La tempête ne t'a pas emporté. Le Badge Marin est à toi, dresseur." },
+    ],
+    gym4_defeated: [
+        { name: "Champion Voltaire", text: "Choquant... dans le bon sens ! Tu mérites bien le Badge Voltage." },
+    ],
+    gym5_defeated: [
+        { name: "Champion Blaze", text: "Ta flamme brûle plus fort que la mienne aujourd'hui. Voici le Badge Inferno." },
+    ],
+    gym6_defeated: [
+        { name: "Champion Terra", text: "Mes fondations ont tremblé face à toi. Tu mérites le Badge Roc." },
+    ],
+    gym7_defeated: [
+        { name: "Championne Crysta", text: "Mon froid n'a pas suffi à te stopper. Le Badge Blizzard est ton trophée." },
+    ],
+    gym8_defeated: [
+        { name: "Champion Drake", text: "Mes Dragons ont été vaincus... Tu es un dresseur d'exception. Le Badge Dragon est à toi." },
+    ],
+
     // === ELITE FOUR ===
     elite1_dialogue: [
         { name: "Umbra", text: "Je suis Umbra, premier du Conseil des 4. Les ténèbres et les spectres sont mes alliés." },
