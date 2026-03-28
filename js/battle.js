@@ -1079,7 +1079,7 @@ const BattleSystem = {
             this._queueMessage(`......`);
             AudioSystem.playSfx('catch_success');
             this._queueMessage(`Gotcha ! ${ep.nickname || ep.name} est capturé !`);
-            this._processCatchSuccess();
+            this._processCatchSuccess(ballId);
             return;
         }
 
@@ -1117,7 +1117,7 @@ const BattleSystem = {
             // Caught!
             AudioSystem.playSfx('catch_success');
             this._queueMessage(`Gotcha ! ${ep.nickname || ep.name} est capturé !`);
-            this._processCatchSuccess();
+            this._processCatchSuccess(ballId);
         } else {
             // Broke free
             AudioSystem.playSfx('catch_fail');
@@ -1143,10 +1143,10 @@ const BattleSystem = {
         }
     },
 
-    _processCatchSuccess() {
+    _processCatchSuccess(ballId) {
         const ep = this.state.enemyPokemon;
         ep.ot = game.state.playerName || 'Player';
-        ep.caughtBall = 'pokeball';
+        ep.caughtBall = ballId || 'pokeball';
 
         // Start confetti celebration
         this._startConfetti();

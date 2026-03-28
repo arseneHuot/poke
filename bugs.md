@@ -629,3 +629,47 @@ empty.textContent = 'Rien à vendre.';
 **Root cause:** `battle.js` awards the badge at line 1348 (`game.state.badges.push(badgeIndex)`) but does not call `UI.updateBadges()` afterward. `updateBadges()` should be called in `endBattle` whenever a badge is awarded.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #35 - Pokédex detail view removes menu tab bar; Retour doesn't restore it
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/ui.js (`_showPokedexDetail`)
+
+**Description:** Clicking any seen or caught Pokémon entry in the Pokédex tab opens a detail view. `_showPokedexDetail` does `panel.innerHTML = ''` which clears the entire panel including the `.menu-tabs` navigation bar. The detail view renders without any tab bar. The "Retour" button in the detail view calls `_renderPokedexTab(panel)` which renders the Pokédex grid directly into the panel — also without a tab bar. The player is stuck in the Pokédex with no ability to navigate to Équipe, Sac, Dresseur, or Sauvegarder without closing and reopening the menu.
+
+**Compare with:** `_showPokemonDetail` (party detail view) — its Retour button correctly calls `this._renderMenu()` which rebuilds the full menu including the tab bar.
+
+**Steps to reproduce:**
+1. Have a seen or caught Pokémon in the Pokédex
+2. Open menu → Pokédex tab
+3. Click on the Pokémon entry
+4. The tab bar (Équipe / Sac / Pokédex / Dresseur / Sauvegarder / Quitter) disappears
+5. Click "Retour" — still no tab bar, permanently stuck in Pokédex grid
+
+**Expected:** Clicking Retour from a Pokédex detail returns to the full menu (tabs + Pokédex grid).
+**Actual:** Tab bar is gone after entering Pokédex detail; Retour renders the grid without restoring tabs.
+
+**Root cause:** `js/ui.js:1018–1022` — the Retour button calls `_renderPokedexTab(panel)` instead of `_renderMenu()`.
+
+**Fix:** Changed `_renderPokedexTab(panel)` to `this._renderMenu()` in the Retour click handler, matching the pattern used by `_showPokemonDetail` and `_showItemUseTarget`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #36 - Caught ball type always recorded as 'pokeball' regardless of ball used
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/battle.js (`_processCatchSuccess`)
+
+**Description:** When a Pokémon is caught with any ball (Super Ball, Hyper Ball, Master Ball), the `caughtBall` property on the caught Pokémon is always set to `'pokeball'`. The `_executeCatch(ballId)` function receives the correct `ballId` parameter but calls `_processCatchSuccess()` without passing it. `_processCatchSuccess` has no access to `ballId` and hardcodes `ep.caughtBall = 'pokeball'`.
+
+While `caughtBall` is currently not displayed anywhere in the UI, it is saved/loaded in the save system and could be used in future features (e.g., displaying which ball caught the Pokémon in a detail view or trainer card).
+
+**Root cause:** `js/battle.js:1082,1120` — `this._processCatchSuccess()` is called without passing `ballId`. `_processCatchSuccess` at line 1149 hardcodes `'pokeball'` instead of the actual ball used.
+
+**Fix needed:** Pass `ballId` to `_processCatchSuccess(ballId)` and use it: `ep.caughtBall = ballId;`
+
+**Found:** 2026-03-28
