@@ -100,6 +100,8 @@ const BattleSystem = {
         // Hide enemy initially for intro sequence
         this._initBattle(lead, enemyPokemon);
         this.state.enemyAnim.alpha = 0;
+        // Register enemy Pokémon as seen in Pokédex
+        if (game && game.state) game.state.pokedexSeen.add(enemyPokemon.id);
         this._queueMessage(`${trainerNpc.name} veut se battre !`);
         this._queueMessage(`${trainerNpc.name} envoie ${enemyPokemon.name} !`);
         this._processMessageQueue(() => {
@@ -955,6 +957,14 @@ const BattleSystem = {
         // If player used item or switch, enemy attacks first
         if (playerAction.type === 'item' || playerAction.type === 'switch' || playerAction.type === 'run_fail') {
             this._doEnemyTurn(enemyMove.id);
+            // Check if player fainted from enemy attack before applying status damage
+            if (this.state.playerPokemon.currentHp <= 0) {
+                this._handlePlayerFaint();
+                return;
+            }
+            // End of turn status damage still applies even on non-move turns
+            this._processStatusEndTurn(this.state.playerPokemon);
+            this._processStatusEndTurn(this.state.enemyPokemon);
             this._checkFaintsAfterTurn(playerAction);
             return;
         }
@@ -1121,6 +1131,8 @@ const BattleSystem = {
                 if (nextPkmn && nextPkmn.currentHp > 0) {
                     this.state.enemyPokemon = nextPkmn;
                     this.state.enemyStatStages = this._resetStatStages();
+                    // Register next trainer Pokémon as seen in Pokédex
+                    if (game && game.state) game.state.pokedexSeen.add(nextPkmn.id);
                     this.state.hpAnimEnemy = nextPkmn.currentHp;
                     this.state.enemyAnim = { x: 0, y: 0, alpha: 1, shake: 0 };
                     this._queueMessage(`${this.state.trainerNpc.name} envoie ${nextPkmn.nickname || nextPkmn.name} !`);

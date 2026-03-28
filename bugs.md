@@ -1206,3 +1206,43 @@ if (newBtn.dataset.action === 'run') {
 - Added cleanup to `returnToTitle()`: clears `UI.dialogue.active`, `UI.dialogue.callback`, `UI.menu.open`, and `GameEngine.inputLocked`.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #70 - Trainer battle enemy Pokémon never added to Pokédex as "seen"
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/battle.js (`startTrainerBattle`, `_handleEnemyFaint`)
+
+**Description:** When fighting a trainer, none of the trainer's Pokémon are ever registered in `game.state.pokedexSeen`. Only Pokémon that are actually caught (via `_processCatchSuccess`) get added to `pokedexSeen`. Since trainer Pokémon cannot be caught, they will never appear in the Pokédex — even after battling them. The player could defeat all 8 gym leaders without a single gym leader Pokémon appearing in their Pokédex.
+
+**Root cause:**
+- `startTrainerBattle` initialises the battle with `enemyPokemon` but never calls `game.state.pokedexSeen.add(enemyPokemon.id)`.
+- In `continueAfterExp` (inside `_handleEnemyFaint`), when the trainer sends out their next Pokémon (`this.state.enemyPokemon = nextPkmn`), the new Pokémon's ID is also never added to `pokedexSeen`.
+
+**Fix:** Added `if (game && game.state) game.state.pokedexSeen.add(enemyPokemon.id)` in `startTrainerBattle` after `_initBattle`. Added the equivalent for `nextPkmn` in `continueAfterExp`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #71 - End-of-turn status damage skipped when player uses item, switches, or fails to run
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/battle.js (`_executeTurn`)
+
+**Description:** When the player uses an item, switches Pokémon, or fails to run, `_executeTurn` takes an early return path that calls `_doEnemyTurn` then `_checkFaintsAfterTurn` — but skips the `_processStatusEndTurn` calls entirely. As a result, burn damage, poison damage, badly-poisoned damage (toxic), and leech seed damage are NOT applied at the end of those turns. A poisoned Pokémon that uses a Potion takes no damage that turn, making status conditions significantly weaker than intended.
+
+**Steps to reproduce:**
+1. Let a Pokémon get poisoned in battle
+2. Use a Potion from the bag on that Pokémon
+3. Observe: no "X souffre du poison !" message and no HP drop at end of turn
+
+**Expected:** Status damage applies every turn regardless of what action the player took.
+**Actual:** Status damage is silently skipped whenever the player uses an item, switches, or fails to flee.
+
+**Root cause:** `js/battle.js` `_executeTurn` — the item/switch/run_fail branch returns early after `_doEnemyTurn` without ever reaching the `_processStatusEndTurn` calls at the bottom of the function.
+
+**Fix:** Added an explicit player-faint check after `_doEnemyTurn` (to avoid applying status to an already-fainted Pokémon), followed by `_processStatusEndTurn` for both Pokémon, before calling `_checkFaintsAfterTurn`.
+
+**Found:** 2026-03-28
