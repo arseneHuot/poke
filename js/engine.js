@@ -168,11 +168,12 @@ const GameEngine = {
         const endTileY = Math.min(map.height, startTileY + visibleTilesY + 3);
 
         // Draw tiles
+        const mapTheme = map.theme || null;
         for (let ty = startTileY; ty < endTileY; ty++) {
             for (let tx = startTileX; tx < endTileX; tx++) {
                 const tileType = map.tiles[ty] && map.tiles[ty][tx];
                 if (tileType !== undefined) {
-                    SpriteRenderer.drawTile(ctx, tileType, tx * TILE_SIZE, ty * TILE_SIZE, time);
+                    SpriteRenderer.drawTile(ctx, tileType, tx * TILE_SIZE, ty * TILE_SIZE, time, mapTheme);
                 }
             }
         }

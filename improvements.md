@@ -120,3 +120,29 @@
 - ~~**Fainted Pokémon visual feedback in battle**~~ **Done (2026-03-28)**: Info panel now gets `fainted` CSS class on KO — turns dark red, reduces opacity to 50%, and plays a brief white flash animation. Applied to both player and enemy panels.
 
 - ~~**XP bar in battle victory screen**~~ **Done (2026-03-28)**: XP bar fill transition slowed to 1.2s ease-out (from 0.5s) so the fill animation is clearly visible during the "gagne X points d'exp." message. XP bar height increased to 5px for better visibility.
+
+---
+
+## New Suggestions (2026-03-28 QA session #3 — World & Design)
+
+### World / Cities
+
+- ~~**City-themed building colors**~~ **Done (2026-03-28)**: Added `theme.building` color config to each city map. Buildings now render with unique palettes: Porto (teal-blue), Campoverde (forest green), Rivalta (ocean blue), Volcania (red-orange), Glacia (ice-blue), Abyssia (dark purple), Pokémon League (gold). `SpriteRenderer.drawTile` accepts optional theme parameter.
+
+- **City decorative elements**: Cities feel empty with just buildings and NPCs. Add decorative tile types — fountains, benches, lampposts, flower beds, statues — to make cities feel lived-in. Even 2-3 decorative elements per city would help.
+
+- **City entrance signs**: Add a sign post tile at each city entrance showing the city name. In classic Pokémon games, every city has a sign at the entrance. This helps with navigation and immersion.
+
+- **More NPCs with flavor dialogue per city**: Most cities only have 2-3 NPCs. Adding 2-3 more ambient NPCs per city with short flavor text about the city's theme/lore would make the world feel more populated and alive.
+
+### Routes / Environment
+
+- **Desert route green grass inconsistency**: The desert route uses the same green tall grass for encounter areas, which looks wrong on sand terrain. Should use a sand-colored encounter tile or desert scrub variant for visual consistency.
+
+- **Route environmental objects**: Routes are mostly flat with just grass patches and trees. Adding variety — rocks, bushes, small ponds, fallen logs — would make routes more interesting to explore.
+
+### Buildings / Interiors
+
+- **Gym visual differentiation**: Gym buildings look identical to regular buildings from the outside. They should have a distinct visual marker — a colored roof, a badge icon, or a larger building frame — so players can identify them at a glance.
+
+- **Interior furniture and detail**: Interior maps (player house, lab) are bare floors with NPCs. Adding simple furniture tiles — tables, shelves, computers, rugs — would make interiors feel like real rooms.

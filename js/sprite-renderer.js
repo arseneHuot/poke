@@ -1014,7 +1014,7 @@ const SpriteRenderer = {
     },
 
     // Tile rendering
-    drawTile(ctx, tileType, x, y, time) {
+    drawTile(ctx, tileType, x, y, time, theme) {
         const T = TILE_SIZE;
         switch (tileType) {
             case TILE.GRASS:
@@ -1076,18 +1076,20 @@ const SpriteRenderer = {
                 ctx.fill();
                 break;
 
-            case TILE.BUILDING:
-                ctx.fillStyle = '#B8860B';
+            case TILE.BUILDING: {
+                const bColors = theme && theme.building ? theme.building : { border: '#B8860B', fill: '#8B6914', window: '#87CEEB' };
+                ctx.fillStyle = bColors.border;
                 ctx.fillRect(x, y, T, T);
-                ctx.fillStyle = '#8B6914';
+                ctx.fillStyle = bColors.fill;
                 ctx.fillRect(x + 1, y + 1, T - 2, T - 2);
                 // Window
-                ctx.fillStyle = '#87CEEB';
+                ctx.fillStyle = bColors.window || '#87CEEB';
                 ctx.fillRect(x + 10, y + 8, 12, 10);
                 ctx.fillStyle = '#5A5A5A';
                 ctx.fillRect(x + 15.5, y + 8, 1, 10);
                 ctx.fillRect(x + 10, y + 12.5, 12, 1);
                 break;
+            }
 
             case TILE.WALL:
                 ctx.fillStyle = '#808080';

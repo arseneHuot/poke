@@ -118,6 +118,7 @@ const WorldData = {
             width: w, height: h,
             tiles: tiles,
             music: 'town',
+            theme: { building: { border: '#B8860B', fill: '#8B6914' } },
             encounters: [],
             npcs: [
                 { id: 'prof_oliva', type: 'professor', x: 28, y: 12, dir: DIR.DOWN, name: 'Prof. Oliva',
@@ -290,6 +291,7 @@ const WorldData = {
         this.maps['porto'] = {
             id: 'porto', name: 'Porto City', width: w, height: h, tiles,
             music: 'city',
+            theme: { building: { border: '#6B8E9B', fill: '#4A6E7B', window: '#B0E0FF' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_porto', type: 'nurse', x: 13, y: 11, dir: DIR.DOWN, name: 'Infirmière',
@@ -438,6 +440,7 @@ const WorldData = {
         this.maps['campoverde'] = {
             id: 'campoverde', name: 'Campoverde', width: w, height: h, tiles,
             music: 'town',
+            theme: { building: { border: '#5A8A3A', fill: '#3D6B28', window: '#C8E6A0' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_campo', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière',
@@ -556,6 +559,7 @@ const WorldData = {
         this.maps['rivalta'] = {
             id: 'rivalta', name: 'Rivalta', width: w, height: h, tiles,
             music: 'city',
+            theme: { building: { border: '#4A7DAA', fill: '#355D8A', window: '#A0D4FF' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_rivalta', type: 'nurse', x: 11, y: 11, dir: DIR.DOWN, name: 'Infirmière',
@@ -702,6 +706,7 @@ const WorldData = {
         this.maps['volcan_city'] = {
             id: 'volcan_city', name: 'Volcania', width: w, height: h, tiles,
             music: 'city',
+            theme: { building: { border: '#C04030', fill: '#8B2A1A', window: '#FFB060' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_volcan', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
@@ -790,6 +795,7 @@ const WorldData = {
         this.maps['glacia_city'] = {
             id: 'glacia_city', name: 'Glacia', width: w, height: h, tiles,
             music: 'city',
+            theme: { building: { border: '#7AB0C8', fill: '#5090A8', window: '#D0F0FF' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_glacia', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
@@ -875,6 +881,7 @@ const WorldData = {
         this.maps['abyss_city'] = {
             id: 'abyss_city', name: 'Abyssia', width: w, height: h, tiles,
             music: 'city',
+            theme: { building: { border: '#6A4B8A', fill: '#4A2D6A', window: '#C8A0E8' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_abyss', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
@@ -970,6 +977,7 @@ const WorldData = {
         this.maps['pokemon_league'] = {
             id: 'pokemon_league', name: 'Ligue Pokémon de Novara', width: w, height: h, tiles,
             music: 'league',
+            theme: { building: { border: '#C8A830', fill: '#A08820', window: '#FFF8D0' } },
             encounters: [],
             npcs: [
                 { id: 'nurse_league', type: 'nurse', x: 11, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
