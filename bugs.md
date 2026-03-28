@@ -1268,3 +1268,27 @@ if (newBtn.dataset.action === 'run') {
 **Fix:** Added `WorldData.maps = {}; WorldData.init();` at the top of both `_newGame()` and `_loadGame()`. Clearing `maps` forces all maps to be regenerated fresh on first access, with clean NPC state. `WorldData.init()` recreates the 3 eagerly-generated maps (borgo, player_house, prof_lab) immediately.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #73 - SaveSystem auto-save timer leaks on repeated game starts
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/save-system.js (`_startAutoSave`)
+
+**Description:** `SaveSystem.init()` is called every time the player starts a new game or loads a save (via `_newGame()` and `_loadGame()` in `main.js`). Each call invokes `_startAutoSave()`, which creates a new `setInterval` timer and stores it in `this._timer`. However, the old timer is never cleared before creating the new one. After N session restarts (without a page reload), there are N concurrent save timers running, all calling `this.save()` every 10 seconds.
+
+**Steps to reproduce:**
+1. Start a new game
+2. Open menu → Quitter → confirm → return to title
+3. Start another new game
+4. Repeat 5+ times — there are now 6 setInterval timers running
+
+**Expected:** Only one auto-save timer runs at a time.
+**Actual:** Each session restart adds a new timer; old timers are never cancelled.
+
+**Root cause:** `_startAutoSave()` at `js/save-system.js:16` does not check if `this._timer` is already set before creating a new interval.
+
+**Fix:** Added `if (this._timer) { clearInterval(this._timer); this._timer = null; }` at the start of `_startAutoSave()` to ensure only one timer runs at a time.
+
+**Found:** 2026-03-28

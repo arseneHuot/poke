@@ -13,6 +13,10 @@ const SaveSystem = {
     },
 
     _startAutoSave() {
+        if (this._timer) {
+            clearInterval(this._timer);
+            this._timer = null;
+        }
         this._timer = setInterval(() => {
             this.save();
         }, this.AUTO_SAVE_INTERVAL);
