@@ -152,7 +152,11 @@ const TILE = {
     MART: 19,
     GYM_FLOOR: 20,
     STAIRS_UP: 21,
-    STAIRS_DOWN: 22
+    STAIRS_DOWN: 22,
+    FOUNTAIN: 23,
+    BENCH: 24,
+    LAMPPOST: 25,
+    GYM_BUILDING: 26
 };
 
 const WALKABLE_TILES = new Set([

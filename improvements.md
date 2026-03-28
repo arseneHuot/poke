@@ -129,7 +129,7 @@
 
 - ~~**City-themed building colors**~~ **Done (2026-03-28)**: Added `theme.building` color config to each city map. Buildings now render with unique palettes: Porto (teal-blue), Campoverde (forest green), Rivalta (ocean blue), Volcania (red-orange), Glacia (ice-blue), Abyssia (dark purple), Pokémon League (gold). `SpriteRenderer.drawTile` accepts optional theme parameter.
 
-- **City decorative elements**: Cities feel empty with just buildings and NPCs. Add decorative tile types — fountains, benches, lampposts, flower beds, statues — to make cities feel lived-in. Even 2-3 decorative elements per city would help.
+- ~~**City decorative elements**~~ **Done (2026-03-28)**: Added 3 new tile types (FOUNTAIN with animated water, BENCH, LAMPPOST with golden glow) and placed them in all 7 cities. Each city now has a fountain, bench(es), and lamppost(s) for a lived-in feel.
 
 - ~~**City entrance signs**~~ **Done (2026-03-28)**: Added sign tiles and sign NPCs with city description dialogues to Porto, Volcania, Glacia, Abyssia, and Pokémon League entrances. Each sign shows the city name and a brief description.
 
@@ -137,12 +137,12 @@
 
 ### Routes / Environment
 
-- **Desert route green grass inconsistency**: The desert route uses the same green tall grass for encounter areas, which looks wrong on sand terrain. Should use a sand-colored encounter tile or desert scrub variant for visual consistency.
+- ~~**Desert route green grass inconsistency**~~ **Done (2026-03-28)**: Added `theme.tallGrass` color config to desert maps (Route 4 and Route 5). Tall grass on sand now renders with sandy brown colors instead of green, using the theme system in `SpriteRenderer.drawTile`.
 
 - **Route environmental objects**: Routes are mostly flat with just grass patches and trees. Adding variety — rocks, bushes, small ponds, fallen logs — would make routes more interesting to explore.
 
 ### Buildings / Interiors
 
-- **Gym visual differentiation**: Gym buildings look identical to regular buildings from the outside. They should have a distinct visual marker — a colored roof, a badge icon, or a larger building frame — so players can identify them at a glance.
+- ~~**Gym visual differentiation**~~ **Done (2026-03-28)**: Added `TILE.GYM_BUILDING` (26) tile type with red roof stripe and gold badge star. All 8 gym buildings now use this tile, making them visually distinct from regular buildings while still using the city's theme colors.
 
 - **Interior furniture and detail**: Interior maps (player house, lab) are bare floors with NPCs. Adding simple furniture tiles — tables, shelves, computers, rugs — would make interiors feel like real rooms.

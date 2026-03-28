@@ -1027,10 +1027,11 @@ const SpriteRenderer = {
                 ctx.fillRect(x + 12, y + 24, 3, 3);
                 break;
 
-            case TILE.TALL_GRASS:
-                ctx.fillStyle = '#7EC850';
+            case TILE.TALL_GRASS: {
+                const tgColors = theme && theme.tallGrass ? theme.tallGrass : { bg: '#7EC850', blade: '#4A8530' };
+                ctx.fillStyle = tgColors.bg;
                 ctx.fillRect(x, y, T, T);
-                ctx.fillStyle = '#4A8530';
+                ctx.fillStyle = tgColors.blade;
                 for (let i = 0; i < 5; i++) {
                     const gx = x + 2 + (i * 6);
                     const sway = Math.sin(time * 0.002 + i) * 2;
@@ -1041,6 +1042,7 @@ const SpriteRenderer = {
                     ctx.fill();
                 }
                 break;
+            }
 
             case TILE.PATH:
                 ctx.fillStyle = '#D2B48C';
@@ -1268,6 +1270,86 @@ const SpriteRenderer = {
                 ctx.moveTo(x + 16, y + 28);
                 ctx.lineTo(x + 10, y + 18);
                 ctx.lineTo(x + 22, y + 18);
+                ctx.fill();
+                break;
+
+            case TILE.GYM_BUILDING: {
+                const gbColors = theme && theme.building ? theme.building : { border: '#B8860B', fill: '#8B6914' };
+                ctx.fillStyle = gbColors.border;
+                ctx.fillRect(x, y, T, T);
+                ctx.fillStyle = gbColors.fill;
+                ctx.fillRect(x + 1, y + 1, T - 2, T - 2);
+                // Window
+                ctx.fillStyle = gbColors.window || '#87CEEB';
+                ctx.fillRect(x + 10, y + 10, 12, 10);
+                ctx.fillStyle = '#5A5A5A';
+                ctx.fillRect(x + 15.5, y + 10, 1, 10);
+                ctx.fillRect(x + 10, y + 14.5, 12, 1);
+                // Red gym roof stripe
+                ctx.fillStyle = '#E53935';
+                ctx.fillRect(x, y, T, 4);
+                // Gold star badge
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(x + T/2, y + 6, 3, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+            }
+
+            case TILE.FOUNTAIN:
+                ctx.fillStyle = '#7EC850';
+                ctx.fillRect(x, y, T, T);
+                // Stone base
+                ctx.fillStyle = '#999';
+                ctx.beginPath();
+                ctx.ellipse(x + T/2, y + T/2 + 4, 12, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+                // Water pool
+                ctx.fillStyle = '#5DA0E9';
+                ctx.beginPath();
+                ctx.ellipse(x + T/2, y + T/2 + 2, 10, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                // Water spout
+                ctx.fillStyle = '#AAA';
+                ctx.fillRect(x + 14, y + 4, 4, 14);
+                // Water drops
+                ctx.fillStyle = '#80C0FF';
+                const dropOff = Math.sin(time * 0.004) * 2;
+                ctx.beginPath();
+                ctx.arc(x + 10 + dropOff, y + 10, 2, 0, Math.PI * 2);
+                ctx.arc(x + 22 - dropOff, y + 12, 2, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+
+            case TILE.BENCH:
+                ctx.fillStyle = '#7EC850';
+                ctx.fillRect(x, y, T, T);
+                // Bench seat
+                ctx.fillStyle = '#8B6914';
+                ctx.fillRect(x + 4, y + 14, 24, 4);
+                // Legs
+                ctx.fillStyle = '#666';
+                ctx.fillRect(x + 6, y + 18, 2, 8);
+                ctx.fillRect(x + 24, y + 18, 2, 8);
+                // Backrest
+                ctx.fillStyle = '#A0782A';
+                ctx.fillRect(x + 4, y + 10, 24, 3);
+                break;
+
+            case TILE.LAMPPOST:
+                ctx.fillStyle = '#7EC850';
+                ctx.fillRect(x, y, T, T);
+                // Pole
+                ctx.fillStyle = '#555';
+                ctx.fillRect(x + 14, y + 10, 4, 22);
+                // Light
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(x + 16, y + 8, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#FFF8DC';
+                ctx.beginPath();
+                ctx.arc(x + 16, y + 8, 3, 0, Math.PI * 2);
                 ctx.fill();
                 break;
 

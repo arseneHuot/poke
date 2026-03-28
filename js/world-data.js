@@ -112,6 +112,11 @@ const WorldData = {
         // Sign
         tiles[14][19] = TILE.SIGN;
 
+        // Decorations
+        tiles[16][15] = TILE.FOUNTAIN;
+        tiles[20][22] = TILE.BENCH;
+        tiles[14][25] = TILE.LAMPPOST;
+
         this.maps['borgo'] = {
             id: 'borgo',
             name: 'Village de Borgo',
@@ -265,7 +270,7 @@ const WorldData = {
         tiles[12][29] = TILE.MART;
 
         // GYM 1 - Normal type
-        this._fillRect(tiles, 34, 14, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 34, 14, 8, 8, TILE.GYM_BUILDING);
         tiles[21][38] = TILE.DOOR;
 
         // Houses
@@ -290,6 +295,13 @@ const WorldData = {
 
         // City entrance sign
         tiles[26][18] = TILE.SIGN;
+
+        // Decorations
+        tiles[17][20] = TILE.FOUNTAIN;
+        tiles[22][12] = TILE.BENCH;
+        tiles[22][28] = TILE.BENCH;
+        tiles[15][18] = TILE.LAMPPOST;
+        tiles[20][25] = TILE.LAMPPOST;
 
         this.maps['porto'] = {
             id: 'porto', name: 'Porto City', width: w, height: h, tiles,
@@ -425,7 +437,7 @@ const WorldData = {
         tiles[10][29] = TILE.MART;
 
         // GYM 2 - Grass type
-        this._fillRect(tiles, 6, 20, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 6, 20, 8, 8, TILE.GYM_BUILDING);
         tiles[27][10] = TILE.DOOR;
 
         // Lots of flowers and trees
@@ -440,6 +452,9 @@ const WorldData = {
 
         // Sign
         tiles[16][22] = TILE.SIGN;
+        tiles[18][15] = TILE.FOUNTAIN;
+        tiles[22][25] = TILE.BENCH;
+        tiles[14][30] = TILE.LAMPPOST;
 
         this.maps['campoverde'] = {
             id: 'campoverde', name: 'Campoverde', width: w, height: h, tiles,
@@ -545,11 +560,11 @@ const WorldData = {
         tiles[12][31] = TILE.MART;
 
         // GYM 3 - Water type
-        this._fillRect(tiles, 30, 22, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 30, 22, 8, 8, TILE.GYM_BUILDING);
         tiles[29][34] = TILE.DOOR;
 
         // GYM 4 - Electric type
-        this._fillRect(tiles, 6, 24, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 6, 24, 8, 8, TILE.GYM_BUILDING);
         tiles[31][10] = TILE.DOOR;
 
         // Water features
@@ -559,6 +574,9 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+        tiles[18][20] = TILE.FOUNTAIN;
+        tiles[22][12] = TILE.BENCH;
+        tiles[15][28] = TILE.LAMPPOST;
 
         this.maps['rivalta'] = {
             id: 'rivalta', name: 'Rivalta', width: w, height: h, tiles,
@@ -621,6 +639,7 @@ const WorldData = {
         this.maps['route4'] = {
             id: 'route4', name: 'Route 4 - Chemin du Désert', width: w, height: h, tiles,
             music: 'route',
+            theme: { tallGrass: { bg: '#D4C090', blade: '#A08050' } },
             encounters: [
                 { id: 32, minLevel: 22, maxLevel: 25, rate: 25 },
                 { id: 55, minLevel: 22, maxLevel: 26, rate: 20 },
@@ -661,6 +680,7 @@ const WorldData = {
         this.maps['desert_route'] = {
             id: 'desert_route', name: 'Route 5 - Désert Ardent', width: w, height: h, tiles,
             music: 'route',
+            theme: { tallGrass: { bg: '#D4C090', blade: '#A08050' } },
             encounters: [
                 { id: 33, minLevel: 28, maxLevel: 32, rate: 20 },
                 { id: 30, minLevel: 28, maxLevel: 30, rate: 25 },
@@ -695,11 +715,11 @@ const WorldData = {
         tiles[10][31] = TILE.MART;
 
         // GYM 5 - Fire
-        this._fillRect(tiles, 6, 22, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 6, 22, 8, 8, TILE.GYM_BUILDING);
         tiles[29][10] = TILE.DOOR;
 
         // GYM 6 - Ground
-        this._fillRect(tiles, 32, 22, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 32, 22, 8, 8, TILE.GYM_BUILDING);
         tiles[29][36] = TILE.DOOR;
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.ROCK; tiles[y][w-1] = TILE.ROCK; }
@@ -707,6 +727,9 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.ROCK; tiles[h-1][x] = TILE.ROCK; }
         }
         tiles[26][18] = TILE.SIGN;
+        tiles[18][20] = TILE.FOUNTAIN;
+        tiles[22][12] = TILE.BENCH;
+        tiles[15][28] = TILE.LAMPPOST;
 
         this.maps['volcan_city'] = {
             id: 'volcan_city', name: 'Volcania', width: w, height: h, tiles,
@@ -790,7 +813,7 @@ const WorldData = {
         tiles[10][31] = TILE.MART;
 
         // GYM 7 - Ice
-        this._fillRect(tiles, 16, 22, 8, 8, TILE.BUILDING);
+        this._fillRect(tiles, 16, 22, 8, 8, TILE.GYM_BUILDING);
         tiles[29][20] = TILE.DOOR;
 
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.ROCK; tiles[y][w-1] = TILE.ROCK; }
@@ -798,6 +821,9 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.ROCK; tiles[h-1][x] = TILE.ROCK; }
         }
         tiles[26][18] = TILE.SIGN;
+        tiles[18][20] = TILE.FOUNTAIN;
+        tiles[22][12] = TILE.BENCH;
+        tiles[15][28] = TILE.LAMPPOST;
 
         this.maps['glacia_city'] = {
             id: 'glacia_city', name: 'Glacia', width: w, height: h, tiles,
@@ -875,7 +901,7 @@ const WorldData = {
         tiles[10][33] = TILE.MART;
 
         // GYM 8 - Dragon
-        this._fillRect(tiles, 18, 24, 10, 10, TILE.BUILDING);
+        this._fillRect(tiles, 18, 24, 10, 10, TILE.GYM_BUILDING);
         tiles[33][23] = TILE.DOOR;
 
         this._fillRect(tiles, 4, 28, 10, 8, TILE.WATER);
@@ -886,6 +912,9 @@ const WorldData = {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
         tiles[26][18] = TILE.SIGN;
+        tiles[18][20] = TILE.FOUNTAIN;
+        tiles[22][12] = TILE.BENCH;
+        tiles[15][28] = TILE.LAMPPOST;
 
         this.maps['abyss_city'] = {
             id: 'abyss_city', name: 'Abyssia', width: w, height: h, tiles,
