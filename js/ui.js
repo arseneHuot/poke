@@ -745,6 +745,12 @@ const UI = {
             } else if (itemData.type === 'escape') {
                 row.addEventListener('click', () => {
                     if (!game || !game.state) return;
+                    const currentMap = typeof WorldData !== 'undefined' && WorldData.getMap
+                        ? WorldData.getMap(game.state.currentMap) : null;
+                    if (!currentMap || !currentMap.isDungeon) {
+                        this.showNotification('Ce n\'est pas le bon endroit pour ça !');
+                        return;
+                    }
                     const targetMap = GameEngine.lastSafeMap || 'borgo';
                     const targetX = GameEngine.lastSafeX || 14;
                     const targetY = GameEngine.lastSafeY || 14;
@@ -1116,6 +1122,10 @@ const UI = {
             'Normal', 'Plante', 'Eau', 'Electrik',
             'Feu', 'Sol', 'Glace', 'Dragon'
         ];
+        const badgeTypeKeys = [
+            'normal', 'grass', 'water', 'electric',
+            'fire', 'ground', 'ice', 'dragon'
+        ];
 
         const badgeRow = document.createElement('div');
         badgeRow.style.cssText = 'display:flex;justify-content:center;gap:8px;flex-wrap:wrap;';
@@ -1123,11 +1133,16 @@ const UI = {
         for (let i = 0; i < 8; i++) {
             const badge = document.createElement('div');
             const earned = game.state.badges.includes(i);
-            badge.style.cssText = 'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;text-align:center;' +
-                (earned
-                    ? 'background:linear-gradient(135deg,#ffd700,#ff8c00);border:2px solid #ffd700;color:#000;font-weight:bold;box-shadow:0 0 8px rgba(255,215,0,0.5);'
-                    : 'background:rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);color:#555;');
-            badge.textContent = earned ? (i + 1) : '?';
+            const typeColor = TYPE_COLORS[badgeTypeKeys[i]] || '#888';
+            if (earned) {
+                badge.style.cssText = 'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;text-align:center;' +
+                    'background:linear-gradient(135deg,#ffd700,#ff8c00);border:2px solid #ffd700;color:#000;font-weight:bold;box-shadow:0 0 8px rgba(255,215,0,0.5);';
+                badge.textContent = i + 1;
+            } else {
+                badge.style.cssText = 'width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;text-align:center;' +
+                    `background:${typeColor}33;border:2px solid ${typeColor}55;color:${typeColor}88;font-weight:bold;`;
+                badge.textContent = badgeNames[i].substring(0, 3).toUpperCase();
+            }
             badge.title = badgeNames[i];
             badgeRow.appendChild(badge);
         }

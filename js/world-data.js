@@ -444,7 +444,7 @@ const WorldData = {
 
         this.maps['grotte1'] = {
             id: 'grotte1', name: 'Grotte Sombre', width: w, height: h, tiles,
-            music: 'cave',
+            music: 'cave', isDungeon: true,
             encounters: [
                 { id: 24, minLevel: 10, maxLevel: 13, rate: 30 },
                 { id: 26, minLevel: 10, maxLevel: 12, rate: 25 },
@@ -1034,7 +1034,7 @@ const WorldData = {
 
         this.maps['victory_road'] = {
             id: 'victory_road', name: 'Route Victoire', width: w, height: h, tiles,
-            music: 'cave',
+            music: 'cave', isDungeon: true,
             encounters: [
                 { id: 65, minLevel: 42, maxLevel: 46, rate: 10 },
                 { id: 88, minLevel: 42, maxLevel: 46, rate: 10 },

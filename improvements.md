@@ -183,8 +183,8 @@
 
 - ~~**Shop: show feedback when purchase fails due to insufficient funds**~~ **Done (2026-03-29)**: Already implemented — `_renderShopBuy` in ui.js calls `this.showNotification('Pas assez d\'argent !')` when `game.state.money < itemData.price`. Verified in code.
 
-- **Escape Rope: add guard against use in towns and routes** — The Escape Rope (Corde Sortie) can be used anywhere in the overworld — including towns and open routes — consuming the item and warping the player to `GameEngine.lastSafeMap` (defaulting to Borgo). In mainline Pokémon games, using an escape rope outside a cave/dungeon shows "This isn't the right place to use this!" and does not consume the item. Consider adding a map-type flag (e.g. `map.isDungeon`) and blocking escape rope use unless that flag is set.
+- ~~**Escape Rope: add guard against use in towns and routes**~~ **Done (2026-03-29)**: Added `isDungeon: true` to `grotte1` and `victory_road` in `world-data.js`. Escape Rope handler in `ui.js` now checks `WorldData.getMap(currentMap).isDungeon` before use — shows "Ce n'est pas le bon endroit pour ça !" and returns early (item not consumed) when used outside a dungeon.
 
 ### Trainer Card
 
-- **Badge slots: show type silhouettes for unearned badges** — All 8 unearned badge slots in the Dresseur (Trainer Card) tab display a plain "?" character in a dark circle. Showing a faint silhouette of each badge type (based on the gym type: Normal, Plante, Eau, Electrik, Feu, Sol, Glace, Dragon) would hint at what each badge looks like and make the card feel more complete even with 0 badges earned.
+- ~~**Badge slots: show type silhouettes for unearned badges**~~ **Done (2026-03-29)**: Unearned badge slots in `_renderTrainerTab` now show a 3-letter type abbreviation (NOR, PLA, EAU, ELE, FEU, SOL, GLA, DRA) with the corresponding type color at low opacity as background, border, and text. Earned badges still show gold gradient with the badge number.
