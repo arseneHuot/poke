@@ -125,19 +125,13 @@ if (enemyFlinched) { ... }
 ---
 
 ## Bug #9 - Dialogue box bleeds through menu and battle screens
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Major
 **File:** js/ui.js
 
 **Description:** When a dialogue is pending/active and the player opens the menu or a battle starts, the dialogue box text remains visible at the bottom of the screen, overlapping the menu and battle UI.
 
-**Steps to reproduce:**
-1. Trigger the post-starter dialogue from Prof. Oliva
-2. While dialogue is active, press Escape to open the menu
-3. Navigate through menu tabs — dialogue text is visible behind/below all tabs
-
-**Expected:** Dialogue box is hidden when menu or battle opens.
-**Actual:** "Excellent choix ! Prends aussi ce Pokédex…" shows at the bottom of every menu tab and the battle screen.
+**Fix:** `openMenu()` now explicitly hides the dialogue box and resets `dialogue.active = false` before rendering the menu (ui.js lines 386–388). `startBattle()` in main.js also hides the dialogue box on entry. Additionally, the `_bindKeys` Escape handler checks `!this.dialogue.active` before calling `openMenu()`, preventing the menu from opening during an active dialogue entirely.
 
 ---
 
@@ -163,9 +157,9 @@ if (enemyFlinched) { ... }
 ---
 
 ## Bug #11 - Save notification not visible through menu overlay
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Minor
-**File:** js/ui.js (save tab)
+**File:** js/ui.js (save tab), css/style.css
 
 **Description:** Clicking "Sauvegarder maintenant" shows `showNotification('Partie sauvegardee !')` and changes the button text to "Sauvegarde OK !" briefly. However the notification toast is hidden behind the menu overlay and is never seen. The button text change does work but uses the "sauvegardee" typo (missing accent).
 
@@ -173,7 +167,9 @@ if (enemyFlinched) { ... }
 1. Open menu → Sauvegarder tab → click "Sauvegarder maintenant"
 
 **Expected:** A visible notification "Partie sauvegardée !" appears above the menu.
-**Actual:** Notification renders behind the menu overlay; button text flash is the only confirmation and contains the typo "sauvegardee".
+**Actual (original):** Notification renders behind the menu overlay.
+
+**Fix:** Notification (`.notification`) has `z-index: 80`, which is higher than `#menu-overlay`'s `z-index: 60`. Both are children of `#ui-layer`. Notification renders correctly above the menu overlay. The accent typo was also fixed: `showNotification('Partie sauvegardée !')` at js/ui.js:987. Verified with persistent DOM test on 2026-03-28 — notification is fully visible above the menu panel.
 
 ---
 
@@ -261,7 +257,7 @@ if (enemyFlinched) { ... }
 ---
 
 ## Bug #18 - Game loop freezes permanently when tab loses visibility
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Major
 **File:** js/main.js
 
@@ -283,7 +279,7 @@ if (enemyFlinched) { ... }
 ---
 
 ## Bug #19 - Missing accents on "Pokemon", "Pokedex", "Equipe" in UI
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Cosmetic
 **File:** js/ui.js
 
@@ -293,6 +289,7 @@ if (enemyFlinched) { ... }
 - Line 298: `'Choisissez votre Pokemon !'` → `'Choisissez votre Pokémon !'`
 - Line 412: `label: 'Equipe'` → `label: 'Équipe'`
 - Line 414: `label: 'Pokedex'` → `label: 'Pokédex'`
+- Line 473: `'Aucun Pokemon dans l\'equipe.'` → `'Aucun Pokémon dans l\'équipe.'` (two issues on same line)
 - Line 827: `title.textContent = 'Pokedex'` → `'Pokédex'`
 - Lines 912–913: `'Pokedex (vus)'`, `'Pokedex (captures)'` → `'Pokédex (vus)'`, `'Pokédex (captures)'`
 
@@ -423,17 +420,21 @@ Contrast with nurse NPC healing via `UI._healAllPokemon()`, which correctly rest
 ## Bug #26 - Re-challenging a defeated trainer starts battle with 0-HP enemy
 **Status:** Fixed (2026-03-28)
 **Priority:** Major
-**File:** js/engine.js (`interactWithNPC`), js/battle.js (`startTrainerBattle`)
+**File:** js/engine.js (`interactWithNPC`), js/world-data.js (all gym leader NPCs)
 
 **Description:** In the same session (before a reload), a defeated trainer can be re-challenged. `interactWithNPC` has no check for `npc.defeated`, so the trainer battle dialogue fires again. `startTrainerBattle` detects that `trainerNpc.party` is already built (from the previous battle) and reuses it without checking HP. The battle starts with the trainer's Pokémon at 0 HP, causing an immediate win condition and a second reward payout.
 
+The fix checks `if (npc.defeated && npc.altDialogue)` in `interactWithNPC`. All 8 gym leaders (`gym1_leader` through `gym8_leader`) now have `altDialogue` and `gym{N}_defeated` dialogue entries set in `world-data.js` and `story-data.js`.
+
 **Steps to reproduce:**
-1. Defeat any trainer (e.g., "Gamin Thomas" on Route 1)
-2. Interact with the same trainer again immediately
-3. A battle starts — the enemy Pokémon has 0 HP
+1. Defeat gym leader Marco in Porto City (gym1_leader)
+2. Interact with him again immediately
+3. A battle starts — Marco's Pokémon has 0 HP
 
 **Expected:** Defeated trainer shows a post-defeat dialogue ("Bien joué !") and cannot be re-battled.
-**Actual:** Battle starts with a dead enemy; player wins instantly and may receive rewards again.
+**Actual (original):** Battle starts with a dead enemy; player wins instantly and may receive rewards again.
+
+**Fix verified (2026-03-28):** gym1_leader.defeated=true after battle, re-interaction shows "Bien joué ! Tu m'as impressionné. Ton Pokémon mérite ce Badge Normalité." dialogue. All 8 gym leaders confirmed to have altDialogue properties in world-data.js.
 
 **Found:** 2026-03-28
 
@@ -476,5 +477,155 @@ Contrast with nurse NPC healing via `UI._healAllPokemon()`, which correctly rest
 **Actual:** `ReferenceError: container is not defined` is silently swallowed; the panel shows only the title. The item is NOT consumed, so there is no permanent softlock (Escape closes the menu), but items can never be used from the overworld bag.
 
 **Root cause:** `js/ui.js:740` — `container.appendChild(list)` should be `panel.appendChild(list)`. The variable `panel` is declared at line 685 but line 740 mistakenly uses `container`.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #29 - Escape key cannot close the menu
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/engine.js (`handleInput`), js/ui.js (keydown handler)
+
+**Description:** Pressing Escape when the menu is open does not close it — the menu stays open permanently. The key only toggles the menu open when it is closed; it cannot be used to close it.
+
+**Steps to reproduce:**
+1. In the overworld, press Escape — menu opens (correct)
+2. Press Escape again — menu should close, but stays open
+
+**Expected:** Escape toggles the menu: opens it when closed, closes it when open.
+**Actual:** The menu cannot be closed with the keyboard at all.
+
+**Root cause:** Two competing keydown listeners handle Escape:
+1. `document.addEventListener` in `ui.js` — correctly checks `UI.menu.open` and calls `closeMenu()` when open
+2. `window.addEventListener` in `engine.js handleInput` — **unconditionally** calls `UI.openMenu()` on every Escape key press, regardless of menu state
+
+Because `document` events fire before `window` events, the sequence on every Escape press is:
+- UI listener fires → calls `closeMenu()` (menu.open = false) ✓
+- Engine listener fires → calls `openMenu()` (menu.open = true) ✗
+
+Net result: menu closes and immediately re-opens on every Escape press.
+
+**Fix needed:** In `js/engine.js handleInput`, change the unconditional `UI.openMenu()` call to only open the menu when it is not already open (i.e., `if (!UI.menu.open) UI.openMenu()`), or remove the call entirely since `ui.js` already handles it.
+
+```js
+// Current (broken):
+if (key === 'Escape' || key === 'x' || key === 'X') {
+    if (typeof UI !== 'undefined' && UI.openMenu) {
+        UI.openMenu();  // always fires, re-opens after ui.js closes it
+    }
+}
+
+// Fix:
+if (key === 'Escape' || key === 'x' || key === 'X') {
+    if (typeof UI !== 'undefined' && UI.openMenu && !UI.menu.open) {
+        UI.openMenu();
+    }
+}
+```
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #30 - Shop buy notification missing accent: "achete" → "acheté"
+**Status:** Fixed (2026-03-28)
+**Priority:** Cosmetic
+**File:** js/ui.js (`_renderShopBuy`, line 1244)
+
+**Description:** After successfully buying an item in a Pokémart, the notification reads `"Poké Ball achete !"` (or `"Potion achete !"` etc.) — the past participle "acheté" is missing its accent.
+
+**Root cause:** `js/ui.js:1244`:
+```js
+this.showNotification(itemData.name + ' achete !');
+// Should be:
+this.showNotification(itemData.name + ' acheté !');
+```
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #32 - Additional missing accents in notification strings
+**Status:** Fixed (2026-03-28)
+**Priority:** Cosmetic
+**File:** js/ui.js
+
+**Description:** Two player-visible notification strings contain missing French accents, distinct from the UI label issues documented in Bug #19.
+
+**Affected locations:**
+- `js/ui.js:277` (`_healAllPokemon`): `'Vos Pokemon sont en pleine forme !'` → should be `'Vos Pokémon sont en pleine forme !'`
+  - This notification fires when a nurse NPC heals the party (via the `heal_pokemon` dialogue action).
+- `js/ui.js:357` (`_selectStarter`): `data.name + ' a rejoint votre equipe !'` → "equipe" should be "équipe"
+  - This notification fires immediately when the player picks their starter Pokémon.
+
+**Steps to reproduce (equipe):**
+1. Start a new game
+2. Enter the lab and choose a starter
+3. Observe the notification toast — it reads "Flamby a rejoint votre equipe !" instead of "équipe"
+
+**Steps to reproduce (Pokemon):**
+1. Visit any Pokémon Center with a nurse NPC
+2. Talk to the nurse and heal the party
+3. The toast notification reads "Vos Pokemon sont en pleine forme !" instead of "Pokémon"
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #31 - Shop sell panel empty message missing accent: "Rien a vendre" → "Rien à vendre"
+**Status:** Fixed (2026-03-28)
+**Priority:** Cosmetic
+**File:** js/ui.js (`_renderShopSell`, line 1264)
+
+**Description:** When opening the "Vendre" tab in a Pokémart with an empty bag, the message reads `"Rien a vendre."` — the preposition "à" is missing its accent.
+
+**Root cause:** `js/ui.js:1264`:
+```js
+empty.textContent = 'Rien a vendre.';
+// Should be:
+empty.textContent = 'Rien à vendre.';
+```
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #33 - Overworld tiles bleed through the battle scene (middle canvas gap)
+**Status:** Fixed (2026-03-28)
+**Priority:** Major
+**File:** js/battle.js (`render`), css/style.css (`#battle-menu`)
+
+**Description:** During battle, the canvas only draws the sky and ground background in the top 55% of the canvas height (`battleHeight = ch * 0.55` = 352px of 640px). The bottom 45% of the canvas (352px–640px) is never cleared or filled by the battle renderer. The `#battle-menu` HTML overlay (action buttons) only covers `min-height: 140px` from the bottom. This leaves an approximately 148px gap between the battle background and the menu panel where the underlying overworld tile map is visible.
+
+**Steps to reproduce:**
+1. Enter any wild or trainer battle
+2. Observe the area between the green battle ground and the action buttons
+
+**Expected:** A solid, uniform area (ideally a dark battle panel or extension of the ground) separates the battle scene from the action buttons.
+**Actual:** The overworld tile map shows through in the middle section of the battle screen, creating a jarring visual glitch.
+
+**Root cause:** `js/battle.js` line 1223: `const battleHeight = ch * 0.55;` — only the top 55% of the canvas is rendered with the battle background. The canvas area from `battleHeight` (352px) to the canvas bottom is not cleared, so the previous overworld frame shows through in this gap region.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #34 - HUD badge dots not updated after earning a badge in-session
+**Status:** Fixed (2026-03-28)
+**Priority:** Minor
+**File:** js/battle.js (`endBattle`), js/main.js (`_loadGame`), js/ui.js (`updateBadges`)
+
+**Description:** When the player defeats a gym leader and earns a badge, `game.state.badges` is correctly updated and persisted, but the HUD badge dots (`.badge-slot` elements in `#badges-display`) are not refreshed. `UI.updateBadges()` — the function that adds the `earned` class to badge slots — is only called in `_loadGame()`. After winning a gym battle in-session, the HUD still shows all badge slots as unearned until the game is saved and reloaded.
+
+**Steps to reproduce:**
+1. Defeat gym leader Marco in Porto City (gym1_leader)
+2. Observe the badge slot HUD in the top-right corner
+3. All 8 slots remain grey (unearned) even though badge 0 was awarded
+
+**Expected:** Badge slot 0 lights up immediately after defeating the gym leader.
+**Actual:** `game.state.badges` contains `[0]`, but `document.querySelectorAll('.badge-slot')[0]` does not have the `earned` class. HUD shows 0/8 until page reload.
+
+**Root cause:** `battle.js` awards the badge at line 1348 (`game.state.badges.push(badgeIndex)`) but does not call `UI.updateBadges()` afterward. `updateBadges()` should be called in `endBattle` whenever a badge is awarded.
 
 **Found:** 2026-03-28

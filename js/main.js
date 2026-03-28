@@ -27,6 +27,14 @@ const game = {
         // Start the loop
         this.lastFrameTime = performance.now();
         requestAnimationFrame((t) => this.loop(t));
+
+        // Restart loop if tab regains visibility after browser paused rAF
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                this.lastFrameTime = performance.now();
+                requestAnimationFrame((t) => this.loop(t));
+            }
+        });
     },
 
     // --------------------------------------------------------

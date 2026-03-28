@@ -274,7 +274,7 @@ const UI = {
             }
         });
         AudioSystem.playSfx('heal');
-        this.showNotification('Vos Pokemon sont en pleine forme !');
+        this.showNotification('Vos Pokémon sont en pleine forme !');
     },
 
     // ----------------------------------------------------------------
@@ -295,7 +295,7 @@ const UI = {
 
         panel.innerHTML = '';
         const title = document.createElement('h2');
-        title.textContent = 'Choisissez votre Pokemon !';
+        title.textContent = 'Choisissez votre Pokémon !';
         panel.appendChild(title);
 
         const choiceMenu = document.createElement('div');
@@ -354,7 +354,7 @@ const UI = {
         game.state.bag.pokeball += 5;
 
         const data = getPokemonById(pokemonId);
-        this.showNotification(data.name + ' a rejoint votre equipe !');
+        this.showNotification(data.name + ' a rejoint votre équipe !');
 
         AudioSystem.playSfx('catch');
 
@@ -409,9 +409,9 @@ const UI = {
 
         // Tabs
         const tabs = [
-            { id: 'party', label: 'Equipe' },
+            { id: 'party', label: 'Équipe' },
             { id: 'bag', label: 'Sac' },
-            { id: 'pokedex', label: 'Pokedex' },
+            { id: 'pokedex', label: 'Pokédex' },
             { id: 'trainer', label: 'Dresseur' },
             { id: 'save', label: 'Sauvegarder' },
             { id: 'quit', label: 'Quitter' },
@@ -465,12 +465,12 @@ const UI = {
     // -- Party Tab --
     _renderPartyTab(container) {
         const title = document.createElement('h2');
-        title.textContent = 'Equipe';
+        title.textContent = 'Équipe';
         container.appendChild(title);
 
         if (!game || !game.state || !game.state.party || game.state.party.length === 0) {
             const empty = document.createElement('p');
-            empty.textContent = 'Aucun Pokemon dans l\'equipe.';
+            empty.textContent = 'Aucun Pokémon dans l\'équipe.';
             empty.style.color = '#888';
             empty.style.textAlign = 'center';
             container.appendChild(empty);
@@ -824,7 +824,7 @@ const UI = {
     // -- Pokedex Tab --
     _renderPokedexTab(container) {
         const title = document.createElement('h2');
-        title.textContent = 'Pokedex';
+        title.textContent = 'Pokédex';
         container.appendChild(title);
 
         if (!game || !game.state) return;
@@ -909,8 +909,8 @@ const UI = {
 
         const stats = [
             { label: 'Argent', value: game.state.money + ' $' },
-            { label: 'Pokedex (vus)', value: game.state.pokedexSeen.size + '' },
-            { label: 'Pokedex (captures)', value: game.state.pokedexCaught.size + '' },
+            { label: 'Pokédex (vus)', value: game.state.pokedexSeen.size + '' },
+            { label: 'Pokédex (capturés)', value: game.state.pokedexCaught.size + '' },
             { label: 'Badges', value: game.state.badges.length + ' / 8' },
             { label: 'Temps de jeu', value: this._formatPlayTime(game.state.playTime || 0) },
         ];
@@ -1241,7 +1241,7 @@ const UI = {
                 if (!game.state.bag[itemId]) game.state.bag[itemId] = 0;
                 game.state.bag[itemId]++;
                 AudioSystem.playSfx('select');
-                this.showNotification(itemData.name + ' achete !');
+                this.showNotification(itemData.name + ' acheté !');
                 this._renderShop();
             });
             rightCol.appendChild(buyBtn);
@@ -1261,7 +1261,7 @@ const UI = {
         if (entries.length === 0) {
             const empty = document.createElement('p');
             empty.style.cssText = 'text-align:center;color:#888;margin-top:20px;';
-            empty.textContent = 'Rien a vendre.';
+            empty.textContent = 'Rien à vendre.';
             panel.appendChild(empty);
             return;
         }

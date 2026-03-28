@@ -1222,6 +1222,10 @@ const BattleSystem = {
         // Battle background - top half of canvas
         const battleHeight = ch * 0.55;
 
+        // Fill entire canvas with dark color first to prevent overworld bleed-through
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, cw, ch);
+
         // Sky gradient
         const grad = ctx.createLinearGradient(0, 0, 0, battleHeight);
         grad.addColorStop(0, '#87CEEB');
@@ -1348,6 +1352,7 @@ const BattleSystem = {
                     game.state.badges.push(badgeIndex);
                 }
                 game.state.storyFlags['badge_' + badgeIndex] = true;
+                if (typeof UI !== 'undefined' && UI.updateBadges) UI.updateBadges();
             }
         }
 
