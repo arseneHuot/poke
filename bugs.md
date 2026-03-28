@@ -174,7 +174,7 @@ if (enemyFlinched) { ... }
 ---
 
 ## Bug #12 - Enemy Pokémon sprite off-screen in battle on sub-960px viewports
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Major
 **File:** js/battle.js, css/style.css
 

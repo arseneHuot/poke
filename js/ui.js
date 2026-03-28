@@ -590,12 +590,16 @@ const UI = {
         const statsDiv = document.createElement('div');
         statsDiv.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px;';
 
-        const statLabels = { hp: 'PV', atk: 'Attaque', def: 'Defense', spatk: 'Atq. Spe.', spdef: 'Def. Spe.', spd: 'Vitesse' };
+        const statLabels = { hp: 'PV', atk: 'Attaque', def: 'Défense', spatk: 'Atq. Spé.', spdef: 'Déf. Spé.', spd: 'Vitesse' };
         if (pokemon.stats) {
             Object.entries(statLabels).forEach(([key, label]) => {
                 const statRow = document.createElement('div');
                 statRow.style.cssText = 'font-size:12px;color:#ccc;';
-                statRow.textContent = label + ': ' + pokemon.stats[key];
+                if (key === 'hp') {
+                    statRow.textContent = label + ': ' + pokemon.currentHp + ' / ' + pokemon.stats[key];
+                } else {
+                    statRow.textContent = label + ': ' + pokemon.stats[key];
+                }
                 statsDiv.appendChild(statRow);
             });
         }

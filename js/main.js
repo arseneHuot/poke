@@ -35,6 +35,19 @@ const game = {
                 requestAnimationFrame((t) => this.loop(t));
             }
         });
+
+        // Responsive viewport scaling
+        this._scaleGame();
+        window.addEventListener('resize', () => this._scaleGame());
+    },
+
+    _scaleGame() {
+        const container = document.getElementById('game-container');
+        const scaleX = window.innerWidth / 960;
+        const scaleY = window.innerHeight / 640;
+        const scale = Math.min(1, scaleX, scaleY);
+        container.style.transform = `scale(${scale})`;
+        container.style.transformOrigin = 'center center';
     },
 
     // --------------------------------------------------------
