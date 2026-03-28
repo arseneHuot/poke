@@ -138,6 +138,10 @@ const WorldData = {
                   dialogue: 'sign_borgo' },
                 { id: 'villager1', type: 'villager', x: 14, y: 20, dir: DIR.LEFT, name: 'Habitant',
                   dialogue: 'villager_borgo1' },
+                { id: 'villager_borgo2', type: 'villager', x: 25, y: 18, dir: DIR.DOWN, name: 'Vieille dame',
+                  dialogue: 'villager_borgo2' },
+                { id: 'villager_borgo3', type: 'villager', x: 12, y: 26, dir: DIR.RIGHT, name: 'Garçon',
+                  dialogue: 'villager_borgo3' },
             ],
             warps: [
                 { x: 20, y: 0, targetMap: 'route1', targetX: 20, targetY: 38 },
@@ -155,6 +159,15 @@ const WorldData = {
         for (let x = 0; x < w; x++) { tiles[0][x] = TILE.WALL; tiles[h-1][x] = TILE.WALL; }
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.WALL; tiles[y][w-1] = TILE.WALL; }
         tiles[h-1][5] = TILE.DOOR;
+        // Furniture
+        tiles[1][2] = TILE.BOOKSHELF;
+        tiles[1][3] = TILE.BOOKSHELF;
+        tiles[4][7] = TILE.TABLE;
+        tiles[4][8] = TILE.TABLE;
+        tiles[5][4] = TILE.RUG;
+        tiles[5][5] = TILE.RUG;
+        tiles[6][4] = TILE.RUG;
+        tiles[6][5] = TILE.RUG;
 
         this.maps['player_house'] = {
             id: 'player_house', name: 'Maison', width: w, height: h, tiles,
@@ -174,9 +187,14 @@ const WorldData = {
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.WALL; tiles[y][w-1] = TILE.WALL; }
         tiles[h-1][8] = TILE.DOOR;
 
-        // Lab equipment (walls as tables)
-        this._fillRect(tiles, 3, 2, 4, 2, TILE.WALL);
-        this._fillRect(tiles, 11, 2, 4, 2, TILE.WALL);
+        // Lab equipment
+        this._fillRect(tiles, 3, 2, 4, 2, TILE.TABLE);
+        this._fillRect(tiles, 11, 2, 4, 2, TILE.TABLE);
+        // Bookshelves along back wall
+        tiles[1][2] = TILE.BOOKSHELF;
+        tiles[1][8] = TILE.BOOKSHELF;
+        tiles[1][9] = TILE.BOOKSHELF;
+        tiles[1][15] = TILE.BOOKSHELF;
 
         this.maps['prof_lab'] = {
             id: 'prof_lab', name: 'Laboratoire du Prof. Oliva', width: w, height: h, tiles,
@@ -748,6 +766,12 @@ const WorldData = {
                     { id: 33, level: 37 }, { id: 55, level: 37 }, { id: 25, level: 38 }, { id: 56, level: 40 }
                   ], defeated: false, reward: 4800, badge: 5, storyReq: 'badge_4' },
                 { id: 'sign_volcan', type: 'sign', x: 18, y: 26, dialogue: 'sign_volcan' },
+                { id: 'villager_volcan1', type: 'villager', x: 24, y: 20, dir: DIR.LEFT, name: 'Forgeron',
+                  dialogue: 'villager_volcan1' },
+                { id: 'villager_volcan2', type: 'villager', x: 14, y: 14, dir: DIR.DOWN, name: 'Randonneur',
+                  dialogue: 'villager_volcan2' },
+                { id: 'villager_volcan3', type: 'villager', x: 30, y: 26, dir: DIR.UP, name: 'Fillette',
+                  dialogue: 'villager_volcan3' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'desert_route', targetX: 20, targetY: 1 },
@@ -838,6 +862,12 @@ const WorldData = {
                     { id: 41, level: 40 }, { id: 84, level: 41 }, { id: 28, level: 42 }, { id: 42, level: 44 }
                   ], defeated: false, reward: 5200, badge: 6, storyReq: 'badge_5' },
                 { id: 'sign_glacia', type: 'sign', x: 18, y: 26, dialogue: 'sign_glacia' },
+                { id: 'villager_glacia1', type: 'villager', x: 28, y: 20, dir: DIR.LEFT, name: 'Patineuse',
+                  dialogue: 'villager_glacia1' },
+                { id: 'villager_glacia2', type: 'villager', x: 12, y: 16, dir: DIR.RIGHT, name: 'Scientifique',
+                  dialogue: 'villager_glacia2' },
+                { id: 'villager_glacia3', type: 'villager', x: 24, y: 28, dir: DIR.UP, name: 'Enfant',
+                  dialogue: 'villager_glacia3' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route6', targetX: 20, targetY: 1 },
@@ -929,6 +959,12 @@ const WorldData = {
                     { id: 66, level: 46 }, { id: 111, level: 47 }, { id: 89, level: 48 }, { id: 136, level: 48 }, { id: 67, level: 50 }
                   ], defeated: false, reward: 6000, badge: 7, storyReq: 'badge_6' },
                 { id: 'sign_abyss', type: 'sign', x: 18, y: 26, dialogue: 'sign_abyss' },
+                { id: 'villager_abyss1', type: 'villager', x: 26, y: 18, dir: DIR.DOWN, name: 'Mystique',
+                  dialogue: 'villager_abyss1' },
+                { id: 'villager_abyss2', type: 'villager', x: 14, y: 24, dir: DIR.RIGHT, name: 'Garde',
+                  dialogue: 'villager_abyss2' },
+                { id: 'villager_abyss3', type: 'villager', x: 30, y: 28, dir: DIR.LEFT, name: 'Vieux sage',
+                  dialogue: 'villager_abyss3' },
             ],
             warps: [
                 { x: 20, y: h-1, targetMap: 'route7', targetX: 20, targetY: 1 },

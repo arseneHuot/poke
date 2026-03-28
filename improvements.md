@@ -133,7 +133,7 @@
 
 - ~~**City entrance signs**~~ **Done (2026-03-28)**: Added sign tiles and sign NPCs with city description dialogues to Porto, Volcania, Glacia, Abyssia, and Pokémon League entrances. Each sign shows the city name and a brief description.
 
-- **More NPCs with flavor dialogue per city**: Most cities only have 2-3 NPCs. Adding 2-3 more ambient NPCs per city with short flavor text about the city's theme/lore would make the world feel more populated and alive.
+- ~~**More NPCs with flavor dialogue per city**~~ **Done (2026-03-28)**: Added 14 new villager NPCs across 4 cities: Borgo (+2), Volcania (+3), Glacia (+3), Abyssia (+3). Each NPC has unique French dialogue reflecting the city's theme and lore.
 
 ### Routes / Environment
 
@@ -145,4 +145,4 @@
 
 - ~~**Gym visual differentiation**~~ **Done (2026-03-28)**: Added `TILE.GYM_BUILDING` (26) tile type with red roof stripe and gold badge star. All 8 gym buildings now use this tile, making them visually distinct from regular buildings while still using the city's theme colors.
 
-- **Interior furniture and detail**: Interior maps (player house, lab) are bare floors with NPCs. Adding simple furniture tiles — tables, shelves, computers, rugs — would make interiors feel like real rooms.
+- ~~**Interior furniture and detail**~~ **Done (2026-03-28)**: Added 3 new tile types (TABLE, RUG walkable, BOOKSHELF with colored book spines). Player house now has bookshelves, dining table, and a red rug. Lab tables upgraded from WALL to TABLE tiles, bookshelves added along the back wall.

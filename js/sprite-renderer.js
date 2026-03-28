@@ -1273,6 +1273,52 @@ const SpriteRenderer = {
                 ctx.fill();
                 break;
 
+            case TILE.TABLE:
+                ctx.fillStyle = '#B0A090';
+                ctx.fillRect(x, y, T, T);
+                // Table top
+                ctx.fillStyle = '#8B6914';
+                ctx.fillRect(x + 4, y + 6, 24, 16);
+                ctx.fillStyle = '#A0782A';
+                ctx.fillRect(x + 5, y + 7, 22, 14);
+                // Legs
+                ctx.fillStyle = '#6B4E14';
+                ctx.fillRect(x + 6, y + 22, 3, 6);
+                ctx.fillRect(x + 23, y + 22, 3, 6);
+                break;
+
+            case TILE.RUG:
+                ctx.fillStyle = '#B0A090';
+                ctx.fillRect(x, y, T, T);
+                // Rug with pattern
+                ctx.fillStyle = '#8B3A3A';
+                ctx.fillRect(x + 2, y + 2, T - 4, T - 4);
+                ctx.fillStyle = '#A04A4A';
+                ctx.fillRect(x + 4, y + 4, T - 8, T - 8);
+                ctx.fillStyle = '#C06060';
+                ctx.fillRect(x + 8, y + 8, T - 16, T - 16);
+                break;
+
+            case TILE.BOOKSHELF:
+                ctx.fillStyle = '#B0A090';
+                ctx.fillRect(x, y, T, T);
+                // Shelf frame
+                ctx.fillStyle = '#5A4020';
+                ctx.fillRect(x + 2, y + 2, 28, 28);
+                // Shelves
+                ctx.fillStyle = '#6B5030';
+                ctx.fillRect(x + 3, y + 10, 26, 2);
+                ctx.fillRect(x + 3, y + 20, 26, 2);
+                // Books (colored spines)
+                const bookColors = ['#E53935', '#1E88E5', '#43A047', '#F9A825', '#8E24AA'];
+                for (let i = 0; i < 4; i++) {
+                    ctx.fillStyle = bookColors[i % bookColors.length];
+                    ctx.fillRect(x + 5 + i * 6, y + 3, 4, 7);
+                    ctx.fillStyle = bookColors[(i + 2) % bookColors.length];
+                    ctx.fillRect(x + 5 + i * 6, y + 13, 4, 7);
+                }
+                break;
+
             case TILE.GYM_BUILDING: {
                 const gbColors = theme && theme.building ? theme.building : { border: '#B8860B', fill: '#8B6914' };
                 ctx.fillStyle = gbColors.border;

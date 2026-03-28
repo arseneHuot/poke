@@ -28,6 +28,47 @@ const DIALOGUES = {
         { name: "Assistant", text: "Le professeur étudie les Pokémon de la région de Novara. Il y en a 150 espèces !" }
     ],
 
+    // Borgo extras
+    villager_borgo2: [
+        { name: "Vieille dame", text: "Borgo est un village paisible. Parfait pour élever des Pokémon !" }
+    ],
+    villager_borgo3: [
+        { name: "Garçon", text: "Un jour, je serai un grand Dresseur comme toi ! Tu as déjà combien de badges ?" }
+    ],
+
+    // Volcania
+    villager_volcan1: [
+        { name: "Forgeron", text: "Le volcan voisin chauffe nos forges jour et nuit. Nos outils sont les meilleurs de Novara !" }
+    ],
+    villager_volcan2: [
+        { name: "Randonneur", text: "Attention aux Pokémon Feu dans les environs. Ils sont puissants mais imprévisibles." }
+    ],
+    villager_volcan3: [
+        { name: "Fillette", text: "Il fait toujours chaud ici ! Même en hiver, on n'a jamais froid à Volcania." }
+    ],
+
+    // Glacia
+    villager_glacia1: [
+        { name: "Patineuse", text: "Le lac gelé au nord est parfait pour patiner ! Les Pokémon Glace adorent s'y retrouver." }
+    ],
+    villager_glacia2: [
+        { name: "Scientifique", text: "Nos recherches montrent que le permafrost de Glacia contient des fossiles anciens." }
+    ],
+    villager_glacia3: [
+        { name: "Enfant", text: "Brrr ! Tu n'as pas froid ? Moi, j'ai l'habitude, je suis née ici !" }
+    ],
+
+    // Abyssia
+    villager_abyss1: [
+        { name: "Mystique", text: "Abyssia cache bien des secrets... Les ténèbres ne sont pas toujours maléfiques." }
+    ],
+    villager_abyss2: [
+        { name: "Garde", text: "Au-delà de cette ville, la Route de la Victoire attend. Seuls les plus forts y survivent." }
+    ],
+    villager_abyss3: [
+        { name: "Vieux sage", text: "On dit que le Champion Drake maîtrise des Pokémon que peu de dresseurs ont jamais vus." }
+    ],
+
     // === PROFESSOR STORYLINE ===
     story_professor_intro: [
         { name: "Prof. Oliva", text: "Oh, te voilà ! Je suis le Professeur Oliva, spécialiste des Pokémon de Novara." },
