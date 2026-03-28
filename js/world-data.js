@@ -39,6 +39,17 @@ const WorldData = {
     getMap(mapId) {
         if (!this.maps[mapId] && this._generators && this._generators[mapId]) {
             this._generators[mapId]();
+            // Restore defeated trainer flags on newly lazy-loaded NPCs
+            if (typeof game !== 'undefined' && game.state && game.state.defeatedTrainers && game.state.defeatedTrainers.size > 0) {
+                const newMap = this.maps[mapId];
+                if (newMap && newMap.npcs) {
+                    for (const npc of newMap.npcs) {
+                        if (npc.id && game.state.defeatedTrainers.has(npc.id)) {
+                            npc.defeated = true;
+                        }
+                    }
+                }
+            }
         }
         return this.maps[mapId];
     },
@@ -294,6 +305,7 @@ const WorldData = {
 
         // GYM 1 - Normal type
         this._fillRect(tiles, 34, 14, 8, 8, TILE.GYM_BUILDING);
+        this._fillRect(tiles, 35, 15, 6, 6, TILE.GYM_FLOOR);
         tiles[21][38] = TILE.DOOR;
 
         // Houses

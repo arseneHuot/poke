@@ -1021,32 +1021,39 @@ const BattleSystem = {
             }
         });
 
-        // Trainer battle: check if more pokemon
-        if (this.state.isTrainer && this.state.trainerNpc) {
-            this.state.trainerPokemonIndex++;
-            const nextPkmn = this.state.trainerNpc.party[this.state.trainerPokemonIndex];
-            if (nextPkmn && nextPkmn.currentHp > 0) {
-                this.state.enemyPokemon = nextPkmn;
-                this.state.enemyStatStages = this._resetStatStages();
-                this.state.hpAnimEnemy = nextPkmn.currentHp;
-                this.state.enemyAnim = { x: 0, y: 0, alpha: 1, shake: 0 };
-                this._queueMessage(`${this.state.trainerNpc.name} envoie ${nextPkmn.nickname || nextPkmn.name} !`);
-                this._processMessageQueue(() => {
-                    this._updateUI();
-                    this._showActions();
-                });
-                return;
+        // After exp messages (and optional evolution), continue or end the battle
+        const continueAfterExp = () => {
+            // Trainer battle: check if more pokemon
+            if (this.state.isTrainer && this.state.trainerNpc) {
+                this.state.trainerPokemonIndex++;
+                const nextPkmn = this.state.trainerNpc.party[this.state.trainerPokemonIndex];
+                if (nextPkmn && nextPkmn.currentHp > 0) {
+                    this.state.enemyPokemon = nextPkmn;
+                    this.state.enemyStatStages = this._resetStatStages();
+                    this.state.hpAnimEnemy = nextPkmn.currentHp;
+                    this.state.enemyAnim = { x: 0, y: 0, alpha: 1, shake: 0 };
+                    this._queueMessage(`${this.state.trainerNpc.name} envoie ${nextPkmn.nickname || nextPkmn.name} !`);
+                    this._processMessageQueue(() => {
+                        this._updateUI();
+                        this._showActions();
+                    });
+                    return;
+                }
+
+                // Trainer defeated
+                this._queueMessage(`Vous avez battu ${this.state.trainerNpc.name} !`);
+                if (this.state.trainerNpc.reward) {
+                    game.state.money = (game.state.money || 0) + this.state.trainerNpc.reward;
+                    this._queueMessage(`Vous recevez ${this.state.trainerNpc.reward}₽ !`);
+                }
             }
 
-            // Trainer defeated
-            this._queueMessage(`Vous avez battu ${this.state.trainerNpc.name} !`);
-            if (this.state.trainerNpc.reward) {
-                game.state.money = (game.state.money || 0) + this.state.trainerNpc.reward;
-                this._queueMessage(`Vous recevez ${this.state.trainerNpc.reward}₽ !`);
-            }
-        }
+            this._processMessageQueue(() => {
+                this.endBattle('win');
+            });
+        };
 
-        // Handle pending evolution
+        // Handle pending evolution before continuing, then proceed
         this._processMessageQueue(() => {
             if (this.state.pendingEvolve) {
                 const evo = this.state.pendingEvolve;
@@ -1073,14 +1080,12 @@ const BattleSystem = {
                             const newName = this.state.playerPokemon.name;
                             this._queueMessage(`${oldName} a évolué en ${newName} !`);
                             this.state.pendingEvolve = null;
-                            this._processMessageQueue(() => {
-                                this.endBattle('win');
-                            });
+                            this._processMessageQueue(() => continueAfterExp());
                         }
                     }, 200);
                 });
             } else {
-                this.endBattle('win');
+                continueAfterExp();
             }
         });
     },
