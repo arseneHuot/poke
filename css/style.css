@@ -402,6 +402,9 @@ body {
     border-radius: 8px;
     transition: all 0.2s;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .move-btn:hover {
