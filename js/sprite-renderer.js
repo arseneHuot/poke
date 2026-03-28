@@ -4,17 +4,25 @@
 
 const SpriteRenderer = {
     cache: {},
+    _cacheOrder: [],
+    _maxCacheSize: 200,
 
     // Draw a Pokemon sprite on canvas
     drawPokemon(ctx, pokemonId, x, y, size, facing = 'front', isShiny = false) {
         const key = `${pokemonId}_${size}_${facing}_${isShiny}`;
         if (!this.cache[key]) {
+            // Evict oldest entry if cache is full
+            if (this._cacheOrder.length >= this._maxCacheSize) {
+                const evict = this._cacheOrder.shift();
+                delete this.cache[evict];
+            }
             const canvas = document.createElement('canvas');
             canvas.width = size;
             canvas.height = size;
             const sctx = canvas.getContext('2d');
             this._generatePokemonSprite(sctx, pokemonId, size, facing, isShiny);
             this.cache[key] = canvas;
+            this._cacheOrder.push(key);
         }
         ctx.drawImage(this.cache[key], x, y);
     },

@@ -1008,13 +1008,27 @@ const BattleSystem = {
             if (this.state.pendingEvolve) {
                 const evo = this.state.pendingEvolve;
                 const oldName = this.state.playerPokemon.nickname || this.state.playerPokemon.name;
-                AudioSystem.playSfx('evolve');
-                evolvePokemon(this.state.playerPokemon, evo.to);
-                const newName = this.state.playerPokemon.name;
-                this._queueMessage(`${oldName} évolue en ${newName} !`);
-                this.state.pendingEvolve = null;
+                this._queueMessage(`Hein ?! ${oldName} évolue !`);
                 this._processMessageQueue(() => {
-                    this.endBattle('win');
+                    // Flash screen effect during evolution
+                    AudioSystem.playSfx('evolve');
+                    this.state.evolveFlash = 1.0;
+                    let flashes = 0;
+                    const flashInterval = setInterval(() => {
+                        flashes++;
+                        this.state.evolveFlash = (flashes % 2 === 0) ? 0.8 : 0;
+                        if (flashes >= 6) {
+                            clearInterval(flashInterval);
+                            this.state.evolveFlash = 0;
+                            evolvePokemon(this.state.playerPokemon, evo.to);
+                            const newName = this.state.playerPokemon.name;
+                            this._queueMessage(`${oldName} a évolué en ${newName} !`);
+                            this.state.pendingEvolve = null;
+                            this._processMessageQueue(() => {
+                                this.endBattle('win');
+                            });
+                        }
+                    }, 200);
                 });
             } else {
                 this.endBattle('win');
@@ -1302,6 +1316,12 @@ const BattleSystem = {
             ctx.beginPath();
             ctx.arc(ca.x, ca.y, 3, 0, Math.PI * 2);
             ctx.fill();
+        }
+
+        // Evolution flash overlay
+        if (this.state.evolveFlash > 0) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.state.evolveFlash})`;
+            ctx.fillRect(0, 0, cw, ch);
         }
     },
 

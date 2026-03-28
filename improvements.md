@@ -17,7 +17,7 @@
 - **Catch rate feedback**: When a Poké Ball fails, the shake-count messages do exist ("Oh non ! Le Pokémon s'est libéré !", "Mince ! C'était presque !", "Argh ! Si près du but !"), but there is no success fanfare or confetti effect when a catch succeeds — just a silent party addition message. A visual/audio celebration would improve the feel.
 - ~~**No "Gotcha!" catch success message**~~ **Done (2026-03-28)**: Battle system already shows `"Gotcha ! {name} est capturé !"` on successful catch.
 - ~~**No experience bar animation**~~ **Done (2026-03-28)**: `.xp-fill` already has `transition: width 0.5s ease` in CSS, providing smooth XP bar animation.
-- **No evolution animation/sequence**: If a Pokemon evolves after battle, consider adding a visual evolution sequence rather than a silent update.
+- ~~**No evolution animation/sequence**~~ **Done (2026-03-28)**: Added evolution flash sequence — white screen pulses 3 times over 1.2s with "Hein ?! X évolue !" message before the transformation completes.
 - ~~**Trainers need post-defeat dialogue**~~ **Done (2026-03-28)**: All 8 gym leaders now have `altDialogue` and `gym{N}_defeated` entries. Re-interacting with a defeated gym leader shows their post-defeat dialogue instead of re-triggering the battle. See Bug #26 fix.
 - **Borgo Pokémon Center is a bare tile**: The Borgo PC tile (`TILE.PC` at x=8, y=17) sits alone on the path with no building frame and no nurse NPC (the other cities all have a proper Pokémon Center building). The `_healParty()` path does restore HP and PP correctly (Bug #22 fixed), but the visual presentation is inconsistent with the rest of the game. Borgo should have a proper Center building with a nurse NPC using the same `nurse_heal` dialogue.
 
@@ -53,7 +53,7 @@
 
 - ~~**Menu cannot be closed with Escape when sub-view is active**~~ **Done (2026-03-28)**: Escape correctly closes the menu from any tab (Equipe, Sac, Pokédex, Dresseur, Sauvegarder). Bug #29 fix fully verified.
 - ~~**Save confirmation UX**~~ **Done (2026-03-28)**: Notification toast renders correctly above the menu overlay (z-index:80 vs menu z-index:60). Save notification is fully visible during the menu. Bug #11 closed.
-- **Arrow keys don't register reliably for movement**: Key-down/key-up events are processed in a single frame, making held-key movement unreliable unless focus is on the canvas. Clicking the game canvas before using arrow keys is required.
+- ~~**Arrow keys don't register reliably for movement**~~ **Done (2026-03-28)**: Added `e.preventDefault()` for arrow keys and spacebar in the window keydown handler, preventing browser scrolling from stealing focus.
 - ~~**Party HUD dots (top-right) not visible for badges**~~ **Done (2026-03-28)**: Unearned badge slots are now square with a faint ✦ icon; earned badges are round with gold gradient and ★ icon. Visually distinct from party HP dots.
 - **No loading indicator between maps**: Map transitions use a fade to black but there is no spinner or progress indicator. This is fine for small maps but could be extended for feel.
 - ~~**Pokédex entries not clickable**~~ **Done (2026-03-28)**: Clicking a seen/caught Pokédex entry opens a detail panel with sprite, type badges, French description, and base stat bars with color coding. Back button returns to grid.
@@ -64,13 +64,13 @@
 
 ## Sound / Music
 
-- **No sound feedback on dialogue advance**: A subtle "blip" sound when advancing dialogue text (similar to classic Pokémon games) would add to the atmosphere.
-- **No sound on menu navigation**: Tab clicks and button hovers could have light UI sounds.
+- ~~**No sound feedback on dialogue advance**~~ **Done (2026-03-28)**: Added `text_blip` SFX (1200Hz, 30ms square wave) — plays on every `advanceDialogue()` call.
+- ~~**No sound on menu navigation**~~ **Done (2026-03-28)**: Menu tab clicks now play `menu_tab` SFX (600Hz, 50ms triangle wave), distinct from the general `select` sound.
 - ~~**Battle music restarts on every battle**~~ **Done (2026-03-28)**: `AudioSystem.playMusic()` already checks `if (this.currentTrack === trackName) return;` — same track is not restarted.
 
 ---
 
 ## Performance
 
-- **Sprite cache uses `document.createElement('canvas')` without size limits**: The sprite cache in `SpriteRenderer` grows indefinitely as new Pokémon are encountered. For large Pokédex sizes this could consume significant memory. Consider a max-size LRU eviction policy.
+- ~~**Sprite cache LRU**~~ **Done (2026-03-28)**: Added `_cacheOrder` array and `_maxCacheSize: 200` limit — oldest entries are evicted when cache is full.
 - **`WorldData.init()` generates all maps at startup**: All 17+ maps are generated synchronously at game start. For a larger game this could cause noticeable startup lag. Consider lazy-loading maps on first visit.

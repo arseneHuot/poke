@@ -178,6 +178,8 @@ const AudioSystem = {
                     setTimeout(() => this._beep(400 + i * 100, 0.15, 'triangle', 0.08), i * 100);
                 }
             },
+            text_blip: () => this._beep(1200, 0.03, 'square', 0.04),
+            menu_tab: () => this._beep(600, 0.05, 'triangle', 0.08),
             bump: () => this._beep(200, 0.08, 'square', 0.08),
             door: () => { this._beep(300, 0.06, 'sine', 0.1); setTimeout(() => this._beep(400, 0.06, 'sine', 0.1), 60); },
             badge: () => {

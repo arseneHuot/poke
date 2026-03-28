@@ -193,6 +193,7 @@ const UI = {
 
     advanceDialogue() {
         if (!this.dialogue.active) return;
+        AudioSystem.playSfx('text_blip');
 
         // If typewriter still going, finish it immediately
         if (!this.dialogue.typewriterDone) {
@@ -442,7 +443,7 @@ const UI = {
             btn.addEventListener('click', () => {
                 this.menu.currentTab = tab.id;
                 this._renderMenu();
-                AudioSystem.playSfx('select');
+                AudioSystem.playSfx('menu_tab');
             });
             tabBar.appendChild(btn);
         });

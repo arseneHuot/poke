@@ -48,8 +48,10 @@ const GameEngine = {
 
         this.ctx.imageSmoothingEnabled = false;
 
-        // Input handling
+        // Input handling — prevent default for game keys to avoid page scrolling
+        const gameKeys = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ']);
         window.addEventListener('keydown', (e) => {
+            if (gameKeys.has(e.key)) e.preventDefault();
             this.keysDown[e.key] = true;
             this.handleInput(e.key, e);
         });
