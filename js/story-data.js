@@ -167,6 +167,10 @@ const DIALOGUES = {
         { action: 'trainer_battle' }
     ],
 
+    trainer_defeated_generic: [
+        { name: "Dresseur", text: "Tu m'as déjà battu ! Je dois m'entraîner encore..." }
+    ],
+
     // === GYM LEADERS ===
     gym1_dialogue: [
         { name: "Champion Marco", text: "Bienvenue dans l'Arène de Porto City ! Je suis Marco, expert du type Normal." },

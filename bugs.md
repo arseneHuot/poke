@@ -766,3 +766,64 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 **Root cause:** Dialogue state (`inputLocked`, open dialogue queue) is not cleared/reset when the player warps between maps. If the dialogue callback fires after a warp, it uses the last registered speaker/text regardless of current context.
 
 **Found:** 2026-03-28
+
+---
+
+## Bug #44 - Attack menu shown for fainted Pokémon instead of forced switch
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/battle.js
+
+**Description:** When the active Pokémon faints during battle (enemy attacks first and KOs it), the game briefly shows the ATTAQUE move selection menu (listing the fainted Pokémon's moves) instead of immediately forcing a switch to the next alive Pokémon. The player can see moves for a 0 HP Pokémon and must manually click RETOUR → POKÉMON to switch. The forced switch (`_handlePlayerFaint`) does eventually work if the player navigates to it, but the initial display is wrong.
+
+**Steps to reproduce:**
+1. Have 2+ Pokémon in party, with the active one at low HP
+2. Enter a battle where the enemy outspeeds you
+3. Select ATTAQUE and pick a move
+4. Enemy attacks first and KOs your Pokémon
+5. Instead of showing the switch menu, the attack move list appears
+
+**Root cause:** Likely a race condition between `_processMessageQueue` and `_showActions()` in `_checkFaintsAfterTurn`. The faint check runs after the enemy turn, but the message queue callback may call `_showActions()` before `_handlePlayerFaint()` has had a chance to set up the forced switch UI. The `_checkFaintsAfterTurn` at line 916 may not be reached because the earlier faint check at line 884 already returned — but the message queue from `_doEnemyTurn` may still trigger `_showActions` asynchronously.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #45 - Shop overlay not dismissed on map transition / teleport
+**Status:** Fixed (2026-03-28)
+**Priority:** High
+**File:** js/ui.js, js/engine.js
+
+**Description:** If the player has the shop open and the game triggers a map transition (warp, teleport, or any state change that moves to a different map), the shop overlay remains visible on the new map. The shop continues to function (buy/sell) even though the player is no longer near the merchant NPC. This can also cause the shop to appear on top of battle UI if a battle starts while the shop is still open.
+
+**Steps to reproduce:**
+1. Open the shop at any merchant
+2. Without closing it, trigger a map change (e.g., via save/load, teleport, or code)
+3. The shop overlay persists on the new map
+
+**Root cause:** The map transition / warp logic in `engine.js` does not close the shop overlay. There is no `UI.closeShop()` call in the warp handling code. The fix should add `UI.closeShop()` to the warp/map-change handler.
+
+**Found:** 2026-03-28
+
+---
+
+## Bug #46 - Defeated route trainers can be re-battled infinitely
+**Status:** Fixed (2026-03-28)
+**Priority:** Critical
+**File:** js/engine.js (interactWithNPC), js/world.js (trainer NPC definitions)
+
+**Description:** After defeating a route trainer (e.g., "Gamin Thomas" on Route 1), talking to them again immediately triggers a new battle instead of showing a post-defeat dialogue. The trainer IS correctly added to `game.state.defeatedTrainers` and `npc.defeated` is set to `true`, but the re-battle still happens.
+
+**Steps to reproduce:**
+1. Fight and defeat any route trainer (e.g., Gamin Thomas on Route 1)
+2. Talk to the same trainer again
+3. A new battle starts instead of post-defeat dialogue
+
+**Root cause:** In `engine.js:interactWithNPC()`, line 440 checks `if (npc.defeated && npc.altDialogue)` to use the alternate dialogue. However, route trainers do NOT have an `altDialogue` field defined — only gym leaders do (Bug #26 fix only added `altDialogue` to gym leaders). When `altDialogue` is undefined, the check falls through and uses the original `trainer_battle` dialogue, re-triggering the battle.
+
+**Fix:** Either:
+1. Add a generic post-defeat dialogue for all trainers (e.g., "Tu m'as déjà battu !") and set `altDialogue` on all trainer NPCs, OR
+2. Change the check in `interactWithNPC` to also guard against defeated trainers without altDialogue: `if (npc.defeated) { dialogueKey = npc.altDialogue || 'trainer_defeated_generic'; }`
+
+**Found:** 2026-03-28
+

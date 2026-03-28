@@ -435,10 +435,10 @@ const GameEngine = {
             AudioSystem.playSfx('confirm');
         }
 
-        // Resolve dialogue key — defeated trainers use altDialogue; otherwise check altFlag
+        // Resolve dialogue key — defeated trainers use altDialogue or generic; otherwise check altFlag
         let dialogueKey = npc.dialogue;
-        if (npc.defeated && npc.altDialogue) {
-            dialogueKey = npc.altDialogue;
+        if (npc.defeated) {
+            dialogueKey = npc.altDialogue || 'trainer_defeated_generic';
         } else if (npc.altDialogue && npc.altFlag && state.storyFlags[npc.altFlag]) {
             dialogueKey = npc.altDialogue;
         }
@@ -567,7 +567,7 @@ const GameEngine = {
         const state = this.game.state;
         const target = this.warpTarget;
 
-        // Clear any stale dialogue/input state before map transition
+        // Clear any stale dialogue/input/shop state before map transition
         if (typeof UI !== 'undefined') {
             if (UI.dialogue && UI.dialogue.active) {
                 UI.dialogue.active = false;
@@ -578,6 +578,12 @@ const GameEngine = {
                 if (UI.elements && UI.elements.dialogueBox) {
                     UI.elements.dialogueBox.classList.add('hidden');
                 }
+            }
+            if (UI.shop && UI.shop.active && typeof UI.closeShop === 'function') {
+                UI.closeShop();
+            }
+            if (UI.menu && UI.menu.open && typeof UI.closeMenu === 'function') {
+                UI.closeMenu();
             }
         }
         this.inputLocked = false;

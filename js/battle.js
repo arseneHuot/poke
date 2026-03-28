@@ -129,6 +129,8 @@ const BattleSystem = {
             enemyHp.style.width = pct + '%';
             enemyHp.style.backgroundColor = pct > 50 ? '#4CAF50' : pct > 20 ? '#FF9800' : '#F44336';
         }
+        const enemyHpText = document.getElementById('enemy-hp-text');
+        if (enemyHpText) enemyHpText.textContent = `${Math.ceil(Math.max(0, this.state.hpAnimEnemy))}/${ep.stats.hp}`;
 
         // Player info
         const playerName = document.getElementById('player-pokemon-name');
@@ -151,6 +153,16 @@ const BattleSystem = {
     },
 
     _showActions() {
+        // If current Pokémon is fainted, force switch instead of showing actions
+        if (this.state.playerPokemon && this.state.playerPokemon.currentHp <= 0) {
+            const alivePokemon = game.state.party.filter(p => p && p.currentHp > 0);
+            if (alivePokemon.length > 0) {
+                this.state.turnPhase = 'forced_switch';
+                this._showParty();
+                return;
+            }
+        }
+
         const actions = document.getElementById('battle-actions');
         const moves = document.getElementById('battle-moves');
         if (actions) actions.classList.remove('hidden');

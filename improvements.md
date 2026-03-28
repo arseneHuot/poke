@@ -106,3 +106,17 @@
 - ~~**Item descriptions in bag (overworld)**~~ **Done (2026-03-28)**: Already implemented — `.item-desc` div with `itemData.desc` shown for every bag item. Verified in code + CSS.
 
 - ~~**Pokémon detail level/nature display**~~ **Done (2026-03-28)**: Added level, type badges (colored pills), and nature to the party detail view header between the name and sprite.
+
+---
+
+## New Suggestions (2026-03-28 QA session #2)
+
+### Battle
+
+- ~~**Enemy HP numbers in battle**~~ **Done (2026-03-28)**: Added `enemy-hp-text` element and `_updateUI` logic to display current/max HP numerically below the enemy HP bar, matching the player's side.
+
+### UX / UI
+
+- **Fainted Pokémon visual feedback in battle**: When a Pokémon faints, the info panel still shows "0/17" but there's no strong visual cue (e.g., red flash, grey-out of the name panel). A more dramatic faint indication would improve the experience.
+
+- **XP bar in battle victory screen**: After winning a battle, the XP gain message appears but there is no visual XP bar filling animation in the battle UI itself. Adding an animated XP bar below the player's HP bar during battle would give better feedback on leveling progress.
