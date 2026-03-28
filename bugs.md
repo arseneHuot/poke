@@ -367,7 +367,7 @@ Contrast with nurse NPC healing via `UI._healAllPokemon()`, which correctly rest
 ---
 
 ## Bug #23 - Repel items purchasable but unusable
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Major
 **File:** js/ui.js (`_renderBagTab`), js/engine.js (`useRepel`)
 
@@ -386,7 +386,7 @@ Contrast with nurse NPC healing via `UI._healAllPokemon()`, which correctly rest
 ---
 
 ## Bug #24 - Escape Rope (Corde Sortie) has no usage handler
-**Status:** Open
+**Status:** Fixed (2026-03-28)
 **Priority:** Minor
 **File:** js/ui.js, js/constants.js
 

@@ -263,6 +263,12 @@ const UI = {
 
     _healAllPokemon() {
         if (!game || !game.state || !game.state.party) return;
+        // Track last safe heal location for Escape Rope
+        if (typeof GameEngine !== 'undefined') {
+            GameEngine.lastSafeMap = game.state.currentMap;
+            GameEngine.lastSafeX = Math.round(game.state.playerX);
+            GameEngine.lastSafeY = Math.round(game.state.playerY);
+        }
         game.state.party.forEach(pokemon => {
             if (!pokemon) return;
             recalcStats(pokemon);
@@ -673,6 +679,33 @@ const UI = {
             if (itemData.type === 'heal' || itemData.type === 'revive' || itemData.type === 'status' || itemData.type === 'levelup') {
                 row.addEventListener('click', () => {
                     this._showItemUseTarget(itemId);
+                });
+                row.style.cursor = 'pointer';
+            } else if (itemData.type === 'repel') {
+                row.addEventListener('click', () => {
+                    if (!game || !game.state) return;
+                    game.state.bag[itemId]--;
+                    if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
+                    GameEngine.useRepel(itemData.steps || 100);
+                    AudioSystem.playSfx('select');
+                    this.showNotification('Repousse activée pour ' + (itemData.steps || 100) + ' pas !');
+                    this.closeMenu();
+                });
+                row.style.cursor = 'pointer';
+            } else if (itemData.type === 'escape') {
+                row.addEventListener('click', () => {
+                    if (!game || !game.state) return;
+                    const targetMap = GameEngine.lastSafeMap || 'borgo';
+                    const targetX = GameEngine.lastSafeX || 14;
+                    const targetY = GameEngine.lastSafeY || 14;
+                    game.state.bag[itemId]--;
+                    if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
+                    AudioSystem.playSfx('door');
+                    this.showNotification('Vous êtes téléporté à la sécurité !');
+                    this.closeMenu();
+                    GameEngine.warping = true;
+                    GameEngine.warpTarget = { map: targetMap, x: targetX, y: targetY, _arrived: false };
+                    GameEngine.warpFade = 0;
                 });
                 row.style.cursor = 'pointer';
             }

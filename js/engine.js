@@ -248,12 +248,9 @@ const GameEngine = {
             return;
         }
 
-        // Menu key (Escape or X)
+        // Menu key (Escape or X) — handled entirely by ui.js keydown listener
         if (key === 'Escape' || key === 'x' || key === 'X') {
             if (event) event.preventDefault();
-            if (typeof UI !== 'undefined' && UI.openMenu) {
-                UI.openMenu();
-            }
             return;
         }
     },
@@ -415,6 +412,11 @@ const GameEngine = {
     _healParty() {
         const state = this.game.state;
         if (!state.party || state.party.length === 0) return;
+
+        // Track last safe heal location for Escape Rope
+        this.lastSafeMap = state.currentMap;
+        this.lastSafeX = Math.round(state.playerX);
+        this.lastSafeY = Math.round(state.playerY);
 
         if (typeof AudioSystem !== 'undefined') {
             AudioSystem.playSfx('heal');
