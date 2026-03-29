@@ -792,12 +792,12 @@ const BattleSystem = {
         this._hideMenus();
 
         if (item.type === 'ball') {
-            game.state.bag[itemId]--;
             if (this.state.isTrainer) {
                 this._queueMessage(`On ne peut pas capturer le Pokémon d'un dresseur !`);
                 this._executeTurn({ type: 'item' });
                 return;
             }
+            game.state.bag[itemId]--;
             this._executeCatch(itemId);
         } else if (item.type === 'heal') {
             game.state.bag[itemId]--;
@@ -1203,6 +1203,7 @@ const BattleSystem = {
         const pp = this.state.playerPokemon;
         AudioSystem.playSfx('faint');
         this.state.playerAnim.alpha = 0;
+        this._hideMenus(); // Immediately hide UI so stale move list is not shown during faint message
         this._queueMessage(`${pp.nickname || pp.name} est K.O. !`);
 
         // Check for other alive pokemon

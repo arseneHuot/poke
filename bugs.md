@@ -1392,3 +1392,34 @@ const statusCured = pokemon.status && (
 ```
 
 **Found:** 2026-03-29
+
+
+## Bug #76 - Poké Ball consumed when thrown at trainer Pokémon
+**Status:** Fixed (2026-03-29)
+**Priority:** Medium
+**File:** js/battle.js (~line 794)
+
+**Description:** When the player throws a Poké Ball (or any ball) during a trainer battle, the ball is removed from the bag even though it cannot be used. The game shows the correct "cannot catch trainer's Pokémon" message, but the ball count still decreases.
+
+**Root cause:** `game.state.bag[itemId]--` is executed before the `isTrainer` check on line 796. The ball is consumed before the guard can prevent it.
+
+**Fix:** Moved the `isTrainer` guard before `game.state.bag[itemId]--` in `selectItem`. If trainer battle, queue message and execute turn (enemy attacks) without decrementing the ball count.
+
+**Steps to reproduce:** Enter a trainer battle, open SAC, use any Poké Ball.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #77 - Forced switch screen shows stale move list after player Pokémon faints
+**Status:** Fixed (2026-03-29)
+**Priority:** Medium
+**File:** js/battle.js
+
+**Description:** When a player's Pokémon faints during a trainer battle, the forced switch screen should show party member buttons. Instead, the battle-moves panel continues showing the previous turn's move list (with a RETOUR button) until `_showParty()` is called via the `_processMessageQueue` setTimeout chain.
+
+**Root cause:** `_processMessageQueue` uses setTimeout (1500ms delay) before calling the callback that sets `turnPhase = 'forced_switch'` and calls `_showParty()`. During the 1500ms window, the UI still shows the old move selection.
+
+**Fix:** Added `this._hideMenus()` at the start of `_handlePlayerFaint()` so menus are immediately cleared when a faint is detected, before the 1500ms message queue runs.
+
+**Found:** 2026-03-29
