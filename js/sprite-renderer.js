@@ -949,11 +949,22 @@ const SpriteRenderer = {
         ctx.fillStyle = colors.hair;
         this._roundRect(ctx, 8*s, (1+bobY)*s, 16*s, 6*s, 3*s);
 
-        // Eyes
-        if (direction !== DIR.UP) {
+        // Face details based on direction
+        if (direction === DIR.DOWN || direction === DIR.RIGHT) {
+            // Front/right: eyes and mouth
             ctx.fillStyle = '#2C1810';
             ctx.fillRect(12*s, (7+bobY)*s, 2*s, 2*s);
             ctx.fillRect(18*s, (7+bobY)*s, 2*s, 2*s);
+            ctx.fillStyle = colors.skin === '#FFE4C4' ? '#CC8877' : '#AA6655';
+            ctx.fillRect(14*s, (11+bobY)*s, 3*s, 1*s);
+        } else if (direction === DIR.UP) {
+            // Back: hair covers face
+            ctx.fillStyle = colors.hair;
+            this._roundRect(ctx, 10*s, (5+bobY)*s, 12*s, 7*s, 3*s);
+        } else {
+            // Left: side view, one eye
+            ctx.fillStyle = '#2C1810';
+            ctx.fillRect(11*s, (7+bobY)*s, 2*s, 2*s);
         }
 
         ctx.restore();

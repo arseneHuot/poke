@@ -261,3 +261,19 @@
 - ~~**Antidote/status item party indicator**~~ **Done (2026-03-29)**: In `_showItemUseTarget`, each Pokémon row now checks eligibility before rendering. Ineligible Pokémon are shown at 40% opacity with no cursor and a red reason label (e.g. "PV max", "K.O.", "Aucun effet", "Nv. max"). Click handlers are only attached to eligible targets.
 
 - ~~**Bag item use from party tab**~~ **Done (2026-03-29)**: Added "Utiliser un objet" section at the bottom of `_showPokemonDetail`. Shows buttons for all usable bag items (heal/revive/status/levelup). Ineligible items are shown at 40% opacity and non-clickable. Clicking an eligible item applies the effect inline, decrements the bag, shows a notification, and refreshes the detail view after 900ms.
+
+---
+
+## New Suggestions (2026-03-29 QA session #7 — Visual Polish & Gameplay Flow)
+
+### Sprites / Visual
+
+- ~~**Player sprite walking animation**~~ **Done (2026-03-29)**: Already implemented — `drawPlayer` uses `frame`-based `bobY`, `legOffset`, and `armSwing` for bounce, leg alternation, and arm swing. Only activates during movement (`walkFrame = this.moving ? frame : 0`). Verified in code.
+
+- ~~**NPC facing direction visual**~~ **Done (2026-03-29)**: NPC `drawNPC` now renders direction-specific face details — front/right shows eyes+mouth, back (UP) shows hair covering the face, left shows single side-view eye. NPCs now visually face the direction they're looking.
+
+### Gameplay Flow
+
+- ~~**Location name popup duration too short**~~ **Done (2026-03-29)**: Already implemented — `showLocationName` uses 3-second timeout with 0.5s CSS opacity transition. Verified in code.
+
+- **No "Continue" prompt between battle messages**: Battle messages auto-advance on a 1.5s timer. Adding a ▼ indicator and requiring Space/click to advance would give players control over battle pacing, especially for reading damage numbers and status messages.
