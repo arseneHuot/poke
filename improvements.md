@@ -197,7 +197,7 @@
 
 - ~~**No feedback when using item on ineligible Pokémon**~~ **Done (2026-03-29)**: Already implemented — `_useItemOnPokemon` shows `"X a déjà tous ses PV !"` for full-HP targets, `"X est K.O. ! Utilisez un Rappel."` for fainted Pokémon, and `"Cela n'aura aucun effet."` for mismatched status cures. Verified in code.
 
-- **No confirmation after manual save**: Clicking "Sauvegarder maintenant" in the Save tab succeeds silently. No notification or visual feedback is shown to confirm the save completed. A brief notification (e.g. "Partie sauvegardée !") would reassure the player.
+- ~~**No confirmation after manual save**~~ **Done (2026-03-29)**: `_renderSaveTab` click handler calls `this.showNotification('Partie sauvegardée !')` and changes button text to `'Sauvegarde OK !'` for 2s after a manual save. Verified in code at ui.js line 1188.
 
 ### Maps / World
 

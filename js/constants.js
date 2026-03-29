@@ -125,7 +125,7 @@ const ITEMS = {
     maxrevive: { name: 'Rappel Max', desc: 'Ranime un Pokémon KO (100% PV).', type: 'revive', healPercent: 1, price: 4000 },
     rarecandy: { name: 'Super Bonbon', desc: 'Monte d\'un niveau.', type: 'levelup', price: 0 },
     repel: { name: 'Repousse', desc: 'Éloigne les Pokémon faibles (100 pas).', type: 'repel', steps: 100, price: 350 },
-    escaperope: { name: 'Corde Sortie', desc: 'Téléporte à l\'entrée d\'une grotte.', type: 'escape', price: 550 },
+    escape_rope: { name: 'Corde Sortie', desc: 'Téléporte à l\'entrée d\'une grotte.', type: 'escape', price: 550 },
 };
 
 // Tile types

@@ -1344,7 +1344,7 @@ const UI = {
         this.shop.items = [
             'pokeball', 'superball', 'hyperball',
             'potion', 'superpotion', 'hyperpotion',
-            'antidote', 'revive', 'repel'
+            'antidote', 'revive', 'repel', 'escape_rope'
         ];
 
         if (game) game.state.gameMode = 'menu';
@@ -1477,7 +1477,7 @@ const UI = {
                 AudioSystem.playSfx('select');
                 this.showNotification(itemData.name + ' acheté !');
                 this._renderShop();
-            });
+            }, { once: true });
             rightCol.appendChild(buyBtn);
 
             row.appendChild(rightCol);

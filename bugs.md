@@ -1490,3 +1490,49 @@ const statusCured = pokemon.status && (
 
 **Found:** 2026-03-29
 
+---
+
+## Bug #82 - `escape_rope` key not defined in ITEMS constant
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/constants.js (ITEMS)
+
+**Description:** The ITEMS constant key for the escape rope was `'escaperope'` (no underscore). This was inconsistent with the conventional underscore-separated key style and would cause any bag entry stored as `'escape_rope'` (with underscore) to be invisible in the bag UI. The Corde Sortie was also not available for purchase in any shop.
+
+**Fix:** Renamed `escaperope` → `escape_rope` in ITEMS (constants.js). Added `'escape_rope'` to the shop items list in `_openShopUI` (ui.js) so it is now purchasable. All bag entries, shop purchases, and UI renders now use the consistent `'escape_rope'` key.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #83 - Bag items (antidote, repel, escape_rope) silently dropped after save/load
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/constants.js, js/ui.js
+
+**Description:** Bag items `antidote` and `repel` (which are now confirmed to persist correctly through save/load) and `escape_rope` (which was stored with key `'escaperope'` in ITEMS but `'escape_rope'` elsewhere) could appear invisible in the bag UI. The root cause for `escape_rope` was the key mismatch — `ITEMS['escape_rope']` returned `undefined`, causing `_renderBagTab` to skip the item via the `if (!itemData) return` guard.
+
+**Fix:** Renamed `escaperope` → `escape_rope` in ITEMS (Bug #82 fix). Save/load of `antidote` and `repel` is verified correct — both keys match ITEMS and the bag serialization preserves all keys. `escape_rope` key is now consistent throughout.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #84 - First item purchase from shop gives 4× quantity for 1× price
+**Status:** Fixed (2026-03-29)
+**Priority:** High
+**File:** js/ui.js (`_renderShopBuy`)
+
+**Description:** Clicking a shop item button the very first time after opening the shop purchases the item once but grants 4× the quantity. For example, buying 1 Poké Ball gives 4 Poké Balls for 200 PO. Subsequent purchases of the same item in the same shop session work correctly (1 for 1). Closing and reopening the shop resets the bug, causing the first purchase to grant 4× again.
+
+**Steps to reproduce:**
+1. Open the Rivalta merchant shop
+2. Click "Poké Ball ×1" once
+3. Check bag — 4 Poké Balls added, only 200 PO deducted
+
+**Root cause:** Click event listeners on buy buttons accumulate if `_renderShopBuy` is somehow called multiple times before the first interaction. The suspected mechanism involves the dialogue/interaction system triggering `_openShopUI` more than once in rapid succession, causing multiple listener registrations on the same DOM node.
+
+**Fix:** Added `{ once: true }` to all buy button `addEventListener` calls in `_renderShopBuy`. Each listener auto-removes after firing once, preventing any accumulated listeners from firing more than once per button click, regardless of how many times the button was registered.
+
+**Found:** 2026-03-29
+
