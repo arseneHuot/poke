@@ -217,7 +217,7 @@
 
 ### Shop / UX
 
-- **Quantity selector for bulk purchases**: Currently the shop only buys 1 item per click. Add a quantity selector (e.g. +1/+5/+10 buttons or a number input) to allow buying multiple items at once.
+- ~~**Quantity selector for bulk purchases**~~ **Done (2026-03-29)**: Added a ×1/×5/×10 quantity bar at the top of the buy panel. Price display updates to show total cost (e.g. "5×200 $ = 1000 $"). Acheter button purchases the full quantity at once. `shop.buyQty` state persists within the shop session and resets to 1 on re-open.
 
 - ~~**Confirm dialog before selling**~~ **Done (2026-03-29)**: Clicking "Vendre" now shows inline confirmation buttons ("Oui" / "Non") in place of the sell button. "Oui" completes the sale and re-renders the shop; "Non" re-renders the sell list without selling.
 
@@ -239,9 +239,9 @@
 
 ### Shops / Items
 
-- **Town-specific shop inventories**: Every shop (`_openShopUI`) uses the same hardcoded 10-item list regardless of which town or merchant NPC is interacted with. Progressive shops — Borgo selling only Poké Balls and Potions, Porto adding Super Balls and Repels, later cities adding Hyper Balls and Revives — would reinforce the sense of world progression and reward exploration.
+- ~~**Town-specific shop inventories**~~ **Done (2026-03-29)**: Each merchant NPC now has a `shopInventory` array. Porto: Poké Ball, Potion, Antidote, Repousse. Campoverde: adds Super Ball, Super Potion, Rappel. Rivalta: adds Hyper Potion, Corde Sortie. Volcania: adds Hyper Ball. Glacia: adds Rappel Max. Abyss City: adds Potion Max. `_openShopUI` reads `_currentNpc.shopInventory` if present, falls back to the full default list.
 
 ### World / Navigation
 
-- **Warp tile validation at map load**: Add a development-time check (or console warning) in `WorldData._createX()` that verifies each warp's `x/y` source tile is in `WALKABLE_TILES` and the `targetX/targetY` tile in the target map is also walkable. Bugs #89–93 have now been fixed directly; this improvement would prevent regressions.
+- ~~**Warp tile validation at map load**~~ **Done (2026-03-29)**: Added warp validation in `WorldData.getMap()` — after a map is generated, all its warps are checked: source tile at `(x,y)` and target tile at `(targetX,targetY)` in the destination map (if already loaded) are verified against `WALKABLE_TILES`. Non-walkable tiles log `console.warn` with map name and coordinates. Prevents future regressions like Bugs #89–93.
 

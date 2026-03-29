@@ -52,6 +52,23 @@ const WorldData = {
                 }
             }
         }
+        // Development-time warp validation: warn if warp source or target tiles are not walkable
+        if (this.maps[mapId] && this.maps[mapId].warps) {
+            const map = this.maps[mapId];
+            for (const warp of map.warps) {
+                const srcTile = map.tiles[warp.y] && map.tiles[warp.y][warp.x];
+                if (srcTile !== undefined && !WALKABLE_TILES.has(srcTile)) {
+                    console.warn(`[WarpValidation] ${mapId}: source warp (${warp.x},${warp.y}) sits on non-walkable tile type ${srcTile}`);
+                }
+                const targetMap = this.maps[warp.targetMap];
+                if (targetMap) {
+                    const tgtTile = targetMap.tiles[warp.targetY] && targetMap.tiles[warp.targetY][warp.targetX];
+                    if (tgtTile !== undefined && !WALKABLE_TILES.has(tgtTile)) {
+                        console.warn(`[WarpValidation] ${mapId} → ${warp.targetMap}: target (${warp.targetX},${warp.targetY}) lands on non-walkable tile type ${tgtTile}`);
+                    }
+                }
+            }
+        }
         return this.maps[mapId];
     },
 
@@ -374,7 +391,8 @@ const WorldData = {
                 { id: 'nurse_porto', type: 'nurse', x: 13, y: 11, dir: DIR.DOWN, name: 'Infirmière',
                   dialogue: 'nurse_heal' },
                 { id: 'merchant_porto', type: 'merchant', x: 29, y: 11, dir: DIR.DOWN, name: 'Vendeur',
-                  dialogue: 'merchant_shop' },
+                  dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'potion', 'antidote', 'repel'] },
                 { id: 'gym1_leader', type: 'gymleader', x: 38, y: 18, dir: DIR.DOWN, name: 'Champion Marco',
                   dialogue: 'gym1_dialogue', altDialogue: 'gym1_defeated', team: [
                     { id: 10, level: 12 }, { id: 11, level: 14 }
@@ -536,7 +554,8 @@ const WorldData = {
                 { id: 'nurse_campo', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière',
                   dialogue: 'nurse_heal' },
                 { id: 'merchant_campo', type: 'merchant', x: 29, y: 9, dir: DIR.DOWN, name: 'Vendeuse',
-                  dialogue: 'merchant_shop' },
+                  dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'superball', 'potion', 'superpotion', 'antidote', 'revive', 'repel'] },
                 { id: 'gym2_leader', type: 'gymleader', x: 10, y: 24, dir: DIR.DOWN, name: 'Championne Flora',
                   dialogue: 'gym2_dialogue', altDialogue: 'gym2_defeated', team: [
                     { id: 22, level: 18 }, { id: 63, level: 19 }, { id: 40, level: 21 }
@@ -667,7 +686,8 @@ const WorldData = {
                 { id: 'nurse_rivalta', type: 'nurse', x: 11, y: 11, dir: DIR.DOWN, name: 'Infirmière',
                   dialogue: 'nurse_heal' },
                 { id: 'merchant_rivalta', type: 'merchant', x: 31, y: 11, dir: DIR.DOWN, name: 'Vendeur',
-                  dialogue: 'merchant_shop' },
+                  dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'superball', 'potion', 'superpotion', 'hyperpotion', 'antidote', 'revive', 'repel', 'escape_rope'] },
                 { id: 'gym3_leader', type: 'gymleader', x: 34, y: 26, dir: DIR.DOWN, name: 'Champion Ondine',
                   dialogue: 'gym3_dialogue', altDialogue: 'gym3_defeated', team: [
                     { id: 20, level: 24 }, { id: 47, level: 25 }, { id: 68, level: 27 }
@@ -820,7 +840,8 @@ const WorldData = {
             encounters: [],
             npcs: [
                 { id: 'nurse_volcan', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
-                { id: 'merchant_volcan', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
+                { id: 'merchant_volcan', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'superball', 'hyperball', 'potion', 'superpotion', 'hyperpotion', 'antidote', 'revive', 'repel', 'escape_rope'] },
                 { id: 'gym5_leader', type: 'gymleader', x: 10, y: 26, dir: DIR.DOWN, name: 'Champion Blaze',
                   dialogue: 'gym5_dialogue', altDialogue: 'gym5_defeated', team: [
                     { id: 30, level: 34 }, { id: 82, level: 35 }, { id: 59, level: 35 }, { id: 31, level: 37 }
@@ -925,7 +946,8 @@ const WorldData = {
             encounters: [],
             npcs: [
                 { id: 'nurse_glacia', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
-                { id: 'merchant_glacia', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
+                { id: 'merchant_glacia', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'superball', 'hyperball', 'potion', 'superpotion', 'hyperpotion', 'antidote', 'revive', 'maxrevive', 'repel', 'escape_rope'] },
                 { id: 'gym7_leader', type: 'gymleader', x: 20, y: 26, dir: DIR.DOWN, name: 'Championne Crysta',
                   dialogue: 'gym7_dialogue', altDialogue: 'gym7_defeated', team: [
                     { id: 41, level: 40 }, { id: 84, level: 41 }, { id: 28, level: 42 }, { id: 42, level: 44 }
@@ -1028,7 +1050,8 @@ const WorldData = {
             encounters: [],
             npcs: [
                 { id: 'nurse_abyss', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
-                { id: 'merchant_abyss', type: 'merchant', x: 33, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop' },
+                { id: 'merchant_abyss', type: 'merchant', x: 33, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop',
+                  shopInventory: ['pokeball', 'superball', 'hyperball', 'potion', 'superpotion', 'hyperpotion', 'maxpotion', 'antidote', 'revive', 'maxrevive', 'repel', 'escape_rope'] },
                 { id: 'gym8_leader', type: 'gymleader', x: 23, y: 28, dir: DIR.DOWN, name: 'Champion Drake',
                   dialogue: 'gym8_dialogue', altDialogue: 'gym8_defeated', team: [
                     { id: 66, level: 46 }, { id: 111, level: 47 }, { id: 89, level: 48 }, { id: 136, level: 48 }, { id: 67, level: 50 }

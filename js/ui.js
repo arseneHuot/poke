@@ -57,6 +57,7 @@ const UI = {
         mode: 'buy',
         items: [],
         selectedIndex: 0,
+        buyQty: 1,
     },
 
     // Starter selection state
@@ -1341,11 +1342,18 @@ const UI = {
     _openShopUI() {
         this.shop.active = true;
         this.shop.mode = 'buy';
-        this.shop.items = [
-            'pokeball', 'superball', 'hyperball',
-            'potion', 'superpotion', 'hyperpotion',
-            'antidote', 'revive', 'repel', 'escape_rope'
-        ];
+        this.shop.buyQty = 1;
+
+        // Use NPC-specific inventory if available, otherwise fall back to full default list
+        if (this._currentNpc && this._currentNpc.shopInventory) {
+            this.shop.items = this._currentNpc.shopInventory;
+        } else {
+            this.shop.items = [
+                'pokeball', 'superball', 'hyperball',
+                'potion', 'superpotion', 'hyperpotion',
+                'antidote', 'revive', 'repel', 'escape_rope'
+            ];
+        }
 
         if (game) game.state.gameMode = 'menu';
         this._renderShop();
@@ -1426,6 +1434,27 @@ const UI = {
     },
 
     _renderShopBuy(panel) {
+        // Quantity selector bar
+        const qtyBar = document.createElement('div');
+        qtyBar.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:12px;';
+        const qtyLabel = document.createElement('span');
+        qtyLabel.style.cssText = 'color:#aaa;font-size:13px;';
+        qtyLabel.textContent = 'Quantité :';
+        qtyBar.appendChild(qtyLabel);
+        [1, 5, 10].forEach(n => {
+            const qBtn = document.createElement('button');
+            qBtn.className = 'menu-tab';
+            qBtn.style.cssText = 'padding:2px 10px;font-size:13px;' + (this.shop.buyQty === n ? 'background:#4a90e2;color:#fff;' : '');
+            qBtn.textContent = '×' + n;
+            qBtn.addEventListener('click', () => {
+                this.shop.buyQty = n;
+                this._renderShop();
+            });
+            qtyBar.appendChild(qBtn);
+        });
+        panel.appendChild(qtyBar);
+
+        const qty = this.shop.buyQty || 1;
         const list = document.createElement('div');
 
         this.shop.items.forEach(itemId => {
@@ -1451,31 +1480,32 @@ const UI = {
             const rightCol = document.createElement('div');
             rightCol.style.cssText = 'display:flex;align-items:center;gap:10px;';
 
+            const totalPrice = itemData.price * qty;
             const priceSpan = document.createElement('span');
             priceSpan.style.cssText = 'color:#ffd700;font-weight:bold;white-space:nowrap;';
-            priceSpan.textContent = itemData.price + ' $';
+            priceSpan.textContent = (qty > 1 ? qty + '×' : '') + itemData.price + ' $' + (qty > 1 ? ' = ' + totalPrice + ' $' : '');
             rightCol.appendChild(priceSpan);
 
             const buyBtn = document.createElement('button');
             buyBtn.className = 'menu-tab';
             buyBtn.style.padding = '4px 12px';
             buyBtn.textContent = 'Acheter';
-            const canAfford = game && game.state && game.state.money >= itemData.price;
+            const canAfford = game && game.state && game.state.money >= totalPrice;
             if (!canAfford) {
                 buyBtn.style.opacity = '0.4';
                 buyBtn.style.cursor = 'default';
             }
             buyBtn.addEventListener('click', () => {
                 if (!game || !game.state) return;
-                if (game.state.money < itemData.price) {
+                if (game.state.money < totalPrice) {
                     this.showNotification('Pas assez d\'argent !');
                     return;
                 }
-                game.state.money -= itemData.price;
+                game.state.money -= totalPrice;
                 if (!game.state.bag[itemId]) game.state.bag[itemId] = 0;
-                game.state.bag[itemId]++;
+                game.state.bag[itemId] += qty;
                 AudioSystem.playSfx('select');
-                this.showNotification(itemData.name + ' acheté !');
+                this.showNotification((qty > 1 ? qty + '× ' : '') + itemData.name + ' acheté' + (qty > 1 ? 's' : '') + ' !');
                 this._renderShop();
             }, { once: true });
             rightCol.appendChild(buyBtn);
