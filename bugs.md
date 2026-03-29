@@ -1658,3 +1658,88 @@ const statusCured = pokemon.status && (
 **Root cause:** The interior map for Kaël's house was never created, and no warp entry for `{x:30, y:22}` was added to borgo's warp list.
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #91 - Campoverde east exit to Grotte1 blocked by TREE tile
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/world-data.js (campoverde map definition)
+
+**Description:** Campoverde's east exit to Grotte1 is permanently inaccessible. The campoverde map defines a warp at `{x:44, y:19}` targeting `grotte1`, but `WorldData.getMap('campoverde').tiles[19][44]` is `TILE.TREE` (value 4, not walkable). `x=44` is the map's rightmost column (width=45). `GameEngine._canWalkTo(44, 19)` returns false. The tile directly above (y=18) is also TREE. The player cannot reach x=44 to trigger the eastward warp.
+
+**Steps to reproduce:**
+1. Enter Campoverde and walk east along row y=19
+2. Player stops at x=43 — the eastern edge is blocked by a TREE tile
+3. Confirm: `WorldData.getMap('campoverde').tiles[19][44]` returns 4 (TREE)
+
+**Expected:** The easternmost tile at the warp column should be walkable (PATH or similar) so the player can exit east into Grotte1.
+**Actual:** TREE tile at x=44 blocks all movement; Grotte1 is inaccessible via Campoverde.
+
+**Root cause:** The right border of the campoverde tile map is filled with TREE tiles, including the column where the east exit warp is placed.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #92 - Route 2 east exit to Porto blocked by TREE tile
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/world-data.js (route2 map definition)
+
+**Description:** Route 2's east exit to Porto is permanently inaccessible. The route2 map defines a warp at `{x:49, y:19}` targeting `porto`, but `WorldData.getMap('route2').tiles[19][49]` is `TILE.TREE` (value 4, not walkable). `x=49` is the map's rightmost column (width=50). `GameEngine._canWalkTo(49, 19)` returns false. The player cannot exit Route 2 eastward to Porto.
+
+**Steps to reproduce:**
+1. Enter Route 2 and walk east along row y=19
+2. Player stops at x=48 — the TREE at x=49 blocks movement
+3. Confirm: `WorldData.getMap('route2').tiles[19][49]` returns 4 (TREE)
+
+**Expected:** The rightmost tile at the warp row should be walkable so the player can cross into Porto from Route 2.
+**Actual:** TREE tile permanently blocks the east exit. Porto is unreachable via Route 2.
+
+**Root cause:** Route 2's right border row contains TREE tiles at y=19, sitting on top of the warp entry.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #93 - Route 2 → Grotte1 warp lands player inside CAVE_WALL tiles
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/world-data.js (route2 map definition)
+
+**Description:** The route2 west-exit warp at `{x:0, y:19}` correctly lands on a walkable DOOR tile in route2. However, its `targetX:28, targetY:18` coordinates in Grotte1 place the player inside a solid `TILE.CAVE_WALL` (value 14) cell. The entire block from `(26,18)` to `(29,18)` in grotte1 is CAVE_WALL. There are no walkable tiles within a 6-tile radius of `(28,18)`. The player would spawn embedded in the wall with no way to move, softlocking the game.
+
+**Steps to reproduce:**
+1. Enter Route 2 from Borgo/Route1 (if accessible — see Bug #89)
+2. Walk west to x=0, y=19 (the DOOR tile on route2's left edge)
+3. Warp triggers → `GameEngine._executeWarp()` sets player position to grotte1(28,18)
+4. Player is now inside a CAVE_WALL; `_canWalkTo` returns false in all directions
+
+**Expected:** The route2 → grotte1 warp should target the entrance area of Grotte1 near the eastern stairs at approximately `(28,10)` where `TILE.STAIRS_UP` is located.
+**Actual:** Target coordinates `(28,18)` are solid cave wall. Player spawns in an inaccessible tile.
+
+**Root cause:** The `targetX`/`targetY` in the route2 warp entry are wrong — they point to a row 8 tiles below the grotte1 right-side staircase at `(29,10)`. The correct target should be approximately `(28,10)` to land next to the grotte1 exit stairs.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #94 - No Struggle fallback when all player moves have 0 PP
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/battle.js (`selectMove`, `_showMoves`)
+
+**Description:** When all of the active Pokémon's moves are at 0 PP, every move button in the battle UI is correctly disabled. However, there is no Struggle (Charge) fallback offered to the player. The enemy AI does use a tackle-equivalent fallback (`{ id: 'tackle' }`) when all its PP is spent, but the player has no such option. In a trainer battle with all moves depleted and no items, the player cannot deal damage and can only switch — or is fully stuck if all Pokémon are also depleted.
+
+**Steps to reproduce:**
+1. In a wild or trainer battle, set all moves of the active Pokémon to `ppUsed = moveData.pp` (or exhaust them naturally)
+2. Click ATTAQUE — the move list shows 4 disabled buttons (PP 0/X each) and a RETOUR button
+3. There is no "Charge" / Struggle button to attack with a no-PP move
+
+**Expected:** When all moves are at 0 PP, a "Charge" (Struggle) button should appear allowing the player to deal typeless damage at the cost of recoil, consistent with the enemy AI fallback already implemented at `battle.js:981`.
+**Actual:** Player has no attack option. In trainer battles with no items and no healthy party members, the player cannot win.
+
+**Root cause:** `_showMoves()` renders move buttons only from `pokemon.moves` and disables those with 0 PP. It does not check whether all moves are depleted and does not inject a Struggle fallback. `selectMove()` also lacks this fallback path.
+
+**Found:** 2026-03-29

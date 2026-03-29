@@ -236,11 +236,13 @@ const BattleSystem = {
         movesDiv.innerHTML = '';
 
         const pp = this.state.playerPokemon;
+        let allDepleted = true;
         pp.moves.forEach((move, index) => {
             const moveData = MOVES_DB[move.id];
             if (!moveData) return;
             const totalPP = moveData.pp || 10;
             const ppLeft = totalPP - (move.ppUsed || 0);
+            if (ppLeft > 0) allDepleted = false;
             const btn = document.createElement('button');
             btn.className = 'battle-btn move-btn';
             const typeColor = TYPE_COLORS[moveData.type] || '#888';
@@ -258,6 +260,20 @@ const BattleSystem = {
             });
             movesDiv.appendChild(btn);
         });
+
+        // Struggle fallback when all moves are depleted
+        if (allDepleted) {
+            const struggleBtn = document.createElement('button');
+            struggleBtn.className = 'battle-btn move-btn';
+            struggleBtn.style.borderLeft = '4px solid #888';
+            struggleBtn.innerHTML = `<span class="move-name">Charge</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:#888;color:#fff;margin-left:6px;">Normal</span><span class="move-info">PP —/— | Pw: 40 | Préc: 100%</span>`;
+            struggleBtn.addEventListener('click', () => {
+                AudioSystem.playSfx('confirm');
+                this._hideMenus();
+                this._executeTurn({ type: 'move', moveId: 'tackle', moveIndex: -1 });
+            });
+            movesDiv.appendChild(struggleBtn);
+        }
 
         // Back button
         const backBtn = document.createElement('button');

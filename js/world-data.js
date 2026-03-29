@@ -418,8 +418,9 @@ const WorldData = {
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.TREE; tiles[y][w-1] = TILE.TREE; }
         for (let x = 0; x < w; x++) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
 
-        // Cave entrance
+        // Cave entrance and east exit
         tiles[19][0] = TILE.DOOR;
+        tiles[19][w-1] = TILE.PATH; // east exit to porto
 
         // Signs
         tiles[19][w-3] = TILE.SIGN;
@@ -450,7 +451,7 @@ const WorldData = {
             ],
             warps: [
                 { x: w-1, y: 19, targetMap: 'porto', targetX: 1, targetY: 19 },
-                { x: 0, y: 19, targetMap: 'grotte1', targetX: 28, targetY: 18 },
+                { x: 0, y: 19, targetMap: 'grotte1', targetX: 28, targetY: 10 },
             ]
         };
     },
@@ -518,6 +519,7 @@ const WorldData = {
         for (let x = 0; x < w; x++) {
             if (x < 17 || x > 21) { tiles[0][x] = TILE.TREE; tiles[h-1][x] = TILE.TREE; }
         }
+        tiles[19][w-1] = TILE.PATH; // east exit to grotte1
 
         // Sign
         tiles[16][22] = TILE.SIGN;

@@ -227,3 +227,21 @@
 
 - **Pokémon following the player**: Show the first party Pokémon as a small sprite following one tile behind the player in the overworld. Classic QoL feature from HeartGold/SoulSilver.
 
+---
+
+## New Suggestions (2026-03-29 QA session #8 — Battle, Shops, Progression)
+
+### Battle
+
+- ~~**Struggle fallback when all PP is depleted**~~ **Done (2026-03-29)**: When all moves show 0 PP, a "Charge" button now appears in the move list. It executes a tackle-equivalent attack (Normal, Pw:40, 100% accuracy) using the existing MOVES_DB `tackle` entry. Consistent with the enemy AI fallback already at `battle.js:981`. See Bug #94 fix.
+
+- **EXP share for party**: Currently only the active battler gains EXP (original Gen 1–2 mechanic). Adding an optional "EXP Partagé" item that distributes a portion of EXP to all living party members would speed up late-game grinding and reduce the need to individually rotate weak Pokémon.
+
+### Shops / Items
+
+- **Town-specific shop inventories**: Every shop (`_openShopUI`) uses the same hardcoded 10-item list regardless of which town or merchant NPC is interacted with. Progressive shops — Borgo selling only Poké Balls and Potions, Porto adding Super Balls and Repels, later cities adding Hyper Balls and Revives — would reinforce the sense of world progression and reward exploration.
+
+### World / Navigation
+
+- **Warp tile validation at map load**: Add a development-time check (or console warning) in `WorldData._createX()` that verifies each warp's `x/y` source tile is in `WALKABLE_TILES` and the `targetX/targetY` tile in the target map is also walkable. Bugs #89–93 have now been fixed directly; this improvement would prevent regressions.
+
