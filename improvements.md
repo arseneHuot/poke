@@ -313,3 +313,35 @@
 - ~~**Humanoid sprite full gradient upgrade**~~ **Done (2026-03-29)**: Humanoid body, belly, arms, and head now use `_gradientRect` with outlines. Eyes upgraded with `_drawEye`.
 
 - ~~**Mineral sprite enhanced eyes**~~ **Done (2026-03-29)**: Mineral glowing eyes now use `_drawEye` for more expressive appearance.
+
+---
+
+## New Suggestions (2026-03-29 QA session #9 — Deep Visual Playtest)
+
+### Pokémon Sprite Character
+
+- ~~**Starter Pokémon lack type-specific visual features**~~ **Done (2026-03-29)**: Enhanced `_addTypeDecoration` with Fire (tail flame with inner glow + head tuft), Water (floating bubbles with shine highlights), Grass (leaf on head with vein detail + vine tendril). All type-themed Pokémon now have distinctive visual features.
+
+- **Pokémon silhouettes too similar across body types**: Most Pokémon have the same roundish proportions regardless of body type. Bipeds, quadrupeds, and aquatics should have much more distinct outlines — taller/thinner for humanoids, longer/lower for quadrupeds, streamlined for aquatics.
+
+### World & Tile Rendering
+
+- ~~**Building tiles lack rooftop rendering**~~ **Done (2026-03-29)**: Buildings now render with a dark roof strip (4px) at the top with a lighter accent line. Windows shifted down to accommodate roof. Added subtle window shine highlight. Buildings now look 3D.
+
+- ~~**Grass tiles too uniform**~~ **Done (2026-03-29)**: Grass tiles now use position-seeded color variation (alternating between two green shades), plus randomized dark patches and grass tufts at seeded positions. Terrain looks natural and varied.
+
+- **Path-to-grass transition is abrupt**: The boundary between path tiles and grass tiles is a hard pixel edge. Adding a 1-2 pixel feathered edge or scattered grass pixels along the path would soften transitions.
+
+### Interior Design
+
+- **Lab floor uses gym arena tile**: The professor's lab uses GYM_FLOOR tiles (grey circles), which looks like a sports arena instead of a scientific laboratory. Should have a unique lab floor tile (white/blue checkerboard or clean tile pattern).
+
+### Battle Scene
+
+- **Battle background is a simple gradient**: The sky and grass in the battle scene are flat color bands. Adding clouds, sun/moon, or parallax hills would create depth and atmosphere.
+
+- **No hit/damage animation on sprites**: When a Pokémon takes damage, there's a shake effect but no visual flash or color change on the sprite itself. A brief white flash or red tint on the damaged sprite would provide clearer feedback.
+
+### Starter Selection
+
+- ~~**No hover effect on starter cards**~~ **Done (2026-03-29)**: Already implemented — CSS `.choice-option:hover` has `transform: scale(1.05)`, gold border, and gold background tint. Verified in code.

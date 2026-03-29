@@ -759,13 +759,72 @@ const SpriteRenderer = {
         // Add type-specific visual elements
         if (types.includes('fire')) {
             const flameColor = colors.flame || '#FF4500';
+            // Tail flame (behind body)
             ctx.fillStyle = flameColor;
-            // Small flame on head or tail
+            ctx.beginPath();
+            ctx.moveTo(14*s, 40*s);
+            ctx.quadraticCurveTo(6*s, 30*s, 10*s, 22*s);
+            ctx.quadraticCurveTo(14*s, 28*s, 12*s, 34*s);
+            ctx.quadraticCurveTo(16*s, 32*s, 14*s, 40*s);
+            ctx.fill();
+            // Inner flame (brighter)
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.moveTo(13*s, 38*s);
+            ctx.quadraticCurveTo(9*s, 32*s, 11*s, 26*s);
+            ctx.quadraticCurveTo(14*s, 30*s, 13*s, 38*s);
+            ctx.fill();
+            // Head flame tuft
+            ctx.fillStyle = flameColor;
+            ctx.beginPath();
+            ctx.moveTo(30*s, 6*s);
+            ctx.quadraticCurveTo(28*s, -2*s, 32*s, -4*s);
+            ctx.quadraticCurveTo(36*s, -2*s, 34*s, 6*s);
+            ctx.fill();
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.moveTo(31*s, 5*s);
+            ctx.quadraticCurveTo(30*s, 0, 32*s, -2*s);
+            ctx.quadraticCurveTo(34*s, 0, 33*s, 5*s);
+            ctx.fill();
+        }
+        if (types.includes('water') && !types.includes('ice')) {
+            // Water droplets / bubbles around body
+            ctx.fillStyle = '#87CEEB60';
+            ctx.beginPath();
+            ctx.arc(50*s, 16*s, 3*s, 0, Math.PI*2);
+            ctx.arc(54*s, 24*s, 2*s, 0, Math.PI*2);
+            ctx.arc(48*s, 32*s, 2.5*s, 0, Math.PI*2);
+            ctx.fill();
+            // Water shine highlights
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.arc(49*s, 15*s, 1*s, 0, Math.PI*2);
+            ctx.arc(53*s, 23*s, 0.8*s, 0, Math.PI*2);
+            ctx.fill();
+        }
+        if (types.includes('grass') && !types.includes('poison')) {
+            // Leaf on head
+            ctx.fillStyle = '#228B22';
             ctx.beginPath();
             ctx.moveTo(32*s, 4*s);
-            ctx.quadraticCurveTo(28*s, -2*s, 32*s, -4*s);
-            ctx.quadraticCurveTo(36*s, -2*s, 32*s, 4*s);
+            ctx.quadraticCurveTo(40*s, -4*s, 48*s, 2*s);
+            ctx.quadraticCurveTo(40*s, 4*s, 32*s, 4*s);
             ctx.fill();
+            // Leaf vein
+            ctx.strokeStyle = '#1A6B1A';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(33*s, 3*s);
+            ctx.quadraticCurveTo(40*s, 0, 46*s, 2*s);
+            ctx.stroke();
+            // Small vine/tendril
+            ctx.strokeStyle = '#228B22';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(12*s, 28*s);
+            ctx.quadraticCurveTo(6*s, 22*s, 8*s, 16*s);
+            ctx.stroke();
         }
         if (types.includes('electric')) {
             const boltColor = colors.bolts || '#FFFF00';
@@ -1026,15 +1085,21 @@ const SpriteRenderer = {
     drawTile(ctx, tileType, x, y, time, theme) {
         const T = TILE_SIZE;
         switch (tileType) {
-            case TILE.GRASS:
-                ctx.fillStyle = '#7EC850';
+            case TILE.GRASS: {
+                // Seeded variation based on position for natural look
+                const gSeed = (x * 7 + y * 13) & 0xFF;
+                const gBase = (gSeed & 1) ? '#7EC850' : '#7AC54D';
+                ctx.fillStyle = gBase;
                 ctx.fillRect(x, y, T, T);
-                // Grass detail
+                // Subtle darker patches
                 ctx.fillStyle = '#6DB840';
-                ctx.fillRect(x + 4, y + 4, 3, 3);
-                ctx.fillRect(x + 20, y + 18, 3, 3);
-                ctx.fillRect(x + 12, y + 24, 3, 3);
+                ctx.fillRect(x + (gSeed % 8) + 2, y + (gSeed % 6) + 2, 3, 3);
+                ctx.fillRect(x + ((gSeed * 3) % 12) + 8, y + ((gSeed * 5) % 10) + 12, 2, 2);
+                // Small grass tufts
+                ctx.fillStyle = '#72B445';
+                ctx.fillRect(x + ((gSeed * 7) % 16) + 4, y + ((gSeed * 11) % 14) + 8, 2, 3);
                 break;
+            }
 
             case TILE.TALL_GRASS: {
                 const tgColors = theme && theme.tallGrass ? theme.tallGrass : { bg: '#7EC850', blade: '#4A8530' };
@@ -1092,13 +1157,21 @@ const SpriteRenderer = {
                 ctx.fillStyle = bColors.border;
                 ctx.fillRect(x, y, T, T);
                 ctx.fillStyle = bColors.fill;
-                ctx.fillRect(x + 1, y + 1, T - 2, T - 2);
+                ctx.fillRect(x + 1, y + 3, T - 2, T - 3);
+                // Roof (darker strip at top)
+                ctx.fillStyle = this._darken(bColors.border, 30);
+                ctx.fillRect(x, y, T, 4);
+                ctx.fillStyle = this._darken(bColors.border, 15);
+                ctx.fillRect(x + 1, y + 1, T - 2, 2);
                 // Window
                 ctx.fillStyle = bColors.window || '#87CEEB';
-                ctx.fillRect(x + 10, y + 8, 12, 10);
+                ctx.fillRect(x + 10, y + 10, 12, 10);
                 ctx.fillStyle = '#5A5A5A';
-                ctx.fillRect(x + 15.5, y + 8, 1, 10);
-                ctx.fillRect(x + 10, y + 12.5, 12, 1);
+                ctx.fillRect(x + 15.5, y + 10, 1, 10);
+                ctx.fillRect(x + 10, y + 14.5, 12, 1);
+                // Window shine
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.fillRect(x + 10, y + 10, 5, 4);
                 break;
             }
 
