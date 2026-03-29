@@ -1175,6 +1175,35 @@ const BattleSystem = {
             }
         });
 
+        // EXP share: distribute half EXP to all bench Pokémon if player has Exp. Partagé
+        if (game && game.state && game.state.bag && game.state.bag['exp_share'] > 0) {
+            const halfExp = Math.max(1, Math.floor(expGain / 2));
+            const activePkmn = this.state.playerPokemon;
+            game.state.party.forEach(pkmn => {
+                if (!pkmn || pkmn === activePkmn || pkmn.currentHp <= 0) return;
+                const benchEvents = addExp(pkmn, halfExp);
+                benchEvents.forEach(evt => {
+                    const benchName = pkmn.nickname || pkmn.name;
+                    if (evt.type === 'levelup') {
+                        AudioSystem.playSfx('levelup');
+                        this._queueMessage(`${benchName} monte au niveau ${evt.level} ! (Exp. Partagé)`);
+                    } else if (evt.type === 'newmove') {
+                        const md = MOVES_DB[evt.move];
+                        this._queueMessage(`${benchName} apprend ${md ? md.name : evt.move} !`);
+                    } else if (evt.type === 'evolve') {
+                        // Evolve bench Pokémon immediately (no animation)
+                        const oldBenchName = benchName;
+                        evolvePokemon(pkmn, evt.to);
+                        if (game && game.state) {
+                            game.state.pokedexSeen.add(pkmn.id);
+                            game.state.pokedexCaught.add(pkmn.id);
+                        }
+                        this._queueMessage(`${oldBenchName} a évolué en ${pkmn.name} !`);
+                    }
+                });
+            });
+        }
+
         // After exp messages (and optional evolution), continue or end the battle
         const continueAfterExp = () => {
             // Trainer battle: check if more pokemon

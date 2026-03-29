@@ -208,6 +208,10 @@ const AudioSystem = {
                     setTimeout(() => this._beep(600 - i * 80, 0.12, 'square', 0.08), i * 100);
                 }
             },
+            step_grass: () => this._noise(0.02, 0.04),
+            step_path: () => this._beep(900, 0.015, 'square', 0.03),
+            step_cave: () => this._beep(200, 0.025, 'sine', 0.05),
+            step_sand: () => this._noise(0.018, 0.03),
         };
 
         const fn = sfx[name];

@@ -223,7 +223,7 @@
 
 ### Overworld / UX
 
-- **Run animation / footstep sound**: Play a subtle "step" SFX every tile the player moves on different terrain types (grass rustle on TALL_GRASS, stone tap on PATH, etc.) for audio feedback while walking.
+- ~~**Run animation / footstep sound**~~ **Done (2026-03-29)**: Added 4 terrain-specific step SFX (`step_grass`, `step_path`, `step_cave`, `step_sand`) to AudioSystem. `engine.js` plays the appropriate sound on every movement step completion based on the destination tile type (TALL_GRASS/FLOWER → rustle, CAVE_FLOOR → hollow tap, SAND → soft rustle, everything else → stone click).
 
 - **Pokémon following the player**: Show the first party Pokémon as a small sprite following one tile behind the player in the overworld. Classic QoL feature from HeartGold/SoulSilver.
 
@@ -235,7 +235,7 @@
 
 - ~~**Struggle fallback when all PP is depleted**~~ **Done (2026-03-29)**: When all moves show 0 PP, a "Charge" button now appears in the move list. It executes a tackle-equivalent attack (Normal, Pw:40, 100% accuracy) using the existing MOVES_DB `tackle` entry. Consistent with the enemy AI fallback already at `battle.js:981`. See Bug #94 fix.
 
-- **EXP share for party**: Currently only the active battler gains EXP (original Gen 1–2 mechanic). Adding an optional "EXP Partagé" item that distributes a portion of EXP to all living party members would speed up late-game grinding and reduce the need to individually rotate weak Pokémon.
+- ~~**EXP share for party**~~ **Done (2026-03-29)**: Added `exp_share` key item (2000₽, available at Volcania shop). When in bag, `_handleEnemyFaint` in `battle.js` automatically distributes 50% of earned EXP to all living bench Pokémon. Level-up and evolution events for bench Pokémon are queued as battle messages. Bag UI shows "Actif" label for key items; shop prevents buying more than one.
 
 ### Shops / Items
 

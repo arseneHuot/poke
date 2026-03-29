@@ -841,7 +841,7 @@ const WorldData = {
             npcs: [
                 { id: 'nurse_volcan', type: 'nurse', x: 13, y: 9, dir: DIR.DOWN, name: 'Infirmière', dialogue: 'nurse_heal' },
                 { id: 'merchant_volcan', type: 'merchant', x: 31, y: 9, dir: DIR.DOWN, name: 'Vendeur', dialogue: 'merchant_shop',
-                  shopInventory: ['pokeball', 'superball', 'hyperball', 'potion', 'superpotion', 'hyperpotion', 'antidote', 'revive', 'repel', 'escape_rope'] },
+                  shopInventory: ['pokeball', 'superball', 'hyperball', 'potion', 'superpotion', 'hyperpotion', 'antidote', 'revive', 'repel', 'escape_rope', 'exp_share'] },
                 { id: 'gym5_leader', type: 'gymleader', x: 10, y: 26, dir: DIR.DOWN, name: 'Champion Blaze',
                   dialogue: 'gym5_dialogue', altDialogue: 'gym5_defeated', team: [
                     { id: 30, level: 34 }, { id: 82, level: 35 }, { id: 59, level: 35 }, { id: 31, level: 37 }

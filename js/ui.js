@@ -723,7 +723,13 @@ const UI = {
 
             const countDiv = document.createElement('div');
             countDiv.className = 'item-count';
-            countDiv.textContent = 'x' + quantity;
+            if (itemData.type === 'keyitem') {
+                countDiv.textContent = 'Actif';
+                countDiv.style.color = '#4CAF50';
+                countDiv.style.fontSize = '12px';
+            } else {
+                countDiv.textContent = 'x' + quantity;
+            }
             row.appendChild(countDiv);
 
             // Click to use item
@@ -1480,32 +1486,45 @@ const UI = {
             const rightCol = document.createElement('div');
             rightCol.style.cssText = 'display:flex;align-items:center;gap:10px;';
 
-            const totalPrice = itemData.price * qty;
+            const isKeyItemDisplay = itemData.type === 'keyitem';
+            const displayQty = isKeyItemDisplay ? 1 : qty;
+            const totalPrice = itemData.price * displayQty;
             const priceSpan = document.createElement('span');
             priceSpan.style.cssText = 'color:#ffd700;font-weight:bold;white-space:nowrap;';
-            priceSpan.textContent = (qty > 1 ? qty + '×' : '') + itemData.price + ' $' + (qty > 1 ? ' = ' + totalPrice + ' $' : '');
+            priceSpan.textContent = (displayQty > 1 ? displayQty + '×' : '') + itemData.price + ' $' + (displayQty > 1 ? ' = ' + totalPrice + ' $' : '');
             rightCol.appendChild(priceSpan);
 
             const buyBtn = document.createElement('button');
             buyBtn.className = 'menu-tab';
             buyBtn.style.padding = '4px 12px';
-            buyBtn.textContent = 'Acheter';
-            const canAfford = game && game.state && game.state.money >= totalPrice;
-            if (!canAfford) {
+            const isKeyItem = itemData.type === 'keyitem';
+            const alreadyOwned = isKeyItem && game && game.state && game.state.bag && game.state.bag[itemId] > 0;
+            const effectiveQty = isKeyItem ? 1 : qty;
+            const effectivePrice = itemData.price * effectiveQty;
+            const canAfford = game && game.state && game.state.money >= effectivePrice;
+            if (alreadyOwned) {
+                buyBtn.textContent = 'Possédé';
                 buyBtn.style.opacity = '0.4';
                 buyBtn.style.cursor = 'default';
+            } else {
+                buyBtn.textContent = 'Acheter';
+                if (!canAfford) {
+                    buyBtn.style.opacity = '0.4';
+                    buyBtn.style.cursor = 'default';
+                }
             }
             buyBtn.addEventListener('click', () => {
                 if (!game || !game.state) return;
-                if (game.state.money < totalPrice) {
+                if (alreadyOwned) return;
+                if (game.state.money < effectivePrice) {
                     this.showNotification('Pas assez d\'argent !');
                     return;
                 }
-                game.state.money -= totalPrice;
+                game.state.money -= effectivePrice;
                 if (!game.state.bag[itemId]) game.state.bag[itemId] = 0;
-                game.state.bag[itemId] += qty;
+                game.state.bag[itemId] += effectiveQty;
                 AudioSystem.playSfx('select');
-                this.showNotification((qty > 1 ? qty + '× ' : '') + itemData.name + ' acheté' + (qty > 1 ? 's' : '') + ' !');
+                this.showNotification((effectiveQty > 1 ? effectiveQty + '× ' : '') + itemData.name + ' acheté' + (effectiveQty > 1 ? 's' : '') + ' !');
                 this._renderShop();
             }, { once: true });
             rightCol.appendChild(buyBtn);

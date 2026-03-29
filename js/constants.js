@@ -126,6 +126,7 @@ const ITEMS = {
     rarecandy: { name: 'Super Bonbon', desc: 'Monte d\'un niveau.', type: 'levelup', price: 0 },
     repel: { name: 'Repousse', desc: 'Éloigne les Pokémon faibles (100 pas).', type: 'repel', steps: 100, price: 350 },
     escape_rope: { name: 'Corde Sortie', desc: 'Téléporte à l\'entrée d\'une grotte.', type: 'escape', price: 550 },
+    exp_share: { name: 'Exp. Partagé', desc: 'Distribue 50% de l\'exp à tous les Pokémon en réserve (passif).', type: 'keyitem', price: 2000 },
 };
 
 // Tile types

@@ -109,6 +109,21 @@ const GameEngine = {
                 this.moving = false;
                 this.moveProgress = 0;
 
+                // Play footstep sound based on terrain
+                if (typeof AudioSystem !== 'undefined') {
+                    const stepMap = WorldData.getMap(state.currentMap);
+                    const stepTile = stepMap && stepMap.tiles[this.moveTargetY] && stepMap.tiles[this.moveTargetY][this.moveTargetX];
+                    if (stepTile === TILE.TALL_GRASS || stepTile === TILE.FLOWER) {
+                        AudioSystem.playSfx('step_grass');
+                    } else if (stepTile === TILE.CAVE_FLOOR) {
+                        AudioSystem.playSfx('step_cave');
+                    } else if (stepTile === TILE.SAND) {
+                        AudioSystem.playSfx('step_sand');
+                    } else {
+                        AudioSystem.playSfx('step_path');
+                    }
+                }
+
                 // Increment step counter
                 state.stepsCount = (state.stepsCount || 0) + 1;
 
