@@ -445,6 +445,7 @@ const UI = {
         const tabs = [
             { id: 'party', label: 'Équipe' },
             { id: 'bag', label: 'Sac' },
+            { id: 'pcbox', label: 'Boîte PC' },
             { id: 'pokedex', label: 'Pokédex' },
             { id: 'trainer', label: 'Dresseur' },
             { id: 'save', label: 'Sauvegarder' },
@@ -478,6 +479,9 @@ const UI = {
                 break;
             case 'bag':
                 this._renderBagTab(content);
+                break;
+            case 'pcbox':
+                this._renderPCBoxTab(content);
                 break;
             case 'pokedex':
                 this._renderPokedexTab(content);
@@ -775,15 +779,235 @@ const UI = {
             }
         }
 
+        // Move button (swap party order)
+        if (game && game.state && game.state.party && game.state.party.filter(p => p).length > 1) {
+            const moveBtn = document.createElement('button');
+            moveBtn.className = 'menu-tab';
+            moveBtn.style.marginTop = '10px';
+            moveBtn.textContent = 'Déplacer';
+            moveBtn.addEventListener('click', () => {
+                this._showSwapPokemon(pokemon, index);
+            });
+            panel.appendChild(moveBtn);
+        }
+
         // Back button
         const backBtn = document.createElement('button');
         backBtn.className = 'menu-tab';
-        backBtn.style.marginTop = '15px';
+        backBtn.style.marginTop = '5px';
         backBtn.textContent = 'Retour';
         backBtn.addEventListener('click', () => {
             this._renderMenu();
         });
         panel.appendChild(backBtn);
+    },
+
+    _showSwapPokemon(pokemon, fromIndex) {
+        const panel = this.elements.menuPanel;
+        panel.innerHTML = '';
+
+        const title = document.createElement('h2');
+        title.textContent = 'Déplacer avec…';
+        panel.appendChild(title);
+
+        const list = document.createElement('div');
+        list.className = 'pokemon-party-list';
+
+        game.state.party.forEach((other, toIndex) => {
+            if (!other || toIndex === fromIndex) return;
+            const data = getPokemonById(other.id);
+            if (!data) return;
+
+            const row = document.createElement('div');
+            row.className = 'party-pokemon';
+
+            const spriteContainer = document.createElement('div');
+            spriteContainer.className = 'sprite-container';
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 48;
+            spriteCanvas.height = 48;
+            SpriteRenderer.drawPokemon(spriteCanvas.getContext('2d'), other.id, 0, 0, 48, 'front', other.isShiny);
+            spriteContainer.appendChild(spriteCanvas);
+            row.appendChild(spriteContainer);
+
+            const info = document.createElement('div');
+            info.className = 'info';
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
+            nameDiv.textContent = other.nickname || data.name;
+            info.appendChild(nameDiv);
+            const detDiv = document.createElement('div');
+            detDiv.className = 'details';
+            detDiv.textContent = 'Nv. ' + other.level;
+            info.appendChild(detDiv);
+            row.appendChild(info);
+
+            row.addEventListener('click', () => {
+                const temp = game.state.party[fromIndex];
+                game.state.party[fromIndex] = game.state.party[toIndex];
+                game.state.party[toIndex] = temp;
+                AudioSystem.playSfx('select');
+                this._renderMenu();
+            });
+
+            list.appendChild(row);
+        });
+
+        panel.appendChild(list);
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'menu-tab';
+        backBtn.style.marginTop = '15px';
+        backBtn.textContent = 'Retour';
+        backBtn.addEventListener('click', () => {
+            this._showPokemonDetail(pokemon, fromIndex);
+        });
+        panel.appendChild(backBtn);
+    },
+
+    // -- PC Box Tab --
+    _renderPCBoxTab(container) {
+        const title = document.createElement('h2');
+        title.textContent = 'Boîte PC';
+        container.appendChild(title);
+
+        if (!game || !game.state) return;
+
+        const pc = game.state.pc || [];
+        const party = game.state.party || [];
+        const partyCount = party.filter(p => p).length;
+
+        // PC Pokémon section
+        const pcTitle = document.createElement('div');
+        pcTitle.style.cssText = 'font-weight:bold;color:#ffd700;margin-bottom:8px;';
+        pcTitle.textContent = 'Pokémon en réserve (' + pc.length + ')';
+        container.appendChild(pcTitle);
+
+        if (pc.length === 0) {
+            const empty = document.createElement('p');
+            empty.style.cssText = 'color:#888;font-size:13px;margin-bottom:12px;';
+            empty.textContent = 'La boîte est vide.';
+            container.appendChild(empty);
+        } else {
+            const pcList = document.createElement('div');
+            pcList.className = 'pokemon-party-list';
+
+            pc.forEach((pokemon, pcIndex) => {
+                if (!pokemon) return;
+                const data = getPokemonById(pokemon.id);
+                if (!data) return;
+
+                const row = document.createElement('div');
+                row.className = 'party-pokemon';
+                row.style.cssText = 'align-items:center;';
+
+                const spriteContainer = document.createElement('div');
+                spriteContainer.className = 'sprite-container';
+                const spriteCanvas = document.createElement('canvas');
+                spriteCanvas.width = 48;
+                spriteCanvas.height = 48;
+                SpriteRenderer.drawPokemon(spriteCanvas.getContext('2d'), pokemon.id, 0, 0, 48, 'front', pokemon.isShiny);
+                spriteContainer.appendChild(spriteCanvas);
+                row.appendChild(spriteContainer);
+
+                const info = document.createElement('div');
+                info.className = 'info';
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'name';
+                nameDiv.textContent = pokemon.nickname || data.name;
+                info.appendChild(nameDiv);
+                const detDiv = document.createElement('div');
+                detDiv.className = 'details';
+                detDiv.textContent = 'Nv. ' + pokemon.level + ' | PV ' + pokemon.currentHp + '/' + (pokemon.stats ? pokemon.stats.hp : '?');
+                info.appendChild(detDiv);
+                row.appendChild(info);
+
+                const withdrawBtn = document.createElement('button');
+                withdrawBtn.style.cssText = 'padding:4px 10px;font-size:12px;border-radius:6px;border:1px solid #555;background:#2a2a3e;color:#eee;cursor:pointer;margin-left:auto;white-space:nowrap;';
+                if (partyCount < 6) {
+                    withdrawBtn.textContent = 'Retirer';
+                    withdrawBtn.addEventListener('click', () => {
+                        game.state.party.push(pokemon);
+                        game.state.pc.splice(pcIndex, 1);
+                        AudioSystem.playSfx('select');
+                        this._renderMenu();
+                    });
+                } else {
+                    withdrawBtn.textContent = 'Retirer';
+                    withdrawBtn.style.opacity = '0.4';
+                    withdrawBtn.style.cursor = 'default';
+                    withdrawBtn.title = 'Équipe pleine — déposez d\'abord un Pokémon.';
+                }
+                row.appendChild(withdrawBtn);
+
+                pcList.appendChild(row);
+            });
+
+            container.appendChild(pcList);
+        }
+
+        // Party Pokémon section (deposit)
+        const partyTitle = document.createElement('div');
+        partyTitle.style.cssText = 'font-weight:bold;color:#ffd700;margin:14px 0 8px;';
+        partyTitle.textContent = 'Équipe (' + partyCount + '/6)';
+        container.appendChild(partyTitle);
+
+        const partyList = document.createElement('div');
+        partyList.className = 'pokemon-party-list';
+
+        party.forEach((pokemon, partyIndex) => {
+            if (!pokemon) return;
+            const data = getPokemonById(pokemon.id);
+            if (!data) return;
+
+            const row = document.createElement('div');
+            row.className = 'party-pokemon';
+            row.style.cssText = 'align-items:center;';
+
+            const spriteContainer = document.createElement('div');
+            spriteContainer.className = 'sprite-container';
+            const spriteCanvas = document.createElement('canvas');
+            spriteCanvas.width = 48;
+            spriteCanvas.height = 48;
+            SpriteRenderer.drawPokemon(spriteCanvas.getContext('2d'), pokemon.id, 0, 0, 48, 'front', pokemon.isShiny);
+            spriteContainer.appendChild(spriteCanvas);
+            row.appendChild(spriteContainer);
+
+            const info = document.createElement('div');
+            info.className = 'info';
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
+            nameDiv.textContent = pokemon.nickname || data.name;
+            info.appendChild(nameDiv);
+            const detDiv = document.createElement('div');
+            detDiv.className = 'details';
+            detDiv.textContent = 'Nv. ' + pokemon.level;
+            info.appendChild(detDiv);
+            row.appendChild(info);
+
+            const depositBtn = document.createElement('button');
+            depositBtn.style.cssText = 'padding:4px 10px;font-size:12px;border-radius:6px;border:1px solid #555;background:#2a2a3e;color:#eee;cursor:pointer;margin-left:auto;white-space:nowrap;';
+            if (partyCount > 1) {
+                depositBtn.textContent = 'Déposer';
+                depositBtn.addEventListener('click', () => {
+                    if (!game.state.pc) game.state.pc = [];
+                    game.state.pc.push(pokemon);
+                    game.state.party.splice(partyIndex, 1);
+                    AudioSystem.playSfx('select');
+                    this._renderMenu();
+                });
+            } else {
+                depositBtn.textContent = 'Déposer';
+                depositBtn.style.opacity = '0.4';
+                depositBtn.style.cursor = 'default';
+                depositBtn.title = 'Impossible de déposer le dernier Pokémon de l\'équipe.';
+            }
+            row.appendChild(depositBtn);
+
+            partyList.appendChild(row);
+        });
+
+        container.appendChild(partyList);
     },
 
     // -- Bag Tab --

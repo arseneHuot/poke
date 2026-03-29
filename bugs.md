@@ -1863,7 +1863,7 @@ const statusCured = pokemon.status && (
 ---
 
 ## Bug #98 - Player Pokémon sprite missing at battle start; disappears during attack animations
-**Status:** Open
+**Status:** Cannot Reproduce (2026-03-29)
 **Priority:** Major
 **File:** js/battle.js (render / sprite initialization)
 
@@ -1883,25 +1883,68 @@ const statusCured = pokemon.status && (
 
 **Root cause:** Likely the player Pokémon sprite is only drawn in specific render states (e.g. 'idle' or 'selecting') and the initial 'intro' state and 'attacking' state do not trigger the sprite draw call.
 
+**Retest note (2026-03-29):** Could not reproduce in retesting. Code analysis shows `playerAnim.alpha` is initialized to 1 in `_initBattle` (line 58) and `_showParty` (line 978), and is only set to 0 in `_handlePlayerFaint` (line 1326). The enemy sprite correctly starts at alpha=0 during trainer intro (intentional). What was observed as "missing player sprite" was likely the enemy sprite being hidden during intro, misidentified due to non-standard platform layout (player at left/25%, enemy at right/70%). Monitor for regression.
+
 **Found:** 2026-03-29
 
 ---
 
 ## Bug #99 - Super Bonbon (Rare Candy) from party menu does not trigger evolution
-**Status:** Open
+**Status:** Fixed (2026-03-29) — Already resolved by Bug #98 (Bonbon Rare fix)
 **Priority:** Major
 **File:** js/ui.js (`_showPokemonDetail`)
 
 **Description:** Using a Super Bonbon (Rare Candy) on a Pokémon from the party detail view levels the Pokémon up correctly but never checks for evolution. A Pokémon that reaches its evolution level via Rare Candy remains unevolved.
 
-**Steps to reproduce:**
-1. Have a Pokémon one level below its evolution threshold (e.g. Flamby at Lv.15, evolves at Lv.16)
-2. Open menu → Équipe → click on Pokémon → click Super Bonbon
-3. Notification: "Flamby passe au Nv.16 !" — level confirmed
-4. Pokémon remains unevolved (still Flamby id=1, not Flamberg id=2)
-
-**Expected:** When the new level meets or exceeds `evolveLevel`, the evolution sequence should play.
-
 **Root cause:** In `_showPokemonDetail`, the `levelup` item handler directly sets `pokemon.level` and calls `recalcStats(pokemon)` with no evolution check. The battle EXP flow uses `addExp()` which returns `{type:'evolve'}` events — this path is bypassed entirely when using a Rare Candy from the menu.
+
+**Fix:** Code at js/ui.js line 750–762 already contains `checkEvolution(pokemon)` call and `evolvePokemon()` in the levelup handler — applied as part of the Bug #98 (Bonbon Rare) fix. Verified in code review (2026-03-29).
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #100 - PC box Pokémon inaccessible — no UI to retrieve stored Pokémon
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/ui.js (missing feature)
+
+**Description:** When the player catches a Pokémon with a full party (6 members), the caught Pokémon is correctly sent to `game.state.pc[]` (js/battle.js line 1443–1444). However, there is no UI anywhere in the game to view, withdraw, or deposit Pokémon from the PC box. Once a Pokémon is stored in the PC, it is permanently inaccessible to the player. The `game.state.pc` array is saved and loaded correctly, but the data is silently stranded.
+
+**Steps to reproduce:**
+1. Fill the party with 6 Pokémon
+2. Catch a 7th Pokémon — it is sent to the PC (confirmed via `game.state.pc`)
+3. Open menu → Équipe — only 6 party Pokémon shown
+4. No "PC" option exists anywhere in the game menus
+
+**Expected:** Interacting with the PC tile (TILE.PC=18 in Borgo) or a menu option should open a box UI allowing the player to view and swap Pokémon between the party and PC.
+**Actual:** PC tile only triggers nurse healing (`_healParty`). No box UI exists. Pokémon in `game.state.pc` are trapped.
+
+**Root cause:** The PC box UI was never implemented. `_healParty()` is the only handler for TILE.PC interaction; no "manage box" screen was built.
+
+**Fix:** Added a "Boîte PC" tab to the pause menu (`_renderMenu` tabs array + `case 'pcbox'` switch + new `_renderPCBoxTab` method in js/ui.js). The tab shows all `game.state.pc` Pokémon with a "Retirer" button (enabled when party < 6) and all party Pokémon with a "Déposer" button (enabled when party > 1, preventing depositing last Pokémon).
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #101 - Party Pokémon order cannot be changed
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/ui.js (`_showPokemonDetail`)
+
+**Description:** There is no way to reorder Pokémon in the party from the menu. The `_showPokemonDetail` screen shows stats, moves, and usable items but offers no "Move" or "Swap" button. In mainline Pokémon games the player can drag or swap Pokémon to change the battle order (e.g. put a stronger Pokémon in the lead slot).
+
+**Steps to reproduce:**
+1. Open menu → Équipe
+2. Click on any Pokémon — detail view opens
+3. No option to move or swap party order exists
+
+**Expected:** A "Changer de place" or equivalent button to swap the selected Pokémon with another party slot.
+**Actual:** No reorder mechanism exists. Party order is fixed at capture/receive time.
+
+**Root cause:** Feature never implemented in `_showPokemonDetail` or the party list.
+
+**Fix:** Added a "Déplacer" button in `_showPokemonDetail` (visible when party has ≥ 2 Pokémon). Clicking it calls the new `_showSwapPokemon(pokemon, fromIndex)` method, which renders the remaining party slots as click targets. Selecting one swaps the two Pokémon in `game.state.party` and returns to the party list.
 
 **Found:** 2026-03-29
