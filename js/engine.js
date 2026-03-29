@@ -39,6 +39,17 @@ const GameEngine = {
     // Repel tracking
     repelSteps: 0,
 
+    // Follower Pokémon state
+    followerX: 0,
+    followerY: 0,
+    followerDir: 0, // initialized properly in init()
+    followerMoving: false,
+    followerMoveStartX: 0,
+    followerMoveStartY: 0,
+    followerMoveTargetX: 0,
+    followerMoveTargetY: 0,
+    followerMoveProgress: 0,
+
     init(canvas, game) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
@@ -62,6 +73,15 @@ const GameEngine = {
         this.lastSafeMap = null;
         this.lastSafeX = null;
         this.lastSafeY = null;
+
+        // Reset follower state
+        const px = game.state ? game.state.playerX : 20;
+        const py = game.state ? game.state.playerY : 16;
+        this.followerX = px;
+        this.followerY = py;
+        this.followerDir = DIR.DOWN;
+        this.followerMoving = false;
+        this.followerMoveProgress = 0;
 
         // Input handling — only bind once to avoid duplicate listeners on restart
         if (!this._eventsBound) {
@@ -109,6 +129,15 @@ const GameEngine = {
                 this.moving = false;
                 this.moveProgress = 0;
 
+                // Advance follower one step toward the player's previous position
+                this.followerMoveStartX = Math.round(this.followerX);
+                this.followerMoveStartY = Math.round(this.followerY);
+                this.followerMoveTargetX = this.moveStartX;
+                this.followerMoveTargetY = this.moveStartY;
+                this.followerDir = state.playerDir;
+                this.followerMoving = true;
+                this.followerMoveProgress = 0;
+
                 // Play footstep sound based on terrain
                 if (typeof AudioSystem !== 'undefined') {
                     const stepMap = WorldData.getMap(state.currentMap);
@@ -147,6 +176,20 @@ const GameEngine = {
         // If not moving, check for held movement keys
         if (!this.moving && !this.inputLocked) {
             this._checkMovementKeys();
+        }
+
+        // Update follower Pokémon position
+        if (this.followerMoving) {
+            this.followerMoveProgress += this.moveSpeed * dt;
+            if (this.followerMoveProgress >= 1) {
+                this.followerX = this.followerMoveTargetX;
+                this.followerY = this.followerMoveTargetY;
+                this.followerMoving = false;
+                this.followerMoveProgress = 0;
+            } else {
+                this.followerX = this.followerMoveStartX + (this.followerMoveTargetX - this.followerMoveStartX) * this.followerMoveProgress;
+                this.followerY = this.followerMoveStartY + (this.followerMoveTargetY - this.followerMoveStartY) * this.followerMoveProgress;
+            }
         }
 
         // Update camera smoothly
@@ -234,6 +277,18 @@ const GameEngine = {
             }
         }
 
+        // Follower Pokémon entity (first alive party Pokémon)
+        const followerPokemon = state.party && state.party.find(p => p && p.currentHp > 0);
+        if (followerPokemon) {
+            entities.push({
+                type: 'follower',
+                x: this.followerX * TILE_SIZE,
+                y: this.followerY * TILE_SIZE,
+                sortY: this.followerY,
+                pokemon: followerPokemon
+            });
+        }
+
         // Player entity
         entities.push({
             type: 'player',
@@ -256,6 +311,19 @@ const GameEngine = {
                     npc.type,
                     npc.dir !== undefined ? npc.dir : DIR.DOWN,
                     frame
+                );
+            } else if (entity.type === 'follower') {
+                // Draw follower Pokémon sprite (32px, centered on tile)
+                const fSize = 32;
+                const fOffset = (TILE_SIZE - fSize) / 2;
+                SpriteRenderer.drawPokemon(
+                    ctx,
+                    entity.pokemon.id,
+                    Math.round(entity.x + fOffset),
+                    Math.round(entity.y + fOffset),
+                    fSize,
+                    'front',
+                    entity.pokemon.isShiny || false
                 );
             } else if (entity.type === 'player') {
                 const walkFrame = this.moving ? frame : 0;
@@ -644,6 +712,12 @@ const GameEngine = {
 
         this.moving = false;
         this.moveProgress = 0;
+
+        // Snap follower to new player position on warp
+        this.followerX = target.x;
+        this.followerY = target.y;
+        this.followerMoving = false;
+        this.followerMoveProgress = 0;
 
         // Update camera immediately to new position
         this.cameraX = target.x * TILE_SIZE + TILE_SIZE / 2;

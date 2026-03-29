@@ -225,7 +225,7 @@
 
 - ~~**Run animation / footstep sound**~~ **Done (2026-03-29)**: Added 4 terrain-specific step SFX (`step_grass`, `step_path`, `step_cave`, `step_sand`) to AudioSystem. `engine.js` plays the appropriate sound on every movement step completion based on the destination tile type (TALL_GRASS/FLOWER → rustle, CAVE_FLOOR → hollow tap, SAND → soft rustle, everything else → stone click).
 
-- **Pokémon following the player**: Show the first party Pokémon as a small sprite following one tile behind the player in the overworld. Classic QoL feature from HeartGold/SoulSilver.
+- ~~**Pokémon following the player**~~ **Done (2026-03-29)**: First alive party Pokémon follows one tile behind the player in the overworld. Follower state tracked in `GameEngine` (followerX/Y, followerMoving, followerMoveProgress). Follower animates at the same speed as the player, snaps to player position on warp, and is rendered as a 32px Pokémon sprite via `SpriteRenderer.drawPokemon` in the y-sorted entity list.
 
 ---
 
@@ -245,3 +245,19 @@
 
 - ~~**Warp tile validation at map load**~~ **Done (2026-03-29)**: Added warp validation in `WorldData.getMap()` — after a map is generated, all its warps are checked: source tile at `(x,y)` and target tile at `(targetX,targetY)` in the destination map (if already loaded) are verified against `WALKABLE_TILES`. Non-walkable tiles log `console.warn` with map name and coordinates. Prevents future regressions like Bugs #89–93.
 
+
+---
+
+## New Suggestions (2026-03-29 QA session #9 — Items, Dialogue, Battle UX)
+
+### Battle / Items
+
+- **Party selection for heal items in battle**: Currently heal items in battle (`selectItem`) always target the active Pokémon. Add a party selection panel (like the overworld `_showItemUseTarget`) so the player can choose which party member to heal mid-battle. This would make benched Pokémon healable and prevent accidental waste on a full-HP active Pokémon. See Bug #96.
+
+- **Block menu open during active dialogue**: Pressing Escape during dialogue currently interrupts and destroys the dialogue (see Bug #95). The key handler should detect `UI.dialogue.active` and route Escape to `advanceDialogue()` instead of `openMenu()`, matching Pokémon game conventions. Already partially guarded in some paths but not consistently enforced.
+
+### Overworld / UX
+
+- **Antidote/status item party indicator**: In the overworld `_showItemUseTarget` party list, grey out or mark Pokémon that the selected item cannot affect (e.g. a healthy Pokémon for Antidote, or a full-HP Pokémon for Potion). Currently every Pokémon is shown as selectable, and the "no effect" feedback only appears after clicking.
+
+- **Bag item use from party tab**: Allow using items directly from the Équipe party detail screen (e.g. click Potion while viewing a party member's detail) instead of having to navigate to Sac → select item → pick Pokémon. Common QoL shortcut in modern Pokémon games.
