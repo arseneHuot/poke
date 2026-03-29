@@ -803,9 +803,11 @@ const BattleSystem = {
                 return;
             }
             game.state.bag[itemId]--;
+            if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
             this._executeCatch(itemId);
         } else if (item.type === 'heal') {
             game.state.bag[itemId]--;
+            if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
             const pp = this.state.playerPokemon;
             const healAmt = item.healAmount || 20;
             const old = pp.currentHp;
@@ -822,6 +824,7 @@ const BattleSystem = {
             );
             if (statusCured) {
                 game.state.bag[itemId]--;
+                if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
                 pp.status = null;
                 AudioSystem.playSfx('heal');
                 this._queueMessage(`${pp.nickname || pp.name} est soigné !`);
@@ -861,6 +864,7 @@ const BattleSystem = {
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('heal');
                 game.state.bag[itemId]--;
+                if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
                 const healPct = item.healPercent || 0.5;
                 pkmn.currentHp = Math.max(1, Math.floor(pkmn.stats.hp * healPct));
                 this._queueMessage(`${pkmn.nickname || pkmn.name} est ranimé !`);

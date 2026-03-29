@@ -1536,3 +1536,57 @@ const statusCured = pokemon.status && (
 
 **Found:** 2026-03-29
 
+---
+
+## Bug #85 - Game loop dies silently on any unhandled JS exception
+**Status:** Open
+**Priority:** Critical
+**File:** js/main.js (`loop`)
+
+**Description:** The `game.loop(timestamp)` function calls `update(dt)` and `render()` inside the rAF callback with no try/catch wrapper. Any unhandled JavaScript exception thrown during `update()` or `render()` permanently terminates the animation loop — the game freezes completely (no movement, no animations, no input response) with no error message shown to the player. The only recovery is a page reload.
+
+**Steps to reproduce:**
+1. Trigger any unhandled JS exception during gameplay (e.g., access a property on `undefined` in a move handler, or during an encounter transition with malformed Pokémon data)
+2. The game silently freezes — no toast, no dialog, no in-game error visible
+3. Player must reload the page and loses unsaved progress
+
+**Root cause:** `game.loop()` has no try/catch around `update()` or `render()`. Any uncaught exception escapes to the rAF scheduler which does not reschedule the next frame after a throw, permanently stopping the loop.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #86 - Player stuck unable to move after returning from a battle that triggered mid-step
+**Status:** Fixed (2026-03-29)
+**Priority:** High
+**File:** js/main.js (`endBattle`)
+
+**Description:** If a wild encounter fires while the player is mid-movement (i.e., `this.moving === true` when `startEncounter()` is called), `encounterActive = true` blocks movement processing in `update()`. The move-completion callback that resets `moving = false` never runs during the encounter transition or battle. When the battle ends and `gameMode` returns to `'overworld'`, `this.moving` is still `true`, blocking `_checkMovementKeys()`. The player appears stuck on the map and cannot move.
+
+**Steps to reproduce:**
+1. Walk through tall grass on Route 3 repeatedly
+2. If a random encounter fires at the exact moment between `_tryMove()` setting `moving=true` and the movement step completing, the player gets stuck
+3. Battle plays out normally
+4. After returning to the overworld the player cannot move at all — all directional input is ignored
+
+**Root cause:** `GameEngine.update()` guards movement with the encounter-active check. When `startEncounter()` fires mid-move, `moving` stays `true`. The encounter transition completes and calls `game.startBattle()` changing `gameMode` to `'battle'`. When `gameMode` returns to `'overworld'`, the `moving` flag is never cleared because `_updateMovement()` was never given a chance to finish the step and fire its completion callback.
+
+**Fix:** Added `GameEngine.moving = false; GameEngine.encounterActive = false;` at the start of `endBattle()` in `main.js`. This ensures any stale mid-step movement state is cleared when returning from battle.
+
+**Found:** 2026-03-29
+
+
+---
+
+## Bug #85 - Battle bag item use leaves zero-quantity entries in bag on save
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/battle.js (`selectItem`, `_showReviveTarget`)
+
+**Description:** When using heal, status cure, revive, or Poké Ball items in battle via `selectItem` and `_showReviveTarget`, the bag quantity is decremented but zero-quantity entries are never deleted from `game.state.bag`. This is inconsistent with the overworld `_useItemOnPokemon` handler which correctly calls `delete game.state.bag[itemId]` when quantity reaches 0.
+
+**Root cause:** `selectItem` (heal, status, ball cases) and `_showReviveTarget` (revive click handler) all decrement `game.state.bag[itemId]--` without a subsequent cleanup.
+
+**Fix:** Added `if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];` after each bag decrement in `selectItem` and the revive handler in `_showReviveTarget`.
+
+**Found:** 2026-03-29

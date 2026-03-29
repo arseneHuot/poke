@@ -297,6 +297,9 @@ const game = {
     endBattle(result) {
         this.state.gameMode = 'overworld';
         GameEngine.inputLocked = false;
+        // Reset movement state in case battle triggered mid-step (prevents player getting stuck)
+        GameEngine.moving = false;
+        GameEngine.encounterActive = false;
 
         // Hide battle UI
         const battleUI = document.getElementById('battle-ui');
