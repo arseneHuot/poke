@@ -233,8 +233,12 @@ const game = {
         const dt = Math.min((timestamp - this.lastFrameTime) / 1000, 0.1);
         this.lastFrameTime = timestamp;
 
-        this.update(dt);
-        this.render(timestamp);
+        try {
+            this.update(dt);
+            this.render(timestamp);
+        } catch (e) {
+            console.error('[Game loop error]', e);
+        }
 
         requestAnimationFrame((t) => this.loop(t));
     },

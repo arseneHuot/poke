@@ -1539,7 +1539,7 @@ const statusCured = pokemon.status && (
 ---
 
 ## Bug #85 - Game loop dies silently on any unhandled JS exception
-**Status:** Open
+**Status:** Fixed (2026-03-29)
 **Priority:** Critical
 **File:** js/main.js (`loop`)
 
@@ -1551,6 +1551,8 @@ const statusCured = pokemon.status && (
 3. Player must reload the page and loses unsaved progress
 
 **Root cause:** `game.loop()` has no try/catch around `update()` or `render()`. Any uncaught exception escapes to the rAF scheduler which does not reschedule the next frame after a throw, permanently stopping the loop.
+
+**Fix:** Wrapped `this.update(dt)` and `this.render(timestamp)` in a try/catch block inside `loop()`. The `requestAnimationFrame` call is now always reached, keeping the loop alive even after exceptions. Errors are logged to the console via `console.error`.
 
 **Found:** 2026-03-29
 
