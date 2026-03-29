@@ -297,3 +297,9 @@
 - ~~**Player sprite gradient shading**~~ **Done (2026-03-29)**: Player character now renders with gradient fills on jacket, hat, skin, backpack, arms, and legs. Outlines added to major body parts. Much more polished 3D appearance.
 
 - ~~**NPC sprite gradient shading**~~ **Done (2026-03-29)**: All NPC types now render with gradient fills on shirt, pants, skin, and hair. Body outlines added. NPCs look more polished and consistent with the upgraded player sprite.
+
+- ~~**Bird sprite gradient + radial shading**~~ **Done (2026-03-29)**: Bird body, breast, and head now use radial gradients for sphere-like 3D shading. Body and head have dark outlines. Eyes upgraded with `_drawEye` (iris + reflection).
+
+- ~~**Aquatic sprite gradient + scale detail**~~ **Done (2026-03-29)**: Aquatic body uses radial gradient with outline. Added scale arc details on the body. Eye upgraded with `_drawEye`.
+
+- ~~**Dragon sprite gradient + outline**~~ **Done (2026-03-29)**: Dragon body and head now use `_gradientRect` with outlines. Belly has gradient fill. Eyes upgraded with `_drawEye` for expressive dragon pupils.
