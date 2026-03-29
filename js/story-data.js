@@ -24,6 +24,9 @@ const DIALOGUES = {
     mom_house_dialogue: [
         { name: "Maman", text: "N'oublie pas de soigner tes Pokémon au Centre Pokémon quand ils sont fatigués !" }
     ],
+    rival_mom_dialogue: [
+        { name: "Maman de Kaël", text: "Kaël est parti en voyage Pokémon... Il rêvait de devenir Champion depuis tout petit. Je lui fais confiance !" }
+    ],
     lab_assistant: [
         { name: "Assistant", text: "Le professeur étudie les Pokémon de la région de Novara. Il y en a 150 espèces !" }
     ],

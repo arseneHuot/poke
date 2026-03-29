@@ -219,7 +219,7 @@
 
 - **Quantity selector for bulk purchases**: Currently the shop only buys 1 item per click. Add a quantity selector (e.g. +1/+5/+10 buttons or a number input) to allow buying multiple items at once.
 
-- **Confirm dialog before selling**: Add a brief "Vendre [item] pour [N] PO ?" confirmation step before completing a sale, to prevent accidental sells.
+- ~~**Confirm dialog before selling**~~ **Done (2026-03-29)**: Clicking "Vendre" now shows inline confirmation buttons ("Oui" / "Non") in place of the sell button. "Oui" completes the sale and re-renders the shop; "Non" re-renders the sell list without selling.
 
 ### Overworld / UX
 

@@ -29,6 +29,7 @@ const WorldData = {
             pokemon_league: () => this._createPokemonLeague(),
             prof_lab: () => this._createProfLab(),
             player_house: () => this._createPlayerHouse(),
+            rival_house: () => this._createRivalHouse(),
         };
         // Eagerly generate starting area for instant boot
         this._generators.borgo();
@@ -86,7 +87,6 @@ const WorldData = {
 
         // Trees border
         for (let x = 0; x < w; x++) {
-            tiles[0][x] = TILE.TREE;
             if (x < 17 || x > 21) tiles[0][x] = TILE.TREE;
         }
         for (let y = 0; y < h; y++) {
@@ -159,6 +159,7 @@ const WorldData = {
                 { x: 19, y: 0, targetMap: 'route1', targetX: 19, targetY: 38 },
                 { x: 9, y: 12, targetMap: 'player_house', targetX: 5, targetY: 8 },
                 { x: 28, y: 13, targetMap: 'prof_lab', targetX: 8, targetY: 12 },
+                { x: 30, y: 22, targetMap: 'rival_house', targetX: 5, targetY: 7 },
             ]
         };
     },
@@ -188,6 +189,31 @@ const WorldData = {
                   dialogue: 'mom_house_dialogue' }
             ],
             warps: [{ x: 5, y: h-1, targetMap: 'borgo', targetX: 9, targetY: 13 }]
+        };
+    },
+
+    _createRivalHouse() {
+        const w = 12, h = 9;
+        const tiles = this._createEmptyMap(w, h, TILE.GYM_FLOOR);
+        for (let x = 0; x < w; x++) { tiles[0][x] = TILE.WALL; tiles[h-1][x] = TILE.WALL; }
+        for (let y = 0; y < h; y++) { tiles[y][0] = TILE.WALL; tiles[y][w-1] = TILE.WALL; }
+        tiles[h-1][5] = TILE.DOOR;
+        // Furniture
+        tiles[1][2] = TILE.BOOKSHELF;
+        tiles[1][9] = TILE.BOOKSHELF;
+        tiles[3][7] = TILE.TABLE;
+        tiles[3][8] = TILE.TABLE;
+        tiles[5][3] = TILE.RUG;
+        tiles[5][4] = TILE.RUG;
+
+        this.maps['rival_house'] = {
+            id: 'rival_house', name: "Maison de Kaël", width: w, height: h, tiles,
+            music: 'indoor', encounters: [],
+            npcs: [
+                { id: 'rival_mom', type: 'villager', x: 6, y: 3, dir: DIR.DOWN, name: "Maman de Kaël",
+                  dialogue: 'rival_mom_dialogue' }
+            ],
+            warps: [{ x: 5, y: h-1, targetMap: 'borgo', targetX: 30, targetY: 21 }]
         };
     },
 

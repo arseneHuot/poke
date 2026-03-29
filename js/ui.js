@@ -1533,16 +1533,33 @@ const UI = {
             sellBtn.style.padding = '4px 12px';
             sellBtn.textContent = 'Vendre';
             sellBtn.addEventListener('click', () => {
-                if (!game || !game.state) return;
-                game.state.money += sellPrice;
-                game.state.bag[itemId]--;
-                if (game.state.bag[itemId] <= 0) {
-                    delete game.state.bag[itemId];
-                }
-                AudioSystem.playSfx('select');
-                this.showNotification(itemData.name + ' vendu pour ' + sellPrice + ' $ !');
-                this._renderShop();
-            });
+                // Show inline confirmation
+                rightCol.innerHTML = '';
+                const confirmLabel = document.createElement('span');
+                confirmLabel.style.cssText = 'color:#ffd700;font-size:0.85em;white-space:nowrap;';
+                confirmLabel.textContent = sellPrice + ' $ ?';
+                const yesBtn = document.createElement('button');
+                yesBtn.className = 'menu-tab';
+                yesBtn.style.padding = '3px 8px';
+                yesBtn.textContent = 'Oui';
+                yesBtn.addEventListener('click', () => {
+                    if (!game || !game.state) return;
+                    game.state.money += sellPrice;
+                    game.state.bag[itemId]--;
+                    if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
+                    AudioSystem.playSfx('select');
+                    this.showNotification(itemData.name + ' vendu pour ' + sellPrice + ' $ !');
+                    this._renderShop();
+                }, { once: true });
+                const noBtn = document.createElement('button');
+                noBtn.className = 'menu-tab';
+                noBtn.style.padding = '3px 8px';
+                noBtn.textContent = 'Non';
+                noBtn.addEventListener('click', () => { this._renderShop(); }, { once: true });
+                rightCol.appendChild(confirmLabel);
+                rightCol.appendChild(yesBtn);
+                rightCol.appendChild(noBtn);
+            }, { once: true });
             rightCol.appendChild(sellBtn);
 
             row.appendChild(rightCol);

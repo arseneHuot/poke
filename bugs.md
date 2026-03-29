@@ -1616,3 +1616,45 @@ const statusCured = pokemon.status && (
 **Fix:** Added whiteout trigger in both `startWildBattle` and `startTrainerBattle`: when `party.find(p => p && p.currentHp > 0)` returns null, call `game.endBattle('lose')` immediately instead of returning silently. This heals the party, warps to the last safe map, and deducts half money — same as a normal whiteout.
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #89 - Borgo north exit permanently blocked — route1 warps sit on TREE tiles
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/world-data.js (borgo map definition)
+
+**Description:** The player cannot exit Borgo northward to Route 1 through normal movement. The borgo map defines two warps at `{x:19,y:0}` and `{x:20,y:0}` targeting route1, but `WorldData.getMap('borgo').tiles[0][19]` and `tiles[0][20]` are both `TILE.TREE` (value 4), which is not in `WALKABLE_TILES`. `GameEngine._canWalkTo(19,0)` and `_canWalkTo(20,0)` both return false. The player is permanently blocked by the tree row at y=0 and can never trigger the northward warp.
+
+**Steps to reproduce:**
+1. Start a new game (player spawns in Borgo at x=20, y=16)
+2. Walk north — player stops at y=1 and cannot move further
+3. Inspect `WorldData.getMap('borgo').tiles[0]` — columns 19 and 20 are TILE.TREE (4)
+
+**Expected:** The top row of Borgo at the warp columns should be walkable (GRASS, PATH, or a transparent transition tile) so the player can step onto y=0 and trigger the warp to Route 1.
+**Actual:** TREE tiles at y=0 block all movement; the northern exit is inaccessible. The entire northward route progression (Route 1 → Porto → badges) is gated behind this unpassable row.
+
+**Root cause:** In the borgo tile map, row 0 (the northernmost row) is uniformly filled with TREE tiles or uses a tile value that is not walkable at the two warp columns (x=19, x=20). The warp entries exist in `borgo.warps` but are unreachable.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #90 - Borgo rival's house DOOR tile has no warp target
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/world-data.js (borgo map definition)
+
+**Description:** In Borgo, tile `(30,22)` is `TILE.DOOR` (value 7, included in `WALKABLE_TILES`). The rival NPC "Kaël" stands at `(30,21)` directly in front of it, suggesting it leads to his house interior. However, no entry in `borgo.warps` matches `{x:30, y:22}`. When the player walks onto the door tile, `_checkWarps()` iterates the warp list, finds no matching coordinates, and does nothing. There is no interior map for the rival's house.
+
+**Steps to reproduce:**
+1. In Borgo, navigate to tile (30, 22) — south-east area near the rival NPC Kaël
+2. The DOOR tile is walkable; the player can stand on it
+3. No warp triggers; the player simply stands on the door
+
+**Expected:** Stepping on the DOOR tile at (30,22) should warp the player into the rival's house interior (a new map), consistent with every other building door in the game.
+**Actual:** Nothing happens. The rival's house door is a dead end.
+
+**Root cause:** The interior map for Kaël's house was never created, and no warp entry for `{x:30, y:22}` was added to borgo's warp list.
+
+**Found:** 2026-03-29
