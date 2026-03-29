@@ -258,6 +258,6 @@
 
 ### Overworld / UX
 
-- **Antidote/status item party indicator**: In the overworld `_showItemUseTarget` party list, grey out or mark Pokémon that the selected item cannot affect (e.g. a healthy Pokémon for Antidote, or a full-HP Pokémon for Potion). Currently every Pokémon is shown as selectable, and the "no effect" feedback only appears after clicking.
+- ~~**Antidote/status item party indicator**~~ **Done (2026-03-29)**: In `_showItemUseTarget`, each Pokémon row now checks eligibility before rendering. Ineligible Pokémon are shown at 40% opacity with no cursor and a red reason label (e.g. "PV max", "K.O.", "Aucun effet", "Nv. max"). Click handlers are only attached to eligible targets.
 
-- **Bag item use from party tab**: Allow using items directly from the Équipe party detail screen (e.g. click Potion while viewing a party member's detail) instead of having to navigate to Sac → select item → pick Pokémon. Common QoL shortcut in modern Pokémon games.
+- ~~**Bag item use from party tab**~~ **Done (2026-03-29)**: Added "Utiliser un objet" section at the bottom of `_showPokemonDetail`. Shows buttons for all usable bag items (heal/revive/status/levelup). Ineligible items are shown at 40% opacity and non-clickable. Clicking an eligible item applies the effect inline, decrements the bag, shows a notification, and refreshes the detail view after 900ms.

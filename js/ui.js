@@ -674,6 +674,87 @@ const UI = {
             });
         }
 
+        // Usable items section
+        if (game && game.state && game.state.bag) {
+            const usableItems = Object.entries(game.state.bag).filter(([itemId, qty]) => {
+                if (qty <= 0) return false;
+                const iData = ITEMS[itemId];
+                if (!iData) return false;
+                return iData.type === 'heal' || iData.type === 'revive' || iData.type === 'status' || iData.type === 'levelup';
+            });
+
+            if (usableItems.length > 0) {
+                const itemsTitle = document.createElement('div');
+                itemsTitle.style.cssText = 'font-weight:bold;margin:12px 0 6px;color:#ffd700;';
+                itemsTitle.textContent = 'Utiliser un objet';
+                panel.appendChild(itemsTitle);
+
+                const itemsList = document.createElement('div');
+                itemsList.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+
+                usableItems.forEach(([itemId, qty]) => {
+                    const iData = ITEMS[itemId];
+
+                    // Check eligibility for this Pokémon
+                    let eligible = true;
+                    if (iData.type === 'heal') {
+                        if (pokemon.currentHp <= 0 || (pokemon.stats && pokemon.currentHp >= pokemon.stats.hp)) eligible = false;
+                    } else if (iData.type === 'revive') {
+                        if (pokemon.currentHp > 0) eligible = false;
+                    } else if (iData.type === 'status') {
+                        const hasCurableStatus = pokemon.status && (
+                            pokemon.status === iData.cures ||
+                            (iData.cures === 'poison' && pokemon.status === 'badly_poisoned')
+                        );
+                        if (!hasCurableStatus) eligible = false;
+                    } else if (iData.type === 'levelup') {
+                        if (pokemon.currentHp <= 0 || pokemon.level >= 100) eligible = false;
+                    }
+
+                    const itemBtn = document.createElement('button');
+                    itemBtn.style.cssText = 'padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid #555;background:#2a2a3e;color:#eee;cursor:pointer;';
+                    itemBtn.textContent = iData.name + ' ×' + qty;
+                    if (!eligible) {
+                        itemBtn.style.opacity = '0.4';
+                        itemBtn.style.cursor = 'default';
+                    } else {
+                        itemBtn.addEventListener('click', () => {
+                            // Apply item effect inline (same logic as _useItemOnPokemon but stays in detail view)
+                            const pkData = getPokemonById(pokemon.id);
+                            if (!pkData || !game || !game.state) return;
+                            if (iData.type === 'heal') {
+                                const maxHp = pokemon.stats ? pokemon.stats.hp : 999;
+                                pokemon.currentHp = Math.min(maxHp, pokemon.currentHp + iData.healAmount);
+                                this.showNotification(pkData.name + ' récupère des PV !');
+                            } else if (iData.type === 'revive') {
+                                pokemon.currentHp = Math.floor((pokemon.stats ? pokemon.stats.hp : 20) * iData.healPercent);
+                                pokemon.status = null;
+                                this.showNotification(pkData.name + ' est ranimé !');
+                            } else if (iData.type === 'status') {
+                                pokemon.status = null;
+                                this.showNotification(pkData.name + ' est soigné !');
+                            } else if (iData.type === 'levelup') {
+                                pokemon.level = Math.min(100, pokemon.level + 1);
+                                const oldMax = pokemon.stats.hp;
+                                recalcStats(pokemon);
+                                const hpGain = pokemon.stats.hp - oldMax;
+                                pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);
+                                this.showNotification(pkData.name + ' passe au Nv.' + pokemon.level + ' !');
+                            }
+                            game.state.bag[itemId]--;
+                            if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
+                            AudioSystem.playSfx('select');
+                            // Refresh the detail view after a short delay
+                            setTimeout(() => this._showPokemonDetail(pokemon, index), 900);
+                        });
+                    }
+                    itemsList.appendChild(itemBtn);
+                });
+
+                panel.appendChild(itemsList);
+            }
+        }
+
         // Back button
         const backBtn = document.createElement('button');
         backBtn.className = 'menu-tab';
@@ -802,8 +883,31 @@ const UI = {
             const data = getPokemonById(pokemon.id);
             if (!data) return;
 
+            // Determine eligibility for this item
+            let eligible = true;
+            let ineligibleReason = '';
+            if (itemData.type === 'heal') {
+                if (pokemon.currentHp <= 0) { eligible = false; ineligibleReason = 'K.O.'; }
+                else if (pokemon.stats && pokemon.currentHp >= pokemon.stats.hp) { eligible = false; ineligibleReason = 'PV max'; }
+            } else if (itemData.type === 'revive') {
+                if (pokemon.currentHp > 0) { eligible = false; ineligibleReason = 'Pas K.O.'; }
+            } else if (itemData.type === 'status') {
+                const hasCurableStatus = pokemon.status && (
+                    pokemon.status === itemData.cures ||
+                    (itemData.cures === 'poison' && pokemon.status === 'badly_poisoned')
+                );
+                if (!hasCurableStatus) { eligible = false; ineligibleReason = 'Aucun effet'; }
+            } else if (itemData.type === 'levelup') {
+                if (pokemon.currentHp <= 0) { eligible = false; ineligibleReason = 'K.O.'; }
+                else if (pokemon.level >= 100) { eligible = false; ineligibleReason = 'Nv. max'; }
+            }
+
             const row = document.createElement('div');
             row.className = 'party-pokemon';
+            if (!eligible) {
+                row.style.opacity = '0.45';
+                row.style.cursor = 'default';
+            }
 
             // Sprite
             const spriteContainer = document.createElement('div');
@@ -826,13 +930,21 @@ const UI = {
             const hpInfo = document.createElement('div');
             hpInfo.className = 'details';
             hpInfo.textContent = 'PV: ' + pokemon.currentHp + '/' + (pokemon.stats ? pokemon.stats.hp : '?');
+            if (!eligible && ineligibleReason) {
+                const reasonSpan = document.createElement('span');
+                reasonSpan.style.cssText = 'color:#e06060;font-size:11px;margin-left:8px;';
+                reasonSpan.textContent = '(' + ineligibleReason + ')';
+                hpInfo.appendChild(reasonSpan);
+            }
             info.appendChild(hpInfo);
 
             row.appendChild(info);
 
-            row.addEventListener('click', () => {
-                this._useItemOnPokemon(itemId, pokemon, index);
-            });
+            if (eligible) {
+                row.addEventListener('click', () => {
+                    this._useItemOnPokemon(itemId, pokemon, index);
+                });
+            }
 
             list.appendChild(row);
         });
