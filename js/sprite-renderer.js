@@ -392,14 +392,15 @@ const SpriteRenderer = {
         ctx.fill();
 
         // Body with gradient
+        // Streamlined fish body (wider, flatter)
         try {
-            const aqGrad = ctx.createRadialGradient(30*s, 28*s, 4*s, 34*s, 32*s, 20*s);
+            const aqGrad = ctx.createRadialGradient(30*s, 30*s, 4*s, 34*s, 32*s, 24*s);
             aqGrad.addColorStop(0, this._lighten(bodyColor, 20));
             aqGrad.addColorStop(1, this._darken(bodyColor, 15));
             ctx.fillStyle = aqGrad;
         } catch(e) { ctx.fillStyle = bodyColor; }
         ctx.beginPath();
-        ctx.ellipse(34*s, 32*s, 20*s, 16*s, 0, 0, Math.PI*2);
+        ctx.ellipse(34*s, 32*s, 24*s, 13*s, 0, 0, Math.PI*2);
         ctx.fill();
         ctx.strokeStyle = this._darken(bodyColor, 30);
         ctx.lineWidth = 1;
@@ -651,42 +652,42 @@ const SpriteRenderer = {
         ctx.ellipse(32*s, 60*s, 12*s, 3*s, 0, 0, Math.PI*2);
         ctx.fill();
 
-        // Legs
+        // Legs (tall and lean)
         ctx.fillStyle = bodyColor;
-        this._roundRect(ctx, 24*s, 44*s, 8*s, 16*s, 3*s);
-        this._roundRect(ctx, 36*s, 44*s, 8*s, 16*s, 3*s);
+        this._roundRect(ctx, 25*s, 40*s, 7*s, 20*s, 3*s);
+        this._roundRect(ctx, 36*s, 40*s, 7*s, 20*s, 3*s);
 
-        // Body (torso) with gradient
-        this._gradientRect(ctx, 22*s, 22*s, 20*s, 24*s, 6*s, bodyColor, 'v');
-        this._outline(ctx, 22*s, 22*s, 20*s, 24*s, 6*s, bodyColor);
+        // Body (torso) — tall and narrow for humanoid silhouette
+        this._gradientRect(ctx, 24*s, 16*s, 16*s, 26*s, 5*s, bodyColor, 'v');
+        this._outline(ctx, 24*s, 16*s, 16*s, 26*s, 5*s, bodyColor);
 
         // Belt or marking
         if (colors.belt) {
             ctx.fillStyle = colors.belt;
-            this._roundRect(ctx, 22*s, 40*s, 20*s, 4*s, 2*s);
+            this._roundRect(ctx, 24*s, 36*s, 16*s, 3*s, 1.5*s);
         }
 
-        // Belly
-        this._gradientRect(ctx, 26*s, 28*s, 12*s, 12*s, 4*s, bellyColor, 'v');
+        // Belly (narrower)
+        this._gradientRect(ctx, 27*s, 22*s, 10*s, 14*s, 4*s, bellyColor, 'v');
 
-        // Arms with gradient
-        this._gradientRect(ctx, 12*s, 24*s, 12*s, 6*s, 3*s, bodyColor, 'h');
-        this._gradientRect(ctx, 40*s, 24*s, 12*s, 6*s, 3*s, bodyColor, 'h');
+        // Arms (longer, positioned higher on narrow torso)
+        this._gradientRect(ctx, 14*s, 18*s, 11*s, 5*s, 3*s, bodyColor, 'h');
+        this._gradientRect(ctx, 39*s, 18*s, 11*s, 5*s, 3*s, bodyColor, 'h');
 
         // Fists
         ctx.fillStyle = colors.fists || colors.hands || bellyColor;
         ctx.beginPath();
-        ctx.arc(12*s, 27*s, 4*s, 0, Math.PI*2);
-        ctx.arc(52*s, 27*s, 4*s, 0, Math.PI*2);
+        ctx.arc(14*s, 21*s, 3.5*s, 0, Math.PI*2);
+        ctx.arc(50*s, 21*s, 3.5*s, 0, Math.PI*2);
         ctx.fill();
 
-        // Head with gradient
-        this._gradientRect(ctx, 20*s, 4*s, 24*s, 20*s, 8*s, bodyColor, 'v');
-        this._outline(ctx, 20*s, 4*s, 24*s, 20*s, 8*s, bodyColor);
+        // Head (smaller relative to tall body)
+        this._gradientRect(ctx, 23*s, 2*s, 18*s, 16*s, 7*s, bodyColor, 'v');
+        this._outline(ctx, 23*s, 2*s, 18*s, 16*s, 7*s, bodyColor);
 
         // Eyes with iris + reflection
-        this._drawEye(ctx, 30*s, 13*s, 3.5*s, eyeColor);
-        this._drawEye(ctx, 41*s, 13*s, 3.5*s, eyeColor);
+        this._drawEye(ctx, 29*s, 9*s, 3*s, eyeColor);
+        this._drawEye(ctx, 38*s, 9*s, 3*s, eyeColor);
 
         this._addTypeDecoration(ctx, s, colors, types, id);
     },

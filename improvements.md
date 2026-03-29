@@ -322,7 +322,7 @@
 
 - ~~**Starter Pokémon lack type-specific visual features**~~ **Done (2026-03-29)**: Enhanced `_addTypeDecoration` with Fire (tail flame with inner glow + head tuft), Water (floating bubbles with shine highlights), Grass (leaf on head with vein detail + vine tendril). All type-themed Pokémon now have distinctive visual features.
 
-- **Pokémon silhouettes too similar across body types**: Most Pokémon have the same roundish proportions regardless of body type. Bipeds, quadrupeds, and aquatics should have much more distinct outlines — taller/thinner for humanoids, longer/lower for quadrupeds, streamlined for aquatics.
+- ~~**Pokémon silhouettes too similar across body types**~~ **Done (2026-03-29)**: Humanoid sprites now have taller/narrower torso, longer legs, smaller head, and repositioned arms for a lean fighter silhouette. Aquatic sprites now have a wider/flatter streamlined fish-like body ellipse (24x13 instead of 20x16).
 
 ### World & Tile Rendering
 
