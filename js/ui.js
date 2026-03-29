@@ -113,6 +113,7 @@ const UI = {
             if (e.code === 'Space' || e.code === 'Enter') {
                 if (this.dialogue.active) {
                     e.preventDefault();
+                    e.stopPropagation(); // prevent engine.js window listener from re-triggering interaction
                     this.advanceDialogue();
                 }
             }
@@ -124,7 +125,10 @@ const UI = {
                 } else if (this.menu.open) {
                     e.preventDefault();
                     this.closeMenu();
-                } else if (!this.dialogue.active && game && game.state && game.state.gameMode === 'overworld') {
+                } else if (this.dialogue.active) {
+                    e.preventDefault();
+                    this.advanceDialogue();
+                } else if (game && game.state && game.state.gameMode === 'overworld') {
                     e.preventDefault();
                     this.openMenu();
                 }
@@ -411,7 +415,7 @@ const UI = {
     // Menu System
     // ----------------------------------------------------------------
     openMenu() {
-        if (this.shop.active || this.starterSelect.active) return;
+        if (this.shop.active || this.starterSelect.active || this.dialogue.active) return;
         // Always hide dialogue box when opening menu
         this._clearTypewriter();
         this.elements.dialogueBox.classList.add('hidden');

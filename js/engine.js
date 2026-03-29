@@ -489,6 +489,7 @@ const GameEngine = {
     _handleInteraction() {
         const state = this.game.state;
         if (this.moving) return;
+        if (UI.dialogue.active) return; // prevent re-triggering while dialogue is dismissing
 
         const offset = DIR_OFFSET[state.playerDir];
         const checkX = Math.round(state.playerX) + offset.x;

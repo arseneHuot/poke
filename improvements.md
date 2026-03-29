@@ -252,9 +252,9 @@
 
 ### Battle / Items
 
-- **Party selection for heal items in battle**: Currently heal items in battle (`selectItem`) always target the active Pokémon. Add a party selection panel (like the overworld `_showItemUseTarget`) so the player can choose which party member to heal mid-battle. This would make benched Pokémon healable and prevent accidental waste on a full-HP active Pokémon. See Bug #96.
+- ~~**Party selection for heal items in battle**~~ **Done (2026-03-29)**: Added `_showHealTarget(itemId)` — party selection panel for heal items in battle. Shows all alive party members with current/max HP. Full-HP targets show "X a déjà tous ses PV !" without consuming the item. See Bug #96 fix.
 
-- **Block menu open during active dialogue**: Pressing Escape during dialogue currently interrupts and destroys the dialogue (see Bug #95). The key handler should detect `UI.dialogue.active` and route Escape to `advanceDialogue()` instead of `openMenu()`, matching Pokémon game conventions. Already partially guarded in some paths but not consistently enforced.
+- ~~**Block menu open during active dialogue**~~ **Done (2026-03-29)**: `openMenu()` now guards against `dialogue.active`. Escape during dialogue now calls `advanceDialogue()` instead of silently doing nothing. Also fixed Bug #97 (dialogue restart loop) with `e.stopPropagation()` and `_handleInteraction` guard.
 
 ### Overworld / UX
 

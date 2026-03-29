@@ -833,16 +833,8 @@ const BattleSystem = {
             if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
             this._executeCatch(itemId);
         } else if (item.type === 'heal') {
-            game.state.bag[itemId]--;
-            if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
-            const pp = this.state.playerPokemon;
-            const healAmt = item.healAmount || 20;
-            const old = pp.currentHp;
-            pp.currentHp = Math.min(pp.stats.hp, pp.currentHp + healAmt);
-            const healed = pp.currentHp - old;
-            AudioSystem.playSfx('heal');
-            this._queueMessage(`${pp.nickname || pp.name} récupère ${healed} PV !`);
-            this._executeTurn({ type: 'item' });
+            this._showHealTarget(itemId);
+            return;
         } else if (item.type === 'status') {
             const pp = this.state.playerPokemon;
             const statusCured = pp.status && (
@@ -907,6 +899,59 @@ const BattleSystem = {
             msg.textContent = 'Aucun Pokémon KO !';
             movesDiv.appendChild(msg);
         }
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'battle-btn';
+        backBtn.textContent = 'RETOUR';
+        backBtn.addEventListener('click', () => {
+            AudioSystem.playSfx('cancel');
+            this._showBag();
+        });
+        movesDiv.appendChild(backBtn);
+    },
+
+    _showHealTarget(itemId) {
+        const item = ITEMS[itemId];
+        const actions = document.getElementById('battle-actions');
+        const movesDiv = document.getElementById('battle-moves');
+        if (actions) actions.classList.add('hidden');
+        if (!movesDiv) return;
+        movesDiv.classList.remove('hidden');
+        movesDiv.innerHTML = '';
+
+        const title = document.createElement('div');
+        title.className = 'battle-msg';
+        title.textContent = `Utiliser ${item.name} sur...`;
+        movesDiv.appendChild(title);
+
+        game.state.party.forEach((pkmn) => {
+            if (!pkmn || pkmn.currentHp <= 0) return;
+            const btn = document.createElement('button');
+            btn.className = 'battle-btn';
+            const hpBar = pkmn.currentHp >= pkmn.stats.hp ? ' (PV pleins)' : ` (${pkmn.currentHp}/${pkmn.stats.hp} PV)`;
+            btn.textContent = `${pkmn.nickname || pkmn.name} Nv.${pkmn.level}${hpBar}`;
+            if (pkmn.currentHp >= pkmn.stats.hp) {
+                btn.style.opacity = '0.5';
+            }
+            btn.addEventListener('click', () => {
+                if (pkmn.currentHp >= pkmn.stats.hp) {
+                    this._queueMessage(`${pkmn.nickname || pkmn.name} a déjà tous ses PV !`);
+                    this._processMessageQueue(() => this._showHealTarget(itemId));
+                    return;
+                }
+                game.state.bag[itemId]--;
+                if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
+                const healAmt = item.healAmount || 20;
+                const old = pkmn.currentHp;
+                pkmn.currentHp = Math.min(pkmn.stats.hp, pkmn.currentHp + healAmt);
+                const healed = pkmn.currentHp - old;
+                AudioSystem.playSfx('heal');
+                this._queueMessage(`${pkmn.nickname || pkmn.name} récupère ${healed} PV !`);
+                this._hideMenus();
+                this._executeTurn({ type: 'item' });
+            });
+            movesDiv.appendChild(btn);
+        });
 
         const backBtn = document.createElement('button');
         backBtn.className = 'battle-btn';

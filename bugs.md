@@ -1743,3 +1743,83 @@ const statusCured = pokemon.status && (
 **Root cause:** `_showMoves()` renders move buttons only from `pokemon.moves` and disables those with 0 PP. It does not check whether all moves are depleted and does not inject a Struggle fallback. `selectMove()` also lacks this fallback path.
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #95 - Menu can be opened during active dialogue, destroying its callback
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/ui.js (`openMenu`)
+
+**Description:** Pressing Escape (or calling `UI.openMenu()`) while a dialogue is active successfully opens the menu overlay, setting `game.state.gameMode = 'menu'` and hiding the dialogue box. When the menu is subsequently closed, `gameMode` reverts to `'overworld'` but `UI.dialogue.active` is set to `false` and `UI.dialogue.callback` is cleared. Any pending actions in the dialogue — story flag updates, `{action:"heal_pokemon"}`, `{action:"open_shop"}`, or endgame story transitions — are permanently lost.
+
+**Steps to reproduce:**
+1. Trigger any NPC dialogue (e.g. interact with Infirmière in Borgo)
+2. While the dialogue box is visible and `UI.dialogue.active === true`, press Escape or call `UI.openMenu()`
+3. The menu opens over the dialogue
+4. Close the menu with Escape or the Quitter button
+5. `UI.dialogue.active` is now `false`; dialogue callback never fired
+
+**Expected:** Opening the menu during dialogue should either (a) be blocked — pressing Escape during dialogue advances dialogue rather than opening the menu — or (b) pause the dialogue state and restore it faithfully when the menu closes.
+**Actual:** Dialogue state is silently destroyed. For the nurse, the heal never fires; for story dialogues, flags are never set; game can softlock if the story requires a callback to exit `'dialogue'` gameMode.
+
+**Root cause:** `openMenu()` unconditionally sets `gameMode = 'menu'` and clears active dialogue state. `closeMenu()` returns to `'overworld'` regardless of previous state. There is no check in `_bindKeys` or `openMenu` to block menu access during active dialogue.
+
+**Fix:** Added `this.dialogue.active` to the guard in `openMenu()` — now returns early if dialogue is active. Added Escape → `advanceDialogue()` branch in `_bindKeys()` so Escape advances dialogue instead of silently doing nothing. `e.stopPropagation()` added to Space/Enter dialogue handler to prevent engine.js from re-triggering interaction.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #96 - Battle heal items target active Pokémon only; consumed even at full HP
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/battle.js (`selectItem`)
+
+**Description:** When the player selects a heal item (Potion, Super Potion, Hyper Potion, Potion Max) from the battle bag, `selectItem` immediately applies the heal to `this.state.playerPokemon` (the active Pokémon) with no party selection screen. Two problems result:
+
+1. **Can't heal a benched Pokémon**: The player has no way to heal a damaged or statused back-party member mid-battle — only the active slot is targetable.
+2. **Item consumed at 0 HP gain**: If the active Pokémon is already at full HP, `healed = pp.currentHp - old = 0`, yet `game.state.bag[itemId]--` already ran. The item is permanently consumed and the message "X récupère 0 PV !" is queued, wasting both the item and the turn. No error or refund occurs.
+
+**Steps to reproduce:**
+1. In a wild or trainer battle, ensure the active Pokémon is at full HP
+2. Open SAC → click Potion
+3. The item count decreases by 1; the Pokémon's HP does not change; enemy attacks
+4. Message "X récupère 0 PV !" appears
+
+**Expected:** A party selection screen should appear (like in overworld Bag use). If the selected Pokémon is already at full HP, the game should show "X a déjà tous ses PV !" and return to item selection without consuming the item or wasting the turn.
+**Actual:** Item consumed immediately, 0 HP healed, turn wasted.
+
+**Root cause:** In `selectItem`, the `'heal'` branch decrements the bag count before checking whether any HP will actually be restored, and calls `_executeTurn` unconditionally. No party selection screen is shown.
+
+**Fix:** Added `_showHealTarget(itemId)` method in `battle.js` — shows all alive party members with current/max HP. If target is at full HP, shows "X a déjà tous ses PV !" and returns to item selection without consuming the item or wasting the turn. Heal item handler in `selectItem` now calls `_showHealTarget` instead of directly applying to active Pokémon.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #97 - Enter/Space key cannot dismiss NPC dialogues — dialogue restarts infinitely
+**Status:** Fixed (2026-03-29)
+**Priority:** Critical
+**File:** js/engine.js (`_handleKeyDown`, `_handleInteraction`)
+
+**Description:** Pressing Enter or Space to advance an NPC dialogue restarts the dialogue instead of dismissing it. The dialogue loops indefinitely when the player is standing adjacent to the NPC. The only workaround is to click the dialogue box with the mouse.
+
+**Steps to reproduce:**
+1. Walk adjacent to any NPC (e.g. Mom in the player's house in Borgo)
+2. Press Enter or Space to interact — dialogue opens
+3. Wait for or skip the typewriter animation (press Enter to complete it)
+4. Press Enter again to advance past the last dialogue line
+5. Instead of closing, the dialogue restarts from the beginning (typewriter resets)
+6. Repeat indefinitely — dialogue never dismisses via keyboard
+
+**Expected:** Pressing Enter on the last dialogue line should call `_endDialogue()` and return to overworld.
+**Actual:** `_endDialogue()` is called by `ui.js`, which sets `gameMode = 'overworld'`, but the engine's `_handleKeyDown` fires in the same event tick (registered on `window`, fires after `document` listener), sees `gm === 'overworld'`, calls `_handleInteraction()`, which finds the NPC still in front of the player and calls `UI.showDialogue()` again — resetting the dialogue to line 0.
+
+**Root cause:** `engine.js` `_handleKeyDown` calls `_handleInteraction()` when `gm === 'overworld' || gm === 'dialogue'`. `_handleInteraction()` has no guard against `dialogue.active` being true. `UI.showDialogue()` unconditionally resets `currentIndex = 0`. The `document` keydown listener (ui.js) fires before the `window` listener (engine.js); by the time engine.js runs, `gameMode` may already be `'overworld'` (set by `_endDialogue`), so `_handleInteraction` fires and re-triggers the NPC.
+
+**Fix:** Two-part fix: (1) Added `e.stopPropagation()` in ui.js's Space/Enter handler when `dialogue.active` is true — prevents the event from reaching engine.js's window listener entirely. (2) Added `if (UI.dialogue.active) return;` guard at the top of `_handleInteraction()` in engine.js as a second line of defense.
+
+**Workaround:** Click the dialogue box directly — the click handler calls `advanceDialogue()` without going through the engine, so the dialogue closes correctly.
+
+**Found:** 2026-03-29
