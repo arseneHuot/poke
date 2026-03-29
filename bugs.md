@@ -1823,3 +1823,85 @@ const statusCured = pokemon.status && (
 **Workaround:** Click the dialogue box directly — the click handler calls `advanceDialogue()` without going through the engine, so the dialogue closes correctly.
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #98 - Levelup item (Bonbon Rare) doesn't trigger move learning or evolution
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/ui.js (`_useItemOnPokemon`, `_showPokemonDetail`)
+
+**Description:** Using a Bonbon Rare (level-up item) on a Pokémon increments its level and recalculates stats correctly, but does NOT check if the Pokémon should learn a new move at the new level, nor does it check/apply evolution. A Pokémon at level 15 (evolveLevel 16) using a Bonbon Rare would reach level 16 but not evolve. Similarly, if a learnset move is defined for that level, it is silently skipped.
+
+**Root cause:** Both `_useItemOnPokemon` (case 'levelup') and the inline item handler in `_showPokemonDetail` directly manipulate `pokemon.level` and call `recalcStats`, but do not call `checkEvolution` or check `data.learnset[pokemon.level]` afterward. The `addExp` function in `pokemon-data.js` handles all of this via events, but the levelup item bypasses it entirely.
+
+**Fix:** Added learnset check (`data.learnset[pokemon.level]`) and evolution check (`checkEvolution(pokemon)`) after the level-up in both `_useItemOnPokemon` and `_showPokemonDetail`. New moves are added silently; if evolution triggers, `evolvePokemon` is called and the new species is registered in the Pokédex. Notification shows "X évolue en Y !" if evolution occurred, otherwise "X passe au Nv.N !".
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #99 - Rival house exit warp lands on BUILDING tile in Borgo
+**Status:** Fixed (2026-03-29)
+**Priority:** Major
+**File:** js/world-data.js (`_createRivalHouse`)
+
+**Description:** The rival house exit warp targeted `borgo (30, 21)`. The rival's house building in Borgo occupies `_fillRect(tiles, 28, 18, 5, 5, TILE.BUILDING)` — tiles at x=28-32, y=18-22. The tile at `(30, 21)` is `TILE.BUILDING` (non-walkable). The player would spawn inside the building wall. From there, moving south to the door tile `(30, 22)` would immediately retrigger the warp back into the rival house, trapping the player in an infinite loop.
+
+**Steps to reproduce:**
+1. Enter the rival's house in Borgo
+2. Walk to the door and step south to exit
+3. Player spawns at (30, 21) in Borgo — a BUILDING tile
+4. Moving south reaches the door at (30, 22), re-triggering the warp back into rival_house
+
+**Root cause:** The warp `targetY` was set to 21, which is inside the building footprint. The correct exit point is y=23 — one tile south of the door at y=22, outside the building.
+
+**Fix:** Changed `rival_house` return warp from `targetX: 30, targetY: 21` to `targetX: 30, targetY: 23` in `_createRivalHouse`.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #98 - Player Pokémon sprite missing at battle start; disappears during attack animations
+**Status:** Open
+**Priority:** Major
+**File:** js/battle.js (render / sprite initialization)
+
+**Description:** Two related sprite rendering issues in battle:
+
+1. **Missing at start**: When a battle begins, the player's Pokémon platform is visible but the Pokémon sprite itself does not appear. Only the brown oval platform is rendered. The sprite appears only after the player takes their first action (clicking ATTAQUE and selecting a move).
+
+2. **Disappears during attack**: When the player uses a move, the player's Pokémon sprite vanishes (replaced by the empty oval) while the attack animation plays, then reappears on the next frame that renders the idle state.
+
+**Steps to reproduce:**
+1. Trigger any wild or trainer battle
+2. Observe the battle opening — player platform shows, but no Pokémon sprite
+3. Click ATTAQUE → select any move → Pokémon sprite appears during move selection
+4. Select move → sprite disappears again during the attack animation
+
+**Expected:** Player Pokémon sprite should be visible at all times — at battle start, during move selection, and throughout attack animations.
+
+**Root cause:** Likely the player Pokémon sprite is only drawn in specific render states (e.g. 'idle' or 'selecting') and the initial 'intro' state and 'attacking' state do not trigger the sprite draw call.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #99 - Super Bonbon (Rare Candy) from party menu does not trigger evolution
+**Status:** Open
+**Priority:** Major
+**File:** js/ui.js (`_showPokemonDetail`)
+
+**Description:** Using a Super Bonbon (Rare Candy) on a Pokémon from the party detail view levels the Pokémon up correctly but never checks for evolution. A Pokémon that reaches its evolution level via Rare Candy remains unevolved.
+
+**Steps to reproduce:**
+1. Have a Pokémon one level below its evolution threshold (e.g. Flamby at Lv.15, evolves at Lv.16)
+2. Open menu → Équipe → click on Pokémon → click Super Bonbon
+3. Notification: "Flamby passe au Nv.16 !" — level confirmed
+4. Pokémon remains unevolved (still Flamby id=1, not Flamberg id=2)
+
+**Expected:** When the new level meets or exceeds `evolveLevel`, the evolution sequence should play.
+
+**Root cause:** In `_showPokemonDetail`, the `levelup` item handler directly sets `pokemon.level` and calls `recalcStats(pokemon)` with no evolution check. The battle EXP flow uses `addExp()` which returns `{type:'evolve'}` events — this path is bypassed entirely when using a Rare Candy from the menu.
+
+**Found:** 2026-03-29

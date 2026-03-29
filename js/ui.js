@@ -737,9 +737,29 @@ const UI = {
                                 pokemon.level = Math.min(100, pokemon.level + 1);
                                 const oldMax = pokemon.stats.hp;
                                 recalcStats(pokemon);
-                                const hpGain = pokemon.stats.hp - oldMax;
-                                pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);
-                                this.showNotification(pkData.name + ' passe au Nv.' + pokemon.level + ' !');
+                                const hpGainLvl = pokemon.stats.hp - oldMax;
+                                pokemon.currentHp = Math.min(pokemon.currentHp + hpGainLvl, pokemon.stats.hp);
+                                // Learn new moves at the new level
+                                if (pkData.learnset && pkData.learnset[pokemon.level]) {
+                                    for (const newMoveId of pkData.learnset[pokemon.level]) {
+                                        if (!pokemon.moves.find(m => m.id === newMoveId) && pokemon.moves.length < 4) {
+                                            pokemon.moves.push({ id: newMoveId, ppUsed: 0 });
+                                        }
+                                    }
+                                }
+                                // Check for evolution triggered by the new level
+                                const evoTargetLvl = checkEvolution(pokemon);
+                                if (evoTargetLvl) {
+                                    const oldEvName = pokemon.nickname || pokemon.name;
+                                    evolvePokemon(pokemon, evoTargetLvl);
+                                    if (game && game.state) {
+                                        game.state.pokedexSeen.add(pokemon.id);
+                                        game.state.pokedexCaught.add(pokemon.id);
+                                    }
+                                    this.showNotification(oldEvName + ' évolue en ' + pokemon.name + ' !');
+                                } else {
+                                    this.showNotification(pkData.name + ' passe au Nv.' + pokemon.level + ' !');
+                                }
                             }
                             game.state.bag[itemId]--;
                             if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];
@@ -1023,7 +1043,29 @@ const UI = {
                 const hpGain = pokemon.stats.hp - oldMaxHp;
                 pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);
                 used = true;
-                this.showNotification(data.name + ' passe au Nv.' + pokemon.level + ' !');
+                // Learn new moves at the new level
+                if (data.learnset && data.learnset[pokemon.level]) {
+                    for (const newMoveId of data.learnset[pokemon.level]) {
+                        if (!pokemon.moves.find(m => m.id === newMoveId) && pokemon.moves.length < 4) {
+                            pokemon.moves.push({ id: newMoveId, ppUsed: 0 });
+                        }
+                    }
+                }
+                // Check for evolution triggered by the new level
+                {
+                    const evoTarget = checkEvolution(pokemon);
+                    if (evoTarget) {
+                        const oldEvName = pokemon.nickname || pokemon.name;
+                        evolvePokemon(pokemon, evoTarget);
+                        if (game && game.state) {
+                            game.state.pokedexSeen.add(pokemon.id);
+                            game.state.pokedexCaught.add(pokemon.id);
+                        }
+                        this.showNotification(oldEvName + ' évolue en ' + pokemon.name + ' !');
+                    } else {
+                        this.showNotification(data.name + ' passe au Nv.' + pokemon.level + ' !');
+                    }
+                }
                 break;
         }
 

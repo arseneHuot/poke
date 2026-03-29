@@ -230,7 +230,7 @@ const WorldData = {
                 { id: 'rival_mom', type: 'villager', x: 6, y: 3, dir: DIR.DOWN, name: "Maman de Kaël",
                   dialogue: 'rival_mom_dialogue' }
             ],
-            warps: [{ x: 5, y: h-1, targetMap: 'borgo', targetX: 30, targetY: 21 }]
+            warps: [{ x: 5, y: h-1, targetMap: 'borgo', targetX: 30, targetY: 23 }]
         };
     },
 
