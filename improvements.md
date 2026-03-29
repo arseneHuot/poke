@@ -201,5 +201,5 @@
 
 ### Maps / World
 
-- **Rivalta accessible without badge_1**: The world currently has badge_0 (Porto, Marco) and badge_2/badge_3 (Rivalta, Ondine/Voltaire) but no badge_1 gym is reachable in the loaded maps. Rivalta's gym leaders both require unreachable story flags (badge_1 for Ondine, badge_2 for Voltaire). The city with badge_1 should be added between Porto and Rivalta on the route progression.
+- ~~**Rivalta accessible without badge_1**~~ **Done (2026-03-29)**: Fixed warp connections — Porto's north now leads to Campoverde (badge_1, Flora) instead of directly to Route 3. Campoverde gains a south exit back to Porto. Route 3's south exits now target Campoverde instead of Porto. Correct progression: Porto → Campoverde (badge_1) → Route 3 → Rivalta (badge_2/3). The cave path (Porto → Route 2 → Grotte Sombre → Campoverde east) remains as an alternative route.
 

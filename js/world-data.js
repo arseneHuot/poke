@@ -369,7 +369,8 @@ const WorldData = {
                 { x: 20, y: h-1, targetMap: 'route1', targetX: 20, targetY: 1 },
                 { x: 19, y: h-1, targetMap: 'route1', targetX: 19, targetY: 1 },
                 { x: 0, y: 19, targetMap: 'route2', targetX: 48, targetY: 19 },
-                { x: 20, y: 0, targetMap: 'route3', targetX: 20, targetY: 38 },
+                { x: 20, y: 0, targetMap: 'campoverde', targetX: 20, targetY: 33 },
+                { x: 19, y: 0, targetMap: 'campoverde', targetX: 19, targetY: 33 },
             ]
         };
     },
@@ -525,6 +526,8 @@ const WorldData = {
             warps: [
                 { x: w-1, y: 19, targetMap: 'grotte1', targetX: 5, targetY: 18 },
                 { x: 20, y: 0, targetMap: 'route3', targetX: 20, targetY: 38 },
+                { x: 20, y: h-1, targetMap: 'porto', targetX: 20, targetY: 1 },
+                { x: 19, y: h-1, targetMap: 'porto', targetX: 19, targetY: 1 },
             ]
         };
     },
@@ -584,8 +587,8 @@ const WorldData = {
                 { id: 'sign_r3_north', type: 'sign', x: 19, y: 5, dialogue: 'sign_route3' },
             ],
             warps: [
-                { x: 20, y: h-1, targetMap: 'porto', targetX: 20, targetY: 1 },
-                { x: 19, y: h-1, targetMap: 'porto', targetX: 19, targetY: 1 },
+                { x: 20, y: h-1, targetMap: 'campoverde', targetX: 20, targetY: 33 },
+                { x: 19, y: h-1, targetMap: 'campoverde', targetX: 19, targetY: 33 },
                 { x: 20, y: 0, targetMap: 'rivalta', targetX: 20, targetY: 38 },
             ]
         };
