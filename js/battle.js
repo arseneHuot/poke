@@ -542,7 +542,7 @@ const BattleSystem = {
         // Apply damage
         defender.currentHp = Math.max(0, defender.currentHp - result.damage);
 
-        // Animation shake + hit flash
+        // Animation shake + hit flash + attack particles
         if (isPlayer) {
             this.state.enemyAnim.shake = 8;
             this.state.enemyAnim.flash = 1.0;
@@ -550,6 +550,9 @@ const BattleSystem = {
             this.state.playerAnim.shake = 8;
             this.state.playerAnim.flash = 1.0;
         }
+
+        // Spawn attack particles based on move type
+        this._spawnAttackParticles(moveData.type, isPlayer);
 
         // Sound effects
         if (result.isCritical) {
@@ -1556,6 +1559,17 @@ const BattleSystem = {
             this.state.enemyAnim.flash -= 3 * dt;
             if (this.state.enemyAnim.flash < 0) this.state.enemyAnim.flash = 0;
         }
+        // Update attack particles
+        if (this.state.attackParticles) {
+            this.state.attackParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.15; // gravity
+                p.life -= 2 * dt;
+                p.size *= 0.98;
+            });
+            this.state.attackParticles = this.state.attackParticles.filter(p => p.life > 0);
+        }
 
         this._updateUI();
     },
@@ -1698,6 +1712,19 @@ const BattleSystem = {
             ctx.restore();
         }
 
+        // Attack particles
+        if (this.state.attackParticles && this.state.attackParticles.length > 0) {
+            this.state.attackParticles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.life);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
         // Catch ball animation
         if (this.state.catchAnim) {
             const ca = this.state.catchAnim;
@@ -1730,6 +1757,38 @@ const BattleSystem = {
                 ctx.rotate(p.angle);
                 ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
                 ctx.restore();
+            });
+        }
+    },
+
+    _spawnAttackParticles(moveType, isPlayer) {
+        const cw = GameEngine.canvas ? GameEngine.canvas.width : 960;
+        const battleH = (GameEngine.canvas ? GameEngine.canvas.height : 640) * 0.55;
+        // Target position (where particles appear)
+        const tx = isPlayer ? cw * 0.7 : cw * 0.25;
+        const ty = isPlayer ? battleH * 0.35 : battleH * 0.7;
+        const typeColors = {
+            fire: ['#FF4500', '#FFD700', '#FF6347'], water: ['#4A90D9', '#87CEEB', '#FFFFFF'],
+            grass: ['#228B22', '#90EE90', '#32CD32'], electric: ['#FFD700', '#FFFF00', '#FFA500'],
+            ice: ['#ADD8E6', '#FFFFFF', '#87CEEB'], fighting: ['#C03028', '#FF6347', '#FFFFFF'],
+            poison: ['#A040A0', '#DA70D6', '#800080'], ground: ['#D2B48C', '#8B7355', '#DEB887'],
+            flying: ['#A890F0', '#E0D0FF', '#FFFFFF'], psychic: ['#FF69B4', '#FFB6C1', '#FF1493'],
+            bug: ['#A8B820', '#C8D820', '#90A810'], rock: ['#B8A038', '#D2C068', '#8B7355'],
+            ghost: ['#705898', '#A890F0', '#483D8B'], dragon: ['#7038F8', '#A080FF', '#4B0082'],
+            dark: ['#705848', '#A08870', '#3B2F2F'], steel: ['#B8B8D0', '#D0D0E0', '#808090'],
+            fairy: ['#EE99AC', '#FFB6C1', '#FF69B4'], normal: ['#FFFFFF', '#D0D0D0', '#A8A878']
+        };
+        const colors = typeColors[moveType] || typeColors.normal;
+        if (!this.state.attackParticles) this.state.attackParticles = [];
+        for (let i = 0; i < 12; i++) {
+            this.state.attackParticles.push({
+                x: tx + (Math.random() - 0.5) * 40,
+                y: ty + (Math.random() - 0.5) * 30,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4 - 1,
+                size: 2 + Math.random() * 4,
+                life: 1.0,
+                color: colors[Math.floor(Math.random() * colors.length)]
             });
         }
     },

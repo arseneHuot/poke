@@ -352,7 +352,7 @@
 
 ### Battle Animations
 
-- **No attack projectile/effect animations**: When using moves like Flammèche (fire) or Charge (physical), there is no visual projectile or impact effect — the attack just applies damage. Adding simple particle effects (fire sparks, water splash, leaf storm, contact flash) per move type would dramatically improve battle feel.
+- ~~**No attack projectile/effect animations**~~ **Done (2026-03-29)**: Added `_spawnAttackParticles` with 18 type-specific color palettes. 12 particles spawn at the target on each hit with gravity, fade, and shrink. All types (fire/water/grass/electric/etc.) have unique colored particle bursts.
 
 - ~~**No hit flash on damaged sprite**~~ **Done (2026-03-29)**: Added `flash` property to player/enemy animation state. White overlay fades over 0.3s on hit. Applied via `fillRect` over sprite area with decaying alpha.
 
@@ -368,7 +368,7 @@
 
 - ~~**Player not partially hidden in tall grass**~~ **Done (2026-03-29)**: After entity rendering, tall grass blade triangles are drawn on top of the player's lower body when standing on TALL_GRASS tiles. Uses map theme colors for desert grass compatibility.
 
-- **Tree border lines too perfectly straight**: The rows of trees at map edges form perfectly aligned lines. Slightly offsetting some trees or varying their sizes would create a more natural forest edge.
+- ~~**Tree border lines too perfectly straight**~~ **Done (2026-03-29)**: Trees now use position-seeded offset (-2 to +2 px), varied leaf radius (12-16px), trunk shadow, and 3-layer leaf highlight (dark/mid/light green). Trees look natural and varied.
 
 ### Battle UI
 

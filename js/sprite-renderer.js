@@ -1144,22 +1144,36 @@ const SpriteRenderer = {
                 ctx.fillRect(x, y + 22 + waveOff, T, 3);
                 break;
 
-            case TILE.TREE:
+            case TILE.TREE: {
                 ctx.fillStyle = '#7EC850';
                 ctx.fillRect(x, y, T, T);
-                // Trunk
+                // Position-seeded variation for natural look
+                const tSeed = ((x * 13 + y * 7) & 0xFF);
+                const tOff = (tSeed % 5) - 2; // -2 to +2 pixel offset
+                const tSize = 12 + (tSeed % 5); // leaf radius 12-16
+                // Trunk with slight offset
                 ctx.fillStyle = '#8B6914';
-                ctx.fillRect(x + 12, y + 18, 8, 14);
-                // Leaves
+                ctx.fillRect(x + 12 + tOff, y + 18, 8, 14);
+                // Trunk shadow
+                ctx.fillStyle = '#6B4E10';
+                ctx.fillRect(x + 12 + tOff, y + 18, 3, 14);
+                // Leaves (main canopy)
                 ctx.fillStyle = '#2D7A2D';
                 ctx.beginPath();
-                ctx.arc(x + 16, y + 14, 14, 0, Math.PI * 2);
+                ctx.arc(x + 16 + tOff, y + 14, tSize, 0, Math.PI * 2);
                 ctx.fill();
+                // Highlight leaves
                 ctx.fillStyle = '#3A8A3A';
                 ctx.beginPath();
-                ctx.arc(x + 14, y + 10, 8, 0, Math.PI * 2);
+                ctx.arc(x + 14 + tOff, y + 10, tSize * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                // Top highlight
+                ctx.fillStyle = '#4A9A4A';
+                ctx.beginPath();
+                ctx.arc(x + 13 + tOff, y + 8, tSize * 0.3, 0, Math.PI * 2);
                 ctx.fill();
                 break;
+            }
 
             case TILE.BUILDING: {
                 const bColors = theme && theme.building ? theme.building : { border: '#B8860B', fill: '#8B6914', window: '#87CEEB' };
