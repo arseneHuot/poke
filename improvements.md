@@ -303,3 +303,13 @@
 - ~~**Aquatic sprite gradient + scale detail**~~ **Done (2026-03-29)**: Aquatic body uses radial gradient with outline. Added scale arc details on the body. Eye upgraded with `_drawEye`.
 
 - ~~**Dragon sprite gradient + outline**~~ **Done (2026-03-29)**: Dragon body and head now use `_gradientRect` with outlines. Belly has gradient fill. Eyes upgraded with `_drawEye` for expressive dragon pupils.
+
+- ~~**Serpent sprite enhanced eyes**~~ **Done (2026-03-29)**: Serpent head now has `_gradientRect` with outline. Eyes upgraded with `_drawEye`.
+
+- ~~**Amorphous sprite enhanced eyes**~~ **Done (2026-03-29)**: Amorphous eyes now use `_drawEye` with iris/pupil/reflection instead of flat ellipses.
+
+- ~~**Insect sprite gradient head + eyes**~~ **Done (2026-03-29)**: Insect head uses radial gradient with dark outline. Compound eyes upgraded with `_drawEye`.
+
+- ~~**Humanoid sprite full gradient upgrade**~~ **Done (2026-03-29)**: Humanoid body, belly, arms, and head now use `_gradientRect` with outlines. Eyes upgraded with `_drawEye`.
+
+- ~~**Mineral sprite enhanced eyes**~~ **Done (2026-03-29)**: Mineral glowing eyes now use `_drawEye` for more expressive appearance.

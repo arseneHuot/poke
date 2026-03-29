@@ -343,14 +343,13 @@ const SpriteRenderer = {
         ctx.quadraticCurveTo(56*s, 40*s, 44*s, 34*s);
         ctx.stroke();
 
-        // Head
-        ctx.fillStyle = bodyColor;
-        this._roundRect(ctx, 14*s, 8*s, 22*s, 18*s, 6*s);
+        // Head with gradient
+        this._gradientRect(ctx, 14*s, 8*s, 22*s, 18*s, 6*s, bodyColor, 'v');
+        this._outline(ctx, 14*s, 8*s, 22*s, 18*s, 6*s, bodyColor);
 
-        // Eyes
-        ctx.fillStyle = '#FFF';
-        this._roundRect(ctx, 18*s, 12*s, 6*s, 6*s, 2*s);
-        this._roundRect(ctx, 28*s, 12*s, 6*s, 6*s, 2*s);
+        // Eyes with iris + reflection
+        this._drawEye(ctx, 21*s, 15*s, 3*s, eyeColor);
+        this._drawEye(ctx, 31*s, 15*s, 3*s, eyeColor);
         ctx.fillStyle = eyeColor;
         ctx.beginPath();
         ctx.arc(22*s, 15*s, 2*s, 0, Math.PI*2);
@@ -545,17 +544,9 @@ const SpriteRenderer = {
         ctx.quadraticCurveTo(32*s, 56*s, 20*s, 50*s);
         ctx.fill();
 
-        // Eyes
-        ctx.fillStyle = eyeColor;
-        ctx.beginPath();
-        ctx.ellipse(26*s, 24*s, 4*s, 5*s, 0, 0, Math.PI*2);
-        ctx.ellipse(38*s, 24*s, 4*s, 5*s, 0, 0, Math.PI*2);
-        ctx.fill();
-        ctx.fillStyle = '#FFF';
-        ctx.beginPath();
-        ctx.arc(27*s, 23*s, 1.5*s, 0, Math.PI*2);
-        ctx.arc(39*s, 23*s, 1.5*s, 0, Math.PI*2);
-        ctx.fill();
+        // Eyes with iris + reflection
+        this._drawEye(ctx, 26*s, 24*s, 4.5*s, eyeColor);
+        this._drawEye(ctx, 38*s, 24*s, 4.5*s, eyeColor);
 
         // Wisps
         if (colors.wisps || colors.glow) {
@@ -606,18 +597,23 @@ const SpriteRenderer = {
         ctx.ellipse(32*s, 26*s, 10*s, 8*s, 0, 0, Math.PI*2);
         ctx.fill();
 
-        // Head
-        ctx.fillStyle = bodyColor;
+        // Head with gradient
+        try {
+            const insHeadGrad = ctx.createRadialGradient(30*s, 12*s, 2*s, 32*s, 14*s, 8*s);
+            insHeadGrad.addColorStop(0, this._lighten(bodyColor, 20));
+            insHeadGrad.addColorStop(1, this._darken(bodyColor, 10));
+            ctx.fillStyle = insHeadGrad;
+        } catch(e) { ctx.fillStyle = bodyColor; }
         ctx.beginPath();
         ctx.ellipse(32*s, 14*s, 8*s, 8*s, 0, 0, Math.PI*2);
         ctx.fill();
+        ctx.strokeStyle = this._darken(bodyColor, 30);
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
-        // Eyes
-        ctx.fillStyle = eyeColor;
-        ctx.beginPath();
-        ctx.arc(27*s, 12*s, 3*s, 0, Math.PI*2);
-        ctx.arc(37*s, 12*s, 3*s, 0, Math.PI*2);
-        ctx.fill();
+        // Compound eyes
+        this._drawEye(ctx, 27*s, 12*s, 3*s, eyeColor);
+        this._drawEye(ctx, 37*s, 12*s, 3*s, eyeColor);
 
         // Antennae
         ctx.strokeStyle = colors.antennae || bodyColor;
@@ -660,9 +656,9 @@ const SpriteRenderer = {
         this._roundRect(ctx, 24*s, 44*s, 8*s, 16*s, 3*s);
         this._roundRect(ctx, 36*s, 44*s, 8*s, 16*s, 3*s);
 
-        // Body (torso)
-        ctx.fillStyle = bodyColor;
-        this._roundRect(ctx, 22*s, 22*s, 20*s, 24*s, 6*s);
+        // Body (torso) with gradient
+        this._gradientRect(ctx, 22*s, 22*s, 20*s, 24*s, 6*s, bodyColor, 'v');
+        this._outline(ctx, 22*s, 22*s, 20*s, 24*s, 6*s, bodyColor);
 
         // Belt or marking
         if (colors.belt) {
@@ -671,13 +667,11 @@ const SpriteRenderer = {
         }
 
         // Belly
-        ctx.fillStyle = bellyColor;
-        this._roundRect(ctx, 26*s, 28*s, 12*s, 12*s, 4*s);
+        this._gradientRect(ctx, 26*s, 28*s, 12*s, 12*s, 4*s, bellyColor, 'v');
 
-        // Arms
-        ctx.fillStyle = bodyColor;
-        this._roundRect(ctx, 12*s, 24*s, 12*s, 6*s, 3*s);
-        this._roundRect(ctx, 40*s, 24*s, 12*s, 6*s, 3*s);
+        // Arms with gradient
+        this._gradientRect(ctx, 12*s, 24*s, 12*s, 6*s, 3*s, bodyColor, 'h');
+        this._gradientRect(ctx, 40*s, 24*s, 12*s, 6*s, 3*s, bodyColor, 'h');
 
         // Fists
         ctx.fillStyle = colors.fists || colors.hands || bellyColor;
@@ -686,19 +680,13 @@ const SpriteRenderer = {
         ctx.arc(52*s, 27*s, 4*s, 0, Math.PI*2);
         ctx.fill();
 
-        // Head
-        ctx.fillStyle = bodyColor;
-        this._roundRect(ctx, 20*s, 4*s, 24*s, 20*s, 8*s);
+        // Head with gradient
+        this._gradientRect(ctx, 20*s, 4*s, 24*s, 20*s, 8*s, bodyColor, 'v');
+        this._outline(ctx, 20*s, 4*s, 24*s, 20*s, 8*s, bodyColor);
 
-        // Eyes
-        ctx.fillStyle = '#FFF';
-        this._roundRect(ctx, 26*s, 10*s, 7*s, 6*s, 2*s);
-        this._roundRect(ctx, 37*s, 10*s, 7*s, 6*s, 2*s);
-        ctx.fillStyle = eyeColor;
-        ctx.beginPath();
-        ctx.arc(30*s, 13*s, 2*s, 0, Math.PI*2);
-        ctx.arc(41*s, 13*s, 2*s, 0, Math.PI*2);
-        ctx.fill();
+        // Eyes with iris + reflection
+        this._drawEye(ctx, 30*s, 13*s, 3.5*s, eyeColor);
+        this._drawEye(ctx, 41*s, 13*s, 3.5*s, eyeColor);
 
         this._addTypeDecoration(ctx, s, colors, types, id);
     },
@@ -755,17 +743,9 @@ const SpriteRenderer = {
         ctx.lineTo(48*s, 24*s);
         ctx.fill();
 
-        // Eyes
-        ctx.fillStyle = eyeColor;
-        ctx.beginPath();
-        ctx.arc(26*s, 28*s, 3*s, 0, Math.PI*2);
-        ctx.arc(38*s, 28*s, 3*s, 0, Math.PI*2);
-        ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(27*s, 28*s, 1.5*s, 0, Math.PI*2);
-        ctx.arc(39*s, 28*s, 1.5*s, 0, Math.PI*2);
-        ctx.fill();
+        // Eyes with iris + reflection
+        this._drawEye(ctx, 26*s, 28*s, 3*s, eyeColor);
+        this._drawEye(ctx, 38*s, 28*s, 3*s, eyeColor);
 
         // Arms (if present)
         if (colors.arms) {
