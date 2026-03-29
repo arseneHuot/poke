@@ -277,3 +277,23 @@
 - ~~**Location name popup duration too short**~~ **Done (2026-03-29)**: Already implemented — `showLocationName` uses 3-second timeout with 0.5s CSS opacity transition. Verified in code.
 
 - **No "Continue" prompt between battle messages**: Battle messages auto-advance on a 1.5s timer. Adding a ▼ indicator and requiring Space/click to advance would give players control over battle pacing, especially for reading damage numbers and status messages.
+
+---
+
+## New Suggestions (2026-03-29 QA session #8 — Visual Quality Overhaul)
+
+### Sprite Quality
+
+- ~~**Gradient shading on Pokémon sprites**~~ **Done (2026-03-29)**: Added `_gradientRect` helper for linear gradient fills on all body parts. Biped and quadruped Pokémon now render with top-lit 3D gradient shading instead of flat colors. Bodies, heads, arms, and legs all have highlight-to-shadow gradients.
+
+- ~~**Enhanced Pokémon eyes with iris and reflection**~~ **Done (2026-03-29)**: Added `_drawEye` helper rendering sclera, colored iris, dark pupil, and white highlight reflection dot. Applied to biped and quadruped types. Eyes now look alive and expressive.
+
+- ~~**Body outlines for Pokémon sprites**~~ **Done (2026-03-29)**: Added `_outline` and `_strokeRoundRect` helpers for soft dark outlines around body parts. Pokémon are now clearly defined against any background. Applied to biped and quadruped types.
+
+- ~~**Quadruped ear and nose details**~~ **Done (2026-03-29)**: Quadruped Pokémon now have pointed ears on the head and a small nose dot, making them look more animal-like and distinctive.
+
+### Character Sprites
+
+- ~~**Player sprite gradient shading**~~ **Done (2026-03-29)**: Player character now renders with gradient fills on jacket, hat, skin, backpack, arms, and legs. Outlines added to major body parts. Much more polished 3D appearance.
+
+- ~~**NPC sprite gradient shading**~~ **Done (2026-03-29)**: All NPC types now render with gradient fills on shirt, pants, skin, and hair. Body outlines added. NPCs look more polished and consistent with the upgraded player sprite.
