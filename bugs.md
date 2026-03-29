@@ -1453,3 +1453,40 @@ const statusCured = pokemon.status && (
 **Fix:** Changed to save the old max HP before `recalcStats`, compute the HP gain, then apply it proportionally: `pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);`
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #80 - `smokescreen` and `slash` moves missing from MOVES_DB
+**Status:** Fixed (2026-03-29)
+**Priority:** High
+**File:** js/constants.js (MOVES_DB)
+
+**Description:** Two moves defined in Pokémon learnsets do not exist in MOVES_DB: `smokescreen` (learned by Flamby/Flamberg at level 9) and `slash` (learned by Flamberg at level 25). When `_showMoves()` renders move buttons, it skips any move with `!MOVES_DB[move.id]`, causing these moves to be silently absent from the battle UI — players will see only 3 moves instead of 4 when the affected Pokémon knows one of these.
+
+**Root cause:** MOVES_DB is missing entries for `smokescreen` and `slash`. Both move IDs appear in learnset definitions but have no corresponding entry in the moves database.
+
+**Steps to reproduce:**
+1. Have Flamby in party above level 9
+2. Start a battle and click ATTAQUE
+3. Only 3 move buttons appear — smokescreen is invisible and cannot be used
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #81 - Stale move buttons from previous battle visible during new battle intro
+**Status:** Fixed (2026-03-29)
+**Priority:** Low
+**File:** js/battle.js (`startWildBattle`, `startTrainerBattle`)
+
+**Description:** When a new battle starts, the battle UI is displayed immediately, but `_showActions()` is not called until after the first message finishes processing (~1500ms delay). During this window, move buttons from the previous battle remain visible in the DOM. If the active Pokémon changed between battles (e.g. a different Pokémon leads), the stale buttons show a different Pokémon's moves.
+
+**Root cause:** `startWildBattle` and `startTrainerBattle` call `_processMessageQueue(() => this._showActions())` which only renders fresh action buttons after the intro message delay. No cleanup of the previous battle's `battle-moves` div is performed before the queue starts.
+
+**Steps to reproduce:**
+1. Battle with Pokémon A leading; reach the move selection screen
+2. End that battle and immediately start a new battle with Pokémon B leading
+3. During the "X sauvage apparaît !" message, the battle UI shows Pokémon A's moves
+
+**Found:** 2026-03-29
+

@@ -76,6 +76,7 @@ const BattleSystem = {
         if (!lead) return;
         this.state.isTrainer = false;
         this.state.trainerNpc = null;
+        this._hideMenus();
         this._initBattle(lead, wildPokemon);
         this._queueMessage(`${wildPokemon.name} sauvage apparaît !`);
         this._processMessageQueue(() => this._showActions());
@@ -86,6 +87,7 @@ const BattleSystem = {
         const lead = party.find(p => p && p.currentHp > 0);
         if (!lead) return;
 
+        this._hideMenus();
         this.state.isTrainer = true;
         this.state.trainerNpc = trainerNpc;
         this.state.trainerPokemonIndex = 0;

@@ -8,6 +8,8 @@ const MOVES_DB = {
     // Normal
     tackle: { name: 'Charge', type: 'normal', category: 'physical', power: 40, accuracy: 100, pp: 35, desc: 'Charge physique basique.' },
     scratch: { name: 'Griffe', type: 'normal', category: 'physical', power: 40, accuracy: 100, pp: 35 },
+    smokescreen: { name: 'Écran de Fumée', type: 'normal', category: 'status', power: 0, accuracy: 100, pp: 20, effect: { type: 'stat', stat: 'accuracy', stages: -1, target: 'enemy' } },
+    slash: { name: 'Tranche', type: 'normal', category: 'physical', power: 70, accuracy: 100, pp: 20, critRate: 2 },
     pound: { name: 'Ecras\'Face', type: 'normal', category: 'physical', power: 40, accuracy: 100, pp: 35 },
     quickattack: { name: 'Vive-Attaque', type: 'normal', category: 'physical', power: 40, accuracy: 100, pp: 30, priority: 1 },
     slam: { name: 'Coup d\'Boule', type: 'normal', category: 'physical', power: 80, accuracy: 75, pp: 20 },

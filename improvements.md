@@ -188,3 +188,18 @@
 ### Trainer Card
 
 - ~~**Badge slots: show type silhouettes for unearned badges**~~ **Done (2026-03-29)**: Unearned badge slots in `_renderTrainerTab` now show a 3-letter type abbreviation (NOR, PLA, EAU, ELE, FEU, SOL, GLA, DRA) with the corresponding type color at low opacity as background, border, and text. Earned badges still show gold gradient with the badge number.
+
+---
+
+## New Suggestions (2026-03-29 QA session #6 — Items, Evolution, Exploration)
+
+### Items / Bag
+
+- ~~**No feedback when using item on ineligible Pokémon**~~ **Done (2026-03-29)**: Already implemented — `_useItemOnPokemon` shows `"X a déjà tous ses PV !"` for full-HP targets, `"X est K.O. ! Utilisez un Rappel."` for fainted Pokémon, and `"Cela n'aura aucun effet."` for mismatched status cures. Verified in code.
+
+- **No confirmation after manual save**: Clicking "Sauvegarder maintenant" in the Save tab succeeds silently. No notification or visual feedback is shown to confirm the save completed. A brief notification (e.g. "Partie sauvegardée !") would reassure the player.
+
+### Maps / World
+
+- **Rivalta accessible without badge_1**: The world currently has badge_0 (Porto, Marco) and badge_2/badge_3 (Rivalta, Ondine/Voltaire) but no badge_1 gym is reachable in the loaded maps. Rivalta's gym leaders both require unreachable story flags (badge_1 for Ondine, badge_2 for Voltaire). The city with badge_1 should be added between Porto and Rivalta on the route progression.
+
