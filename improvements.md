@@ -338,10 +338,40 @@
 
 ### Battle Scene
 
-- **Battle background is a simple gradient**: The sky and grass in the battle scene are flat color bands. Adding clouds, sun/moon, or parallax hills would create depth and atmosphere.
+- ~~**Battle background is a simple gradient**~~ **Done (2026-03-29)**: See QA session #10 — clouds, hills, grass tufts added to battle scene.
 
-- **No hit/damage animation on sprites**: When a Pokémon takes damage, there's a shake effect but no visual flash or color change on the sprite itself. A brief white flash or red tint on the damaged sprite would provide clearer feedback.
+- ~~**No hit/damage animation on sprites**~~ **Done (2026-03-29)**: See QA session #10 — white flash overlay with fade implemented.
 
 ### Starter Selection
 
 - ~~**No hover effect on starter cards**~~ **Done (2026-03-29)**: Already implemented — CSS `.choice-option:hover` has `transform: scale(1.05)`, gold border, and gold background tint. Verified in code.
+
+---
+
+## New Suggestions (2026-03-29 QA session #10 — Battle Animation & Scene Detail)
+
+### Battle Animations
+
+- **No attack projectile/effect animations**: When using moves like Flammèche (fire) or Charge (physical), there is no visual projectile or impact effect — the attack just applies damage. Adding simple particle effects (fire sparks, water splash, leaf storm, contact flash) per move type would dramatically improve battle feel.
+
+- ~~**No hit flash on damaged sprite**~~ **Done (2026-03-29)**: Added `flash` property to player/enemy animation state. White overlay fades over 0.3s on hit. Applied via `fillRect` over sprite area with decaying alpha.
+
+- ~~**Enemy platform stays visible after KO**~~ **Done (2026-03-29)**: Enemy platform ellipse now uses `globalAlpha` linked to `enemyAnim.alpha`, fading with the sprite on KO. Minimum 15% opacity for a ghost effect.
+
+### Battle Scene Background
+
+- ~~**Battle sky has no clouds**~~ **Done (2026-03-29)**: Added 2 cloud clusters (white ellipses) in the sky area. Added 2 distant green hills at the horizon for depth. Battle scene now has atmosphere.
+
+- ~~**Battle ground has no detail**~~ **Done (2026-03-29)**: Added 8 grass tuft rectangles at varied positions across the ground band. Ground now has visual texture.
+
+### Overworld
+
+- **Player not partially hidden in tall grass**: In classic Pokémon games, tall grass overlaps the player's lower body. Currently the player sprite is fully visible on top of tall grass, reducing the immersive feeling of walking through vegetation.
+
+- **Tree border lines too perfectly straight**: The rows of trees at map edges form perfectly aligned lines. Slightly offsetting some trees or varying their sizes would create a more natural forest edge.
+
+### Battle UI
+
+- ~~**Action buttons all same color**~~ **Done (2026-03-29)**: Added CSS `[data-action]` selectors: ATTAQUE (red), SAC (yellow), POKÉMON (blue), FUITE (grey). Each button now has a distinct color gradient and border.
+
+- ~~**▼ indicator in battle messages not animated**~~ **Done (2026-03-29)**: Already working — `@keyframes bounce` exists in stylesheet at line 314, inline `animation: bounce 0.8s infinite` references it correctly. Verified.

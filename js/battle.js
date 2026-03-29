@@ -542,11 +542,13 @@ const BattleSystem = {
         // Apply damage
         defender.currentHp = Math.max(0, defender.currentHp - result.damage);
 
-        // Animation shake
+        // Animation shake + hit flash
         if (isPlayer) {
             this.state.enemyAnim.shake = 8;
+            this.state.enemyAnim.flash = 1.0;
         } else {
             this.state.playerAnim.shake = 8;
+            this.state.playerAnim.flash = 1.0;
         }
 
         // Sound effects
@@ -1537,7 +1539,7 @@ const BattleSystem = {
             }
         }
 
-        // Decay shake animations
+        // Decay shake and flash animations
         if (this.state.playerAnim.shake > 0) {
             this.state.playerAnim.shake *= 0.85;
             if (this.state.playerAnim.shake < 0.5) this.state.playerAnim.shake = 0;
@@ -1545,6 +1547,14 @@ const BattleSystem = {
         if (this.state.enemyAnim.shake > 0) {
             this.state.enemyAnim.shake *= 0.85;
             if (this.state.enemyAnim.shake < 0.5) this.state.enemyAnim.shake = 0;
+        }
+        if (this.state.playerAnim.flash > 0) {
+            this.state.playerAnim.flash -= 3 * dt;
+            if (this.state.playerAnim.flash < 0) this.state.playerAnim.flash = 0;
+        }
+        if (this.state.enemyAnim.flash > 0) {
+            this.state.enemyAnim.flash -= 3 * dt;
+            if (this.state.enemyAnim.flash < 0) this.state.enemyAnim.flash = 0;
         }
 
         this._updateUI();
@@ -1588,6 +1598,27 @@ const BattleSystem = {
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, cw, battleHeight);
 
+        // Clouds
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.ellipse(cw * 0.2, battleHeight * 0.15, 40, 14, 0, 0, Math.PI * 2);
+        ctx.ellipse(cw * 0.2 + 25, battleHeight * 0.13, 30, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(cw * 0.7, battleHeight * 0.1, 35, 12, 0, 0, Math.PI * 2);
+        ctx.ellipse(cw * 0.7 + 20, battleHeight * 0.08, 25, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Distant hills
+        ctx.fillStyle = '#8BC34A';
+        ctx.beginPath();
+        ctx.ellipse(cw * 0.3, battleHeight * 0.65, 120, 20, 0, Math.PI, 0);
+        ctx.fill();
+        ctx.fillStyle = '#9CCC65';
+        ctx.beginPath();
+        ctx.ellipse(cw * 0.75, battleHeight * 0.65, 100, 16, 0, Math.PI, 0);
+        ctx.fill();
+
         // Ground
         ctx.fillStyle = '#7CB342';
         ctx.fillRect(0, battleHeight * 0.65, cw, battleHeight * 0.35);
@@ -1596,7 +1627,19 @@ const BattleSystem = {
         ctx.fillStyle = '#558B2F';
         ctx.fillRect(0, battleHeight * 0.65, cw, 3);
 
-        // Enemy platform (ellipse)
+        // Ground grass tufts
+        ctx.fillStyle = '#689F38';
+        for (let i = 0; i < 8; i++) {
+            const gx = (i * 120 + 30) % cw;
+            const gy = battleHeight * 0.72 + (i % 3) * 15;
+            ctx.fillRect(gx, gy, 3, 5);
+            ctx.fillRect(gx + 5, gy + 2, 2, 4);
+        }
+
+        // Enemy platform (fade with sprite)
+        const enemyAlpha = this.state.enemyAnim ? this.state.enemyAnim.alpha : 1;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0.15, enemyAlpha);
         ctx.fillStyle = '#8D6E63';
         ctx.beginPath();
         ctx.ellipse(cw * 0.7, battleHeight * 0.45, 80, 20, 0, 0, Math.PI * 2);
@@ -1605,6 +1648,7 @@ const BattleSystem = {
         ctx.beginPath();
         ctx.ellipse(cw * 0.7, battleHeight * 0.45, 80, 20, 0, 0, Math.PI);
         ctx.fill();
+        ctx.restore();
 
         // Player platform
         ctx.fillStyle = '#8D6E63';
@@ -1626,6 +1670,12 @@ const BattleSystem = {
             const ex = cw * 0.7 - spriteSize / 2 + shakeX;
             const ey = battleHeight * 0.45 - spriteSize + 10;
             SpriteRenderer.drawPokemon(ctx, ep.id, ex, ey, spriteSize, 'front', ep.isShiny);
+            // Hit flash overlay
+            if (this.state.enemyAnim.flash > 0) {
+                ctx.globalAlpha = this.state.enemyAnim.flash * 0.6;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(ex, ey, spriteSize, spriteSize);
+            }
             ctx.restore();
         }
 
@@ -1639,6 +1689,12 @@ const BattleSystem = {
             const px = cw * 0.25 - spriteSize / 2 + shakeX;
             const py = battleHeight * 0.78 - spriteSize + 10;
             SpriteRenderer.drawPokemon(ctx, pp.id, px, py, spriteSize, 'back', pp.isShiny);
+            // Hit flash overlay
+            if (this.state.playerAnim.flash > 0) {
+                ctx.globalAlpha = this.state.playerAnim.flash * 0.6;
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(px, py, spriteSize, spriteSize);
+            }
             ctx.restore();
         }
 
