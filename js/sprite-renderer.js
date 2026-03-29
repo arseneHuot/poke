@@ -1118,13 +1118,22 @@ const SpriteRenderer = {
                 break;
             }
 
-            case TILE.PATH:
+            case TILE.PATH: {
                 ctx.fillStyle = '#D2B48C';
                 ctx.fillRect(x, y, T, T);
                 ctx.fillStyle = '#C4A67A';
                 ctx.fillRect(x + 8, y + 6, 4, 3);
                 ctx.fillRect(x + 20, y + 20, 5, 3);
+                // Scattered grass pixels at edges for soft transition
+                ctx.fillStyle = '#7EC85060';
+                const pSeed = (x * 3 + y * 7) & 0xFF;
+                ctx.fillRect(x, y, 2, 2);
+                ctx.fillRect(x + T - 2, y + T - 2, 2, 2);
+                ctx.fillRect(x + (pSeed % 10) + 4, y, 2, 1);
+                ctx.fillRect(x, y + (pSeed % 8) + 8, 1, 2);
+                ctx.fillRect(x + T - 1, y + (pSeed % 12) + 6, 1, 2);
                 break;
+            }
 
             case TILE.WATER:
                 ctx.fillStyle = '#4A90D9';
@@ -1354,6 +1363,18 @@ const SpriteRenderer = {
                 ctx.lineTo(x + 22, y + 18);
                 ctx.fill();
                 break;
+
+            case TILE.LAB_FLOOR: {
+                // White/blue checkerboard lab tile
+                const labCheck = ((Math.floor(x/T) + Math.floor(y/T)) % 2 === 0);
+                ctx.fillStyle = labCheck ? '#E8EEF4' : '#D0D8E4';
+                ctx.fillRect(x, y, T, T);
+                // Subtle grid lines
+                ctx.strokeStyle = '#C0C8D4';
+                ctx.lineWidth = 0.5;
+                ctx.strokeRect(x + 0.5, y + 0.5, T - 1, T - 1);
+                break;
+            }
 
             case TILE.TABLE:
                 ctx.fillStyle = '#B0A090';

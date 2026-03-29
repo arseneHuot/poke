@@ -330,11 +330,11 @@
 
 - ~~**Grass tiles too uniform**~~ **Done (2026-03-29)**: Grass tiles now use position-seeded color variation (alternating between two green shades), plus randomized dark patches and grass tufts at seeded positions. Terrain looks natural and varied.
 
-- **Path-to-grass transition is abrupt**: The boundary between path tiles and grass tiles is a hard pixel edge. Adding a 1-2 pixel feathered edge or scattered grass pixels along the path would soften transitions.
+- ~~**Path-to-grass transition is abrupt**~~ **Done (2026-03-29)**: Path tiles now render scattered semi-transparent green grass pixels at edges (corners + seeded positions). Creates a soft natural transition between path and grass.
 
 ### Interior Design
 
-- **Lab floor uses gym arena tile**: The professor's lab uses GYM_FLOOR tiles (grey circles), which looks like a sports arena instead of a scientific laboratory. Should have a unique lab floor tile (white/blue checkerboard or clean tile pattern).
+- ~~**Lab floor uses gym arena tile**~~ **Done (2026-03-29)**: Added `TILE.LAB_FLOOR` (30) with white/blue checkerboard pattern and subtle grid lines. Prof lab now uses LAB_FLOOR instead of GYM_FLOOR. Added to WALKABLE_TILES.
 
 ### Battle Scene
 
@@ -366,7 +366,7 @@
 
 ### Overworld
 
-- **Player not partially hidden in tall grass**: In classic Pokémon games, tall grass overlaps the player's lower body. Currently the player sprite is fully visible on top of tall grass, reducing the immersive feeling of walking through vegetation.
+- ~~**Player not partially hidden in tall grass**~~ **Done (2026-03-29)**: After entity rendering, tall grass blade triangles are drawn on top of the player's lower body when standing on TALL_GRASS tiles. Uses map theme colors for desert grass compatibility.
 
 - **Tree border lines too perfectly straight**: The rows of trees at map edges form perfectly aligned lines. Slightly offsetting some trees or varying their sizes would create a more natural forest edge.
 

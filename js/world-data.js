@@ -236,7 +236,7 @@ const WorldData = {
 
     _createProfLab() {
         const w = 18, h = 14;
-        const tiles = this._createEmptyMap(w, h, TILE.GYM_FLOOR);
+        const tiles = this._createEmptyMap(w, h, TILE.LAB_FLOOR);
         for (let x = 0; x < w; x++) { tiles[0][x] = TILE.WALL; tiles[h-1][x] = TILE.WALL; }
         for (let y = 0; y < h; y++) { tiles[y][0] = TILE.WALL; tiles[y][w-1] = TILE.WALL; }
         tiles[h-1][8] = TILE.DOOR;

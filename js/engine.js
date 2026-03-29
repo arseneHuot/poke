@@ -336,6 +336,26 @@ const GameEngine = {
             }
         }
 
+        // Tall grass overlay on player (draw grass tips on top of lower body)
+        const px = Math.round(state.playerX);
+        const py = Math.round(state.playerY);
+        const playerTile = map.tiles[py] && map.tiles[py][px];
+        if (playerTile === TILE.TALL_GRASS) {
+            const tgTheme = map.theme && map.theme.tallGrass ? map.theme.tallGrass : { blade: '#4A8530' };
+            ctx.fillStyle = tgTheme.blade;
+            const ox = state.playerX * TILE_SIZE;
+            const oy = state.playerY * TILE_SIZE;
+            for (let i = 0; i < 4; i++) {
+                const gx = ox + 4 + i * 7;
+                const sway = Math.sin(frame * 0.002 + i) * 2;
+                ctx.beginPath();
+                ctx.moveTo(gx, oy + TILE_SIZE);
+                ctx.lineTo(gx + sway, oy + TILE_SIZE * 0.55);
+                ctx.lineTo(gx + 3, oy + TILE_SIZE);
+                ctx.fill();
+            }
+        }
+
         ctx.restore();
 
         // Warp fade overlay with spinning Poké Ball indicator
