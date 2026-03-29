@@ -100,9 +100,18 @@ const BattleSystem = {
         this.state.trainerNpc = trainerNpc;
         this.state.trainerPokemonIndex = 0;
 
-        // Build trainer's pokemon team from NPC data
+        // Build trainer's pokemon team from NPC data (rebuild if party exists to heal)
         if (!trainerNpc.party) {
             trainerNpc.party = (trainerNpc.team || []).map(t => createPokemon(t.id, t.level, false));
+        } else {
+            // Heal all trainer Pokémon to full HP/PP for re-challenge
+            trainerNpc.party.forEach(p => {
+                if (p && p.stats) {
+                    p.currentHp = p.stats.hp;
+                    p.status = null;
+                    if (p.moves) p.moves.forEach(m => m.ppUsed = 0);
+                }
+            });
         }
         const enemyPokemon = trainerNpc.party[0];
         if (!enemyPokemon) return;
@@ -144,11 +153,11 @@ const BattleSystem = {
         const enemyHpText = document.getElementById('enemy-hp-text');
         if (enemyHpText) enemyHpText.textContent = `${Math.ceil(Math.max(0, this.state.hpAnimEnemy))}/${ep.stats.hp}`;
 
-        // Fainted visual feedback on enemy panel
+        // Fainted visual feedback on enemy panel (only for actual KO, not capture)
         const enemyInfo = document.getElementById('battle-enemy-info');
         if (enemyInfo) {
-            if (ep.currentHp <= 0) enemyInfo.classList.add('fainted');
-            else enemyInfo.classList.remove('fainted');
+            if (ep.currentHp <= 0 && this.state.enemyAnim.alpha <= 0) enemyInfo.classList.add('fainted');
+            else if (ep.currentHp > 0) enemyInfo.classList.remove('fainted');
         }
 
         // Player info
@@ -1290,6 +1299,7 @@ const BattleSystem = {
                 }
             }
 
+            this._queueMessage('Victoire !');
             this._processMessageQueue(() => {
                 this.endBattle('win');
             });

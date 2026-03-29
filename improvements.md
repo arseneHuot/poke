@@ -375,3 +375,39 @@
 - ~~**Action buttons all same color**~~ **Done (2026-03-29)**: Added CSS `[data-action]` selectors: ATTAQUE (red), SAC (yellow), POKÉMON (blue), FUITE (grey). Each button now has a distinct color gradient and border.
 
 - ~~**▼ indicator in battle messages not animated**~~ **Done (2026-03-29)**: Already working — `@keyframes bounce` exists in stylesheet at line 314, inline `animation: bounce 0.8s infinite` references it correctly. Verified.
+
+---
+
+## New Suggestions (2026-03-29 QA session #11 — Gym Progression Playtest)
+
+### Sprites / Evolution
+
+- **Evolved Pokémon sprites too similar to base form**: Flamberg (evolution of Flamby) looks almost identical — same biped shape, just slightly darker red. Evolutions should have noticeably different proportions (larger, different limb sizes, new features like wings/horns/bigger tail flame).
+
+### Gameplay Balance
+
+- **Gym 1 level curve too steep for single starter**: With only 1 Pokémon (Flamby Lv5 from starter), the player faces Gym 1 leader Marco with Lv12+14 Pokémon. Reaching Lv12+ by grinding Route 1 wild Pokémon (Lv2-5) takes very long. Either lower gym 1 levels, increase wild Pokémon levels on Route 1, or add a mandatory trainer battle before the gym to help level up.
+
+### Battle
+
+- ~~**No victory fanfare or celebration after winning**~~ **Done (2026-03-29)**: Added "Victoire !" message at end of battle before endBattle('win'). Provides a clear win marker.
+
+### Cave / Dungeon
+
+- **Cave interior too empty and flat**: Grotte Sombre has simple grey corridors with no visual detail. Adding stalactite/stalagmite decorations, crystal formations, puddles, or rubble piles would make the cave atmospheric. A darkness/fog effect around the player would add immersion.
+
+### World Design
+
+- **No rival encounters on routes**: In classic Pokémon games, the rival appears at key story moments (leaving town, before gym, etc.) for mandatory battles that help with leveling. Currently, only wild Pokémon and optional trainers exist between gyms. Adding rival encounters would improve pacing and narrative.
+
+### Pokédex
+
+- **Pokédex captured indicator**: Captured Pokémon have a gold border but no Poké Ball icon. Adding a small Poké Ball icon in the corner of captured entries would make it instantly clear which Pokémon are caught vs just seen.
+
+- **Pokédex empty slots too dark**: The empty (#XXX) entries are very dark and the numbers hard to read. Slightly brighter text or a subtle outline would improve readability and give players a sense of how many remain.
+
+- **No scroll indicator in Pokédex**: With 150 entries in a grid, players need to scroll down. There's no visual indicator (scrollbar or "scroll down" arrow) to suggest more entries below the visible area.
+
+### NPCs / Overworld
+
+- ~~**NPCs not hidden by tall grass**~~ **Done (2026-03-29)**: Tall grass overlay now applies to ALL entities (player + NPCs) standing on TALL_GRASS tiles, not just the player. Uses entity position for blade rendering.

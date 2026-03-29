@@ -1455,7 +1455,8 @@ const UI = {
             const val = data.baseStats[key] || 0;
             const row = document.createElement('div');
             row.style.cssText = 'display:flex;align-items:center;margin-bottom:4px;font-size:11px;';
-            row.innerHTML = `<span style="width:45px;color:#aaa;">${label}</span><span style="width:30px;color:#fff;">${val}</span><div style="flex:1;height:6px;background:#222;border-radius:3px;overflow:hidden;"><div style="width:${Math.min(100, val / maxStat * 100)}%;height:100%;background:${val >= 100 ? '#4CAF50' : val >= 70 ? '#FF9800' : '#F44336'};border-radius:3px;"></div></div>`;
+            const statColor = val >= 100 ? '#4CAF50' : val >= 80 ? '#8BC34A' : val >= 60 ? '#FF9800' : val >= 40 ? '#F4511E' : '#F44336';
+            row.innerHTML = `<span style="width:45px;color:#aaa;">${label}</span><span style="width:30px;color:#fff;">${val}</span><div style="flex:1;height:8px;background:#333;border-radius:4px;overflow:hidden;"><div style="width:${Math.min(100, val / maxStat * 100)}%;height:100%;background:${statColor};border-radius:4px;"></div></div>`;
             card.appendChild(row);
         });
 

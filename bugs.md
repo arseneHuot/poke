@@ -887,7 +887,7 @@ The save does occur before the reload (correct behaviour), but the UX is jarring
 
 ---
 
-## Bug #50 - Duplicate event listeners accumulate when returning to title and starting a new game
+0
 **Status:** Fixed (2026-03-28)
 **Priority:** Major
 **Files:** js/engine.js, js/ui.js
@@ -1946,5 +1946,58 @@ const statusCured = pokemon.status && (
 **Root cause:** Feature never implemented in `_showPokemonDetail` or the party list.
 
 **Fix:** Added a "Déplacer" button in `_showPokemonDetail` (visible when party has ≥ 2 Pokémon). Clicking it calls the new `_showSwapPokemon(pokemon, fromIndex)` method, which renders the remaining party slots as click targets. Selecting one swaps the two Pokémon in `game.state.party` and returns to the party list.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #50 - Gym leader Pokémon HP not fully healed on re-challenge
+**Status:** Fixed (2026-03-29)
+**Priority:** Medium
+**File:** js/battle.js
+
+**Description:** When re-challenging a gym leader after a previous loss, the gym leader's Pokémon appear with the HP they had at the end of the previous battle instead of being fully healed. For example, after losing to Champion Marco's Rondelet (which was at 27/33 HP when it defeated the player), re-entering the battle shows Rondelet starting at 27/33 HP instead of 33/33.
+
+**Steps to reproduce:**
+1. Challenge a gym leader and deal some damage to their first Pokémon
+2. Lose the battle (whiteout)
+3. Return and re-challenge the same gym leader
+4. The leader's Pokémon starts with reduced HP from the previous battle
+
+**Root cause:** The trainer's `party` array (stored on the NPC object) retains the damaged HP values from the previous battle. `BattleSystem` uses `trainerNpc.party` directly without cloning or healing the Pokémon before the battle starts.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #51 - Enemy info panel shows fainted style after successful capture
+**Status:** Fixed (2026-03-29)
+**Priority:** Low
+**File:** js/battle.js (_updateUI)
+
+**Description:** When a wild Pokémon is successfully caught with a Poké Ball, the enemy info panel changes to the "fainted" visual style (dark red background, 50% opacity) even though the Pokémon was not KO'd — it was captured. The fainted style should only apply when HP reaches 0, not after capture.
+
+**Steps to reproduce:**
+1. Encounter a wild Pokémon
+2. Throw a Poké Ball and catch it
+3. The enemy info panel turns dark red/faded as if the Pokémon fainted
+
+**Root cause:** The `fainted` CSS class is applied based on `ep.currentHp <= 0` in `_updateUI`, but after a catch the enemy Pokémon's HP is still > 0 — however the `enemyAnim.alpha` is set to 0 (sprite hidden). The fainted check may be triggering from the alpha or some state inconsistency.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #52 - Pokédex stat bar color wrong for Vit stat
+**Status:** Fixed (2026-03-29)  
+**Priority:** Low
+**File:** js/ui.js (_showPokedexDetail)
+
+**Description:** In the Pokédex detail view, the Vitesse (Speed) stat bar appears dark grey instead of orange for a value of 80. The color coding should show orange for stats >= 70, but Vit 80 renders as grey/dark.
+
+**Steps to reproduce:**
+1. Open Pokédex, click on Flamberg (#002)
+2. Look at the Stats de base section
+3. Vit 80 bar is dark grey while Atq 78 is orange
 
 **Found:** 2026-03-29
