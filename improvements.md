@@ -276,7 +276,7 @@
 
 - ~~**Location name popup duration too short**~~ **Done (2026-03-29)**: Already implemented — `showLocationName` uses 3-second timeout with 0.5s CSS opacity transition. Verified in code.
 
-- **No "Continue" prompt between battle messages**: Battle messages auto-advance on a 1.5s timer. Adding a ▼ indicator and requiring Space/click to advance would give players control over battle pacing, especially for reading damage numbers and status messages.
+- ~~**No "Continue" prompt between battle messages**~~ **Done (2026-03-29)**: Battle messages now show a golden bouncing ▼ indicator and wait for Space/Enter/click to advance. Auto-advance fallback at 6 seconds. 300ms input delay prevents accidental skipping.
 
 ---
 

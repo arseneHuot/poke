@@ -415,7 +415,14 @@ const BattleSystem = {
     _showMessage(text) {
         this.state.message = text;
         const msgEl = document.getElementById('battle-message');
-        if (msgEl) msgEl.textContent = text;
+        if (msgEl) {
+            msgEl.textContent = text;
+            // Add ▼ indicator
+            const indicator = document.createElement('span');
+            indicator.textContent = ' ▼';
+            indicator.style.cssText = 'color:#FFD700;animation:bounce 0.8s infinite;font-size:12px;margin-left:6px;';
+            msgEl.appendChild(indicator);
+        }
     },
 
     _queueMessage(text, duration) {
@@ -1478,9 +1485,26 @@ const BattleSystem = {
         const msg = this.state.messageQueue.shift();
         this._showMessage(msg.text);
 
-        setTimeout(() => {
+        // Wait for user input (Space/click) to advance, with auto-advance fallback
+        const advance = () => {
+            document.removeEventListener('keydown', onKey);
+            const msgEl = document.getElementById('battle-message');
+            if (msgEl) msgEl.removeEventListener('click', onClick);
+            clearTimeout(autoTimer);
             this._processMessageQueue(callback);
-        }, msg.duration || 1500);
+        };
+        const onKey = (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); advance(); }
+        };
+        const onClick = () => advance();
+        // Delay before accepting input to prevent skipping messages too fast
+        setTimeout(() => {
+            document.addEventListener('keydown', onKey);
+            const msgEl = document.getElementById('battle-message');
+            if (msgEl) msgEl.addEventListener('click', onClick);
+        }, 300);
+        // Auto-advance fallback after 6 seconds if no input
+        const autoTimer = setTimeout(advance, 6000);
     },
 
     // ----------------------------------------------------------
