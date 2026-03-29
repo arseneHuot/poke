@@ -895,8 +895,10 @@ const UI = {
                     return;
                 }
                 pokemon.level = Math.min(100, pokemon.level + 1);
+                const oldMaxHp = pokemon.stats.hp;
                 recalcStats(pokemon);
-                pokemon.currentHp = pokemon.stats.hp;
+                const hpGain = pokemon.stats.hp - oldMaxHp;
+                pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);
                 used = true;
                 this.showNotification(data.name + ' passe au Nv.' + pokemon.level + ' !');
                 break;

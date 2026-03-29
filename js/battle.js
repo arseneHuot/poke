@@ -578,6 +578,9 @@ const BattleSystem = {
                 if (effect.status === 'freeze' && defender.types && defender.types.includes('ice')) break;
 
                 defender.status = effect.status;
+                if (effect.status === 'sleep') {
+                    defender._sleepTurns = Math.floor(Math.random() * 3) + 2; // 2-4 turns
+                }
                 const statusNames = {
                     burn: 'est brûlé !',
                     paralysis: 'est paralysé !',

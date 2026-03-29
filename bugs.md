@@ -1423,3 +1423,33 @@ const statusCured = pokemon.status && (
 **Fix:** Added `this._hideMenus()` at the start of `_handlePlayerFaint()` so menus are immediately cleared when a faint is detected, before the 1500ms message queue runs.
 
 **Found:** 2026-03-29
+
+---
+
+## Bug #78 - Sleep move applied via effect doesn't set _sleepTurns — target wakes up immediately
+**Status:** Fixed (2026-03-29)
+**Priority:** High
+**File:** js/battle.js (`_executeMove`)
+
+**Description:** Moves that apply the sleep status via `effect: { type: 'status', status: 'sleep' }` (e.g., Poudre Dodo, Hypnose) never set `_sleepTurns` on the target. In `_processStatusBeforeTurn`, the sleep case does `pokemon._sleepTurns = (pokemon._sleepTurns || 0) - 1`, which evaluates to `(0) - 1 = -1 ≤ 0`, causing the Pokémon to wake up immediately on the very next turn. Sleep moves are completely ineffective — the target always wakes up on its first turn.
+
+**Root cause:** In `_executeMove`, when `effect.type === 'status'`, the code sets `defender.status = effect.status` but does not set `defender._sleepTurns`. The only place `_sleepTurns` was previously set was in the Rest move handler (hardcoded to 3). All other sleep applications left `_sleepTurns` as `undefined`.
+
+**Fix:** Added `if (effect.status === 'sleep') { defender._sleepTurns = Math.floor(Math.random() * 3) + 2; }` immediately after `defender.status = effect.status` in the status effect handler. Sleep now lasts 2–4 turns as intended.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #79 - Level-up items (Bonbon Rare) fully restore HP instead of scaling proportionally
+**Status:** Fixed (2026-03-29)
+**Priority:** Minor
+**File:** js/ui.js (`_useItemOnPokemon`)
+
+**Description:** Using a level-up item on a damaged Pokémon in the overworld bag menu unconditionally set `pokemon.currentHp = pokemon.stats.hp` after the level-up — fully restoring HP to the new maximum. In standard Pokémon games, leveling up only heals the HP that was gained from the stat increase, not the full bar. A Pokémon at 5/50 HP that levels up to a 55 HP max should end up at 10/55, not 55/55.
+
+**Root cause:** `js/ui.js` `_useItemOnPokemon` levelup case: `pokemon.currentHp = pokemon.stats.hp;` — sets to max unconditionally, unlike the `addExp()` function in `pokemon-data.js` which correctly computes `hpGain = newMax - oldMax` and adds only that amount.
+
+**Fix:** Changed to save the old max HP before `recalcStats`, compute the HP gain, then apply it proportionally: `pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);`
+
+**Found:** 2026-03-29
