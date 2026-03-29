@@ -1092,13 +1092,21 @@ function addExp(pokemon, amount) {
     while (pokemon.level < 100) {
         const nextLevelExp = expGroup(pokemon.level + 1);
         if (pokemon.exp >= nextLevelExp) {
-            const oldHp = pokemon.stats.hp;
+            const oldStats = { ...pokemon.stats };
             pokemon.level++;
             recalcStats(pokemon);
-            const hpGain = pokemon.stats.hp - oldHp;
+            const hpGain = pokemon.stats.hp - oldStats.hp;
             pokemon.currentHp = Math.min(pokemon.currentHp + hpGain, pokemon.stats.hp);
 
-            events.push({ type: 'levelup', level: pokemon.level });
+            const statGains = {
+                hp: pokemon.stats.hp - oldStats.hp,
+                atk: pokemon.stats.atk - oldStats.atk,
+                def: pokemon.stats.def - oldStats.def,
+                spatk: pokemon.stats.spatk - oldStats.spatk,
+                spdef: pokemon.stats.spdef - oldStats.spdef,
+                spd: pokemon.stats.spd - oldStats.spd
+            };
+            events.push({ type: 'levelup', level: pokemon.level, statGains });
 
             // Check for new moves
             const learnset = data.learnset;

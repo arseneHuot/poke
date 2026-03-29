@@ -73,7 +73,11 @@ const BattleSystem = {
     startWildBattle(wildPokemon) {
         const party = game.state.party;
         const lead = party.find(p => p && p.currentHp > 0);
-        if (!lead) return;
+        if (!lead) {
+            // All Pokémon fainted — trigger whiteout instead of starting an unwinnable battle
+            game.endBattle('lose');
+            return;
+        }
         this.state.isTrainer = false;
         this.state.trainerNpc = null;
         this._hideMenus();
@@ -85,7 +89,11 @@ const BattleSystem = {
     startTrainerBattle(trainerNpc) {
         const party = game.state.party;
         const lead = party.find(p => p && p.currentHp > 0);
-        if (!lead) return;
+        if (!lead) {
+            // All Pokémon fainted — trigger whiteout instead of starting an unwinnable battle
+            game.endBattle('lose');
+            return;
+        }
 
         this._hideMenus();
         this.state.isTrainer = true;
@@ -231,7 +239,8 @@ const BattleSystem = {
         pp.moves.forEach((move, index) => {
             const moveData = MOVES_DB[move.id];
             if (!moveData) return;
-            const ppLeft = (moveData.pp || 10) - (move.ppUsed || 0);
+            const totalPP = moveData.pp || 10;
+            const ppLeft = totalPP - (move.ppUsed || 0);
             const btn = document.createElement('button');
             btn.className = 'battle-btn move-btn';
             const typeColor = TYPE_COLORS[moveData.type] || '#888';
@@ -239,7 +248,9 @@ const BattleSystem = {
             btn.style.borderLeft = `4px solid ${typeColor}`;
             const powerStr = moveData.power > 0 ? moveData.power : '—';
             const accStr = moveData.accuracy < 100 ? moveData.accuracy + '%' : '100%';
-            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:${typeColor};color:#fff;margin-left:6px;">${typeName}</span><span class="move-info">PP ${ppLeft}/${moveData.pp || 10} | Pw: ${powerStr} | Préc: ${accStr}</span>`;
+            const ppWarnColor = ppLeft <= 0 ? '#ff4444' : ppLeft <= Math.ceil(totalPP / 4) ? '#ff8800' : '';
+            const ppStyle = ppWarnColor ? `style="color:${ppWarnColor};font-weight:bold;"` : '';
+            btn.innerHTML = `<span class="move-name">${moveData.name}</span><span class="move-type-badge" style="font-size:10px;padding:1px 6px;border-radius:8px;background:${typeColor};color:#fff;margin-left:6px;">${typeName}</span><span class="move-info"><span ${ppStyle}>PP ${ppLeft}/${totalPP}</span> | Pw: ${powerStr} | Préc: ${accStr}</span>`;
             btn.disabled = ppLeft <= 0;
             btn.addEventListener('click', () => {
                 AudioSystem.playSfx('confirm');
@@ -1126,6 +1137,17 @@ const BattleSystem = {
             if (evt.type === 'levelup') {
                 AudioSystem.playSfx('levelup');
                 this._queueMessage(`${this.state.playerPokemon.nickname || this.state.playerPokemon.name} monte au niveau ${evt.level} !`);
+                if (evt.statGains) {
+                    const g = evt.statGains;
+                    const parts = [];
+                    if (g.hp > 0) parts.push(`+${g.hp} PV`);
+                    if (g.atk > 0) parts.push(`+${g.atk} Atq`);
+                    if (g.def > 0) parts.push(`+${g.def} Déf`);
+                    if (g.spatk > 0) parts.push(`+${g.spatk} AtqS`);
+                    if (g.spdef > 0) parts.push(`+${g.spdef} DéfS`);
+                    if (g.spd > 0) parts.push(`+${g.spd} Vit`);
+                    if (parts.length > 0) this._queueMessage(parts.join(' / '));
+                }
             } else if (evt.type === 'newmove') {
                 const md = MOVES_DB[evt.move];
                 this._queueMessage(`${this.state.playerPokemon.nickname || this.state.playerPokemon.name} apprend ${md ? md.name : evt.move} !`);

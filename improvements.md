@@ -203,3 +203,27 @@
 
 - ~~**Rivalta accessible without badge_1**~~ **Done (2026-03-29)**: Fixed warp connections — Porto's north now leads to Campoverde (badge_1, Flora) instead of directly to Route 3. Campoverde gains a south exit back to Porto. Route 3's south exits now target Campoverde instead of Porto. Correct progression: Porto → Campoverde (badge_1) → Route 3 → Rivalta (badge_2/3). The cave path (Porto → Route 2 → Grotte Sombre → Campoverde east) remains as an alternative route.
 
+---
+
+## New Suggestions (2026-03-29 QA session #7 — Shops, Battles, Evolution, UX)
+
+### Battle
+
+- ~~**Guard against starting battle with fully-fainted party**~~ **Done (2026-03-29)**: `startWildBattle` and `startTrainerBattle` now call `game.endBattle('lose')` (whiteout) when no alive Pokémon found instead of returning silently. See Bug #88 fix.
+
+- ~~**Show level-up stat changes in battle**~~ **Done (2026-03-29)**: `addExp` now includes `statGains` in the `levelup` event. Battle handler queues a "+N PV / +N Atq / ..." message after the level-up notification.
+
+- ~~**Move PP warning colour**~~ **Done (2026-03-29)**: PP count in move buttons turns orange when ≤ 25% PP remaining, red when 0 PP. Applied via inline `color` style on the PP span in `_showMoves`.
+
+### Shop / UX
+
+- **Quantity selector for bulk purchases**: Currently the shop only buys 1 item per click. Add a quantity selector (e.g. +1/+5/+10 buttons or a number input) to allow buying multiple items at once.
+
+- **Confirm dialog before selling**: Add a brief "Vendre [item] pour [N] PO ?" confirmation step before completing a sale, to prevent accidental sells.
+
+### Overworld / UX
+
+- **Run animation / footstep sound**: Play a subtle "step" SFX every tile the player moves on different terrain types (grass rustle on TALL_GRASS, stone tap on PATH, etc.) for audio feedback while walking.
+
+- **Pokémon following the player**: Show the first party Pokémon as a small sprite following one tile behind the player in the overworld. Classic QoL feature from HeartGold/SoulSilver.
+

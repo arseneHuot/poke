@@ -1580,7 +1580,7 @@ const statusCured = pokemon.status && (
 
 ---
 
-## Bug #85 - Battle bag item use leaves zero-quantity entries in bag on save
+## Bug #87 - Battle bag item use leaves zero-quantity entries in bag on save
 **Status:** Fixed (2026-03-29)
 **Priority:** Minor
 **File:** js/battle.js (`selectItem`, `_showReviveTarget`)
@@ -1590,5 +1590,29 @@ const statusCured = pokemon.status && (
 **Root cause:** `selectItem` (heal, status, ball cases) and `_showReviveTarget` (revive click handler) all decrement `game.state.bag[itemId]--` without a subsequent cleanup.
 
 **Fix:** Added `if (game.state.bag[itemId] <= 0) delete game.state.bag[itemId];` after each bag decrement in `selectItem` and the revive handler in `_showReviveTarget`.
+
+**Found:** 2026-03-29
+
+---
+
+## Bug #88 - Wild battle starts with fainted (0 HP) lead Pokémon — all action buttons enabled
+**Status:** Fixed (2026-03-29)
+**Priority:** High
+**File:** js/battle.js (`startWildBattle`), js/main.js (`startBattle`)
+
+**Description:** If all party Pokémon are fainted and a wild encounter triggers (or is triggered programmatically), the battle starts with the first party slot as `playerPokemon` regardless of its `currentHp`. The battle UI renders normally — ATTAQUE, SAC, POKÉMON, FUITE buttons all enabled — and the fainted Pokémon can attempt to use moves. No immediate whiteout is triggered, and no forced-switch prompt appears.
+
+**Steps to reproduce:**
+1. Faint all party Pokémon (set all `currentHp = 0`)
+2. Walk through tall grass to trigger a wild encounter
+3. Battle starts with the first party slot displayed — HP shows 0/MAX
+4. All action buttons are active; clicking ATTAQUE shows that Pokémon's move list
+
+**Expected:** If all Pokémon are fainted, the game should not allow a new battle to start. It should either block the encounter and trigger the whiteout sequence, or immediately execute the whiteout when the battle initialises.
+**Actual:** Battle starts normally with a 0 HP Pokémon as the active combatant.
+
+**Root cause:** Neither `startWildBattle` nor `game.startBattle()` validates whether the first party Pokémon (or any party Pokémon) has `currentHp > 0` before initialising the battle. The whiteout check only fires after a Pokémon faints during battle, not before it begins.
+
+**Fix:** Added whiteout trigger in both `startWildBattle` and `startTrainerBattle`: when `party.find(p => p && p.currentHp > 0)` returns null, call `game.endBattle('lose')` immediately instead of returning silently. This heals the party, warps to the last safe map, and deducts half money — same as a normal whiteout.
 
 **Found:** 2026-03-29
